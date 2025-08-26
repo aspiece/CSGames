@@ -1,4 +1,4 @@
-Date (YYYY-MM-DD),Event (No School / Half Day / Holiday / PD),School
+Date,Event,School
 2025-08-25,First Day (Half Day),Clio Schools
 2025-08-28,No School,Clio Schools
 2025-08-29,No School,Clio Schools
@@ -832,4 +832,5 @@ Date (YYYY-MM-DD),Event (No School / Half Day / Holiday / PD),School
 2026-06-02,Half Day,Powers Catholic High School
 2026-06-03,Half Day,Powers Catholic High School
 2026-06-04,Half Day,Powers Catholic High School
+
 
