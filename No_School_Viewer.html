@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GCI • Weekdays‑Only No‑School Viewer</title>
+  <style>
+    :root{
+      --bg:#f8fafc; --panel:#ffffff; --muted:#64748b; --text:#0f172a; --border:#e2e8f0;
+      --blue:#2563eb; --blue-50:#eff6ff; --blue-200:#bfdbfe; --blue-300:#93c5fd;
+      --red-100:#fee2e2; --red-800:#991b1b; --red-200:#fecaca;
+      --yellow-100:#fef9c3; --yellow-800:#854d0e; --yellow-200:#fef08a;
+      --green-100:#dcfce7; --green-800:#166534; --green-200:#bbf7d0;
+      --indigo-100:#e0e7ff; --indigo-800:#3730a3; --indigo-200:#c7d2fe;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--text);font:14px/1.4 system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+    .container{max-width:1100px;margin:0 auto;padding:20px}
+    h1{font-size:22px;margin:0 0 6px}
+    .muted{color:var(--muted)}
+    .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    .btn{border:1px solid var(--border);background:#fff;border-radius:10px;padding:8px 12px;cursor:pointer}
+    .btn:hover{background:#f8fafc}
+    .panel{background:var(--panel);border:1px solid var(--border);border-radius:16px;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+    .p-4{padding:16px}
+    input,select{height:36px;border:1px solid var(--border);border-radius:10px;padding:0 10px;background:#fff}
+    .grid-3{display:grid;grid-template-columns:1fr;gap:12px}
+    @media(min-width:900px){.grid-3{grid-template-columns:1fr 1fr 1fr}}
+    .day{border:1px solid var(--border);border-radius:10px;padding:8px;background:#fff}
+    .day.today{background:var(--blue-50);border-color:var(--blue-300)}
+    .badge{display:inline-block;border:1px solid var(--border);border-radius:8px;padding:2px 6px;font-size:11px}
+    .badge.red{background:var(--red-100);color:var(--red-800);border-color:var(--red-200)}
+    .badge.yellow{background:var(--yellow-100);color:var(--yellow-800);border-color:var(--yellow-200)}
+    .badge.green{background:var(--green-100);color:var(--green-800);border-color:var(--green-200)}
+    .badge.indigo{background:var(--indigo-100);color:var(--indigo-800);border-color:var(--indigo-200)}
+    .week-title{font-weight:600;font-size:13px}
+    .chip-more{border:1px solid var(--border);background:#f8fafc;border-radius:8px;padding:2px 6px;font-size:11px}
+    .legend{display:flex;gap:8px;flex-wrap:wrap}
+    .legend .badge{cursor:default}
+    .header{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;margin-bottom:10px}
+    .filters{display:flex;gap:10px;flex-wrap:wrap}
+    .footer{color:var(--muted);font-size:12px;margin-top:16px}
+    /* Month Snapshot (Mon–Fri only) */
+    .month{margin-top:14px}
+    .weekday-head{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;text-align:center;color:var(--muted);font-size:11px;text-transform:uppercase;margin:6px 0}
+    .month-grid{display:flex;flex-direction:column;gap:8px}
+    .week-row{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+    .month-cell{min-height:90px;border:1px solid var(--border);border-radius:12px;padding:8px;background:#fff}
+    .month-cell.current{outline:2px solid var(--blue-300)}
+    .cell-top{display:flex;justify-content:space-between;color:var(--muted);font-size:11px;margin-bottom:6px}
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+  </style>
+  <!-- Libraries (small, reliable CDNs) -->
+  <script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dayjs@1/plugin/isBetween.js"></script>
+  <script>dayjs.extend(window.dayjs_plugin_isBetween)</script>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div>
+        <h1>GCI • Weekly No‑School Focus (Weekdays Only)</h1>
+        <div class="muted">Shows last, current, and next week (Mon–Fri). Auto‑updates from your master sheet.</div>
+      </div>
+      <div class="row">
+        <button id="btn-today" class="btn" title="Jump to current week">Today</button>
+        <button id="btn-refresh" class="btn" title="Refresh now">Refresh</button>
+      </div>
+    </div>
+
+    <div class="panel p-4">
+      <div class="filters">
+        <input id="search" type="search" placeholder="Search school, event, notes…" style="flex:1;min-width:220px" />
+        <select id="schoolSel" style="min-width:220px"></select>
+        <select id="eventSel" style="min-width:180px"></select>
+      </div>
+    </div>
+
+    <div id="weeks" class="grid-3" style="margin-top:12px"></div>
+
+    <div class="month panel p-4">
+      <div class="row" style="justify-content:space-between;margin-bottom:6px">
+        <div class="row muted"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <span id="monthLabel" class="week-title"></span></div>
+        <div class="row">
+          <button id="prevWeek" class="btn" title="Previous week">◀ Previous</button>
+          <button id="nextWeek" class="btn" title="Next week">Next ▶</button>
+        </div>
+      </div>
+      <div class="weekday-head">
+        <div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div>
+      </div>
+      <div id="monthGrid" class="month-grid"></div>
+    </div>
+
+    <div class="footer">
+      Data source: <code id="dataUrlEcho"></code> • Auto‑refresh every <span id="refreshEcho"></span> min • Week start: Monday
+    </div>
+  </div>
+
+  <script>
+  // ===================== CONFIG =====================
+  const CONFIG = {
+    // TODO: paste your published CSV URL here (same-origin with host is ideal in Teams)
+    DATA_URL: "",
+    REFRESH_MS: 15 * 60 * 1000, // 15 minutes
+    WEEK_START: "monday", // fixed to Monday for Mon–Fri viewer
+  };
+
+  // Sample CSV fallback (used if DATA_URL is empty or fetch fails)
+  const SAMPLE_CSV = `Date,Event,School Name,Notes\n2025-08-25,No School,Fenton High School,Teacher Work Day\n2025-09-01,Holiday,All Schools,Labor Day\n2025-09-18,Half Day,Beecher High School,Parent Conferences\n2025-08-27,No School,Lake Fenton High School,PD Day`;
+
+  // Color map for badges
+  const EVENT_CLASS = {
+    "No School": "badge red",
+    "Half Day": "badge yellow",
+    "Holiday": "badge green",
+    "Teacher PD": "badge indigo",
+  };
+
+  // ===================== STATE =====================
+  let RAW_ROWS = []; // {date: dayjs, event, school, notes}
+  let FILTERED = [];
+  let ANCHOR_DAY = dayjs(); // base day for current/prev/next
+
+  // If user visits on Sat/Sun, snap to upcoming Monday by default
+  if ([0,6].includes(ANCHOR_DAY.day())) {
+    ANCHOR_DAY = nextMonday(ANCHOR_DAY);
+  }
+
+  // ===================== HELPERS =====================
+  function startOfWeek(d){
+    const target = 1; // Monday
+    const wd = d.day();
+    const offset = (wd - target + 7) % 7;
+    return d.subtract(offset, 'day').startOf('day');
+  }
+  function endOfWeek(d){
+    return startOfWeek(d).add(6, 'day').endOf('day');
+  }
+  function getWeekdays(weekStart){
+    return Array.from({length:5}).map((_,i)=>weekStart.add(i,'day'));
+  }
+  function nextMonday(d){
+    const wd = d.day();
+    const delta = (8 - wd) % 7 || 7; // move to next Monday
+    return d.add(delta,'day').startOf('day');
+  }
+  function fmt(d, pat){ return d.format(pat); }
+
+  function parseCsvToRows(csv){
+    const out=[];
+    const parsed = Papa.parse(csv, { header:true, skipEmptyLines:true });
+    const headers = parsed.meta.fields || [];
+    const col = {
+      date: findHeader(headers,["Date","date"]) ,
+      event: findHeader(headers,["Event","Type","Event (No School / Half Day / Holiday / Teacher PD)","Event Type"]) ,
+      school: findHeader(headers,["School Name","School","District","Building"]) ,
+      notes: findHeader(headers,["Notes","Description","Reason"]) ,
+    };
+    for(const r of parsed.data){
+      const dateStr = (r[col.date]||'').trim();
+      const event = (r[col.event]||'').trim();
+      const school= (r[col.school]||'').trim();
+      const notes = (r[col.notes]||'').trim();
+      const d = dayjs(dateStr);
+      if(!d.isValid() || !event || !school) continue;
+      out.push({ date:d.startOf('day'), event, school, notes });
+    }
+    out.sort((a,b)=>a.date.valueOf()-b.date.valueOf());
+    return out;
+  }
+  function findHeader(headers,cands){
+    const norm = s=>String(s||'').trim().toLowerCase();
+    for(const c of cands){
+      const hit = headers.find(h=>norm(h)===norm(c));
+      if(hit) return hit;
+    }
+    return cands[0];
+  }
+  function groupByDate(rows){
+    const map={};
+    for(const r of rows){
+      const k = fmt(r.date,'YYYY-MM-DD');
+      (map[k]||(map[k]=[])).push(r);
+    }
+    return map;
+  }
+
+  function applyFilters(){
+    const q = document.getElementById('search').value.toLowerCase();
+    const school = document.getElementById('schoolSel').value;
+    const eventT = document.getElementById('eventSel').value;
+    FILTERED = RAW_ROWS.filter(r=>{
+      const matchesQ = [r.school,r.event,r.notes||''].some(s=>s.toLowerCase().includes(q));
+      const matchesSchool = (school==='all' || r.school===school);
+      const matchesEvent = (eventT==='all' || r.event===eventT);
+      return matchesQ && matchesSchool && matchesEvent;
+    });
+  }
+
+  // ===================== RENDER =====================
+  function render(){
+    applyFilters();
+    renderWeeks();
+    renderMonth();
+  }
+
+  function renderWeeks(){
+    const byDate = groupByDate(FILTERED);
+    const currStart = startOfWeek(ANCHOR_DAY);
+    const prevStart = currStart.subtract(7,'day');
+    const nextStart = currStart.add(7,'day');
+
+    const weeksEl = document.getElementById('weeks');
+    weeksEl.innerHTML='';
+
+    const blocks = [
+      { label:'Last week', start:prevStart, muted:true },
+      { label:'This week', start:currStart, highlight:true },
+      { label:'Next week', start:nextStart, muted:true },
+    ];
+
+    for(const b of blocks){
+      const card = document.createElement('div');
+      card.className='panel p-4';
+      if(b.highlight) card.style.outline = '2px solid var(--blue-300)';
+
+      const weekEnd = b.start.add(4,'day');
+      const title = `${fmt(b.start,'MMM D')} – ${fmt(weekEnd,'MMM D')}`;
+
+      const header = document.createElement('div');
+      header.className='row';
+      header.style.justifyContent='space-between';
+      header.innerHTML = `<div><div class="muted" style="text-transform:uppercase;font-size:11px">${b.label}</div><div class="week-title">${title}</div></div>`;
+      card.appendChild(header);
+
+      const daysWrap = document.createElement('div');
+      daysWrap.style.display='flex';
+      daysWrap.style.flexDirection='column';
+      daysWrap.style.gap='8px';
+
+      for(const d of getWeekdays(b.start)){
+        const key = fmt(d,'YYYY-MM-DD');
+        const list = byDate[key] || [];
+        const dayDiv = document.createElement('div');
+        dayDiv.className = 'day' + (d.isSame(dayjs(),'day') ? ' today' : '');
+        const count = `${list.length} event${list.length===1?'':'s'}`;
+        const top = document.createElement('div');
+        top.className='row';
+        top.style.justifyContent='space-between';
+        top.innerHTML = `<div style="font-size:12px;font-weight:600;color:#334155">${fmt(d,'ddd, MMM D')}</div><div class="muted" style="font-size:11px">${count}</div>`;
+        dayDiv.appendChild(top);
+        const chips = document.createElement('div');
+        chips.style.display='flex';chips.style.flexWrap='wrap';chips.style.gap='6px';
+        for(const [i,it] of list.slice(0,6).entries()){
+          const span = document.createElement('span');
+          span.className = (EVENT_CLASS[it.event]||'badge');
+          span.title = `${it.event} • ${it.school}${it.notes? ' — '+it.notes: ''}`;
+          span.textContent = `${it.event} · ${it.school}`;
+          chips.appendChild(span);
+        }
+        if(list.length>6){
+          const more = document.createElement('span');
+          more.className='chip-more';
+          more.textContent = `+${list.length-6} more`;
+          chips.appendChild(more);
+        }
+        dayDiv.appendChild(chips);
+        daysWrap.appendChild(dayDiv);
+      }
+
+      card.appendChild(daysWrap);
+      weeksEl.appendChild(card);
+    }
+  }
+
+  function renderMonth(){
+    const byDate = groupByDate(FILTERED);
+    const monthCursor = ANCHOR_DAY;
+    document.getElementById('monthLabel').textContent = monthCursor.format('MMMM YYYY');
+
+    // Build Monday-start grid for whole month, but only keep Mon–Fri cells
+    const monthStart = monthCursor.startOf('month');
+    const monthEnd = monthCursor.endOf('month');
+    const gridStart = startOfWeek(monthStart);
+    const gridEnd = endOfWeek(monthEnd);
+
+    const allDays=[]; for(let d=gridStart; d.isBefore(gridEnd) || d.isSame(gridEnd,'day'); d=d.add(1,'day')) allDays.push(d);
+
+    const weeks=[];
+    for(let i=0;i<allDays.length;i+=7){
+      const chunk = allDays.slice(i,i+7);
+      const weekdays = chunk.filter(dd=>dd.day()>=1 && dd.day()<=5);
+      weeks.push(weekdays);
+    }
+
+    const currStart = startOfWeek(ANCHOR_DAY);
+    const currEnd = currStart.add(4,'day');
+
+    const gridEl = document.getElementById('monthGrid');
+    gridEl.innerHTML='';
+
+    for(const week of weeks){
+      const row = document.createElement('div');
+      row.className='week-row';
+      for(const d of week){
+        const key = fmt(d,'YYYY-MM-DD');
+        const items = byDate[key]||[];
+        const cell = document.createElement('div');
+        cell.className='month-cell';
+        if(d.isBetween(currStart,currEnd,'day','[]')) cell.classList.add('current');
+        if(d.month()!==monthCursor.month()){ cell.style.opacity='.65'; cell.style.background='#f8fafc'; }
+        const top = document.createElement('div');
+        top.className='cell-top';
+        const todayTag = d.isSame(dayjs(),'day') ? '<span style="background:var(--blue-200);color:#1e40af;border-radius:6px;padding:0 4px">Today</span>' : '';
+        top.innerHTML = `<span>${d.date()}</span>${todayTag}`;
+        cell.appendChild(top);
+        for(const it of items.slice(0,3)){
+          const div = document.createElement('div');
+          div.className = (EVENT_CLASS[it.event]||'badge');
+          div.style.display='block';
+          div.style.marginBottom='4px';
+          div.title = `${it.event} • ${it.school}${it.notes? ' — '+it.notes: ''}`;
+          div.textContent = `${it.event} · ${it.school}`;
+          cell.appendChild(div);
+        }
+        if(items.length>3){
+          const more = document.createElement('div');
+          more.className='muted'; more.style.fontSize='11px';
+          more.textContent = `+${items.length-3} more…`;
+          cell.appendChild(more);
+        }
+        row.appendChild(cell);
+      }
+      gridEl.appendChild(row);
+    }
+  }
+
+  // ===================== DATA LOAD =====================
+  async function load(){
+    document.getElementById('dataUrlEcho').textContent = CONFIG.DATA_URL || '(sample data)';
+    document.getElementById('refreshEcho').textContent = Math.round(CONFIG.REFRESH_MS/60000);
+
+    try{
+      let csvText = SAMPLE_CSV;
+      if(CONFIG.DATA_URL){
+        const res = await fetch(CONFIG.DATA_URL, { cache:'no-store' });
+        if(!res.ok) throw new Error('fetch '+res.status);
+        csvText = await res.text();
+      }
+      RAW_ROWS = parseCsvToRows(csvText);
+      populateFilters(RAW_ROWS);
+      render();
+    }catch(err){
+      console.warn('CSV fetch failed, using sample:', err);
+      RAW_ROWS = parseCsvToRows(SAMPLE_CSV);
+      populateFilters(RAW_ROWS);
+      render();
+    }
+  }
+
+  function populateFilters(rows){
+    const schoolSel = document.getElementById('schoolSel');
+    const eventSel = document.getElementById('eventSel');
+    const schools = Array.from(new Set(rows.map(r=>r.school))).sort();
+    const events = Array.from(new Set(rows.map(r=>r.event))).sort();
+
+    schoolSel.innerHTML = '<option value="all">All schools</option>' + schools.map(s=>`<option>${s}</option>`).join('');
+    eventSel.innerHTML = '<option value="all">All types</option>' + events.map(e=>`<option>${e}</option>`).join('');
+  }
+
+  // ===================== INTERACTIONS =====================
+  document.getElementById('btn-refresh').addEventListener('click', load);
+  document.getElementById('btn-today').addEventListener('click', ()=>{ ANCHOR_DAY = dayjs(); if([0,6].includes(ANCHOR_DAY.day())) ANCHOR_DAY = nextMonday(ANCHOR_DAY); render(); });
+  document.getElementById('prevWeek').addEventListener('click', ()=>{ ANCHOR_DAY = startOfWeek(ANCHOR_DAY).subtract(7,'day'); render(); });
+  document.getElementById('nextWeek').addEventListener('click', ()=>{ ANCHOR_DAY = startOfWeek(ANCHOR_DAY).add(7,'day'); render(); });
+  document.getElementById('search').addEventListener('input', render);
+  document.getElementById('schoolSel').addEventListener('change', render);
+  document.getElementById('eventSel').addEventListener('change', render);
+
+  // Auto-refresh
+  setInterval(load, CONFIG.REFRESH_MS);
+
+  // ===================== SELF-TESTS (console) =====================
+  (function selfTests(){
+    const tests=[];
+    const d1 = dayjs('2025-08-27'); // Wed
+    const wMon = startOfWeek(d1);
+    tests.push(['startOfWeek Monday', wMon.format('YYYY-MM-DD')==='2025-08-25']);
+    const fri = wMon.add(4,'day');
+    tests.push(['Mon–Fri end Friday', fri.format('YYYY-MM-DD')==='2025-08-29']);
+    const weekdays = getWeekdays(wMon);
+    tests.push(['Weekdays length=5', weekdays.length===5]);
+    tests.push(['Weekdays Mon..Fri', weekdays[0].day()===1 && weekdays[4].day()===5]);
+    console.groupCollapsed('GCI Weekdays‑Only • Self‑tests');
+    for(const [name,pass] of tests){ console.log((pass?'✅':'❌'), name); }
+    const all = tests.every(t=>t[1]); console.log(all?'All tests passed':'Some tests failed');
+    console.groupEnd();
+  })();
+
+  // Kick things off
+  load();
+  </script>
+</body>
+</html>
