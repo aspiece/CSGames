@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>GCI • Weekdays‑Only No‑School Viewer</title>
+  <title>Home School No School Viewer</title>
   <style>
     :root{
       --bg:#f8fafc; --panel:#ffffff; --muted:#64748b; --text:#0f172a; --border:#e2e8f0;
@@ -54,13 +54,15 @@
   <script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/dayjs@1/plugin/isBetween.js"></script>
   <script>dayjs.extend(window.dayjs_plugin_isBetween)</script>
+  <script src="https://cdn.jsdelivr.net/npm/dayjs@1/plugin/customParseFormat.js"></script>
+  <script>dayjs.extend(window.dayjs_plugin_customParseFormat)</script>
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 </head>
 <body>
   <div class="container">
     <div class="header">
       <div>
-        <h1>GCI • Weekly No‑School Focus (Weekdays Only)</h1>
+        <h1>Home School No School Viewer</h1>
         <div class="muted">Shows last, current, and next week (Mon–Fri). Auto‑updates from your master sheet.</div>
       </div>
       <div class="row">
@@ -118,6 +120,40 @@
     "Holiday": "badge green",
     "Teacher PD": "badge indigo",
   };
+  function classForEvent(name){
+    const n = String(name||"").toLowerCase();
+    if(n.includes("no school")) return "badge red";
+    if(n.includes("half") && n.includes("day")) return "badge yellow";
+    if(n.includes("holiday")) return "badge green";
+    if(n.includes("pd") || n.includes("professional") || n.includes("teacher")) return "badge indigo";
+    return EVENT_CLASS[name] || "badge";
+  }
+
+  // ==== School color mapping (unique color per school) ====
+  function hashHue(str){
+    let h = 0;
+    for(let i=0;i<str.length;i++) h = (h*31 + str.charCodeAt(i)) % 360;
+    return h;
+  }
+  function schoolColors(name){
+    const n = String(name||"").toLowerCase();
+    // Special handling for roll‑ups
+    if(n.includes("all school")){
+      return { bg: 'var(--blue-50)', border: 'var(--blue-300)', text: '#1e40af' };
+    }
+    const h = hashHue(name);
+    // Pastel background with readable text/border
+    const bg = `hsl(${h}, 95%, 90%)`;
+    const border = `hsl(${h}, 70%, 75%)`;
+    const text = `hsl(${h}, 45%, 25%)`;
+    return { bg, border, text };
+  }
+  function applySchoolColor(el, school){
+    const c = schoolColors(school);
+    el.style.backgroundColor = c.bg;
+    el.style.borderColor = c.border;
+    el.style.color = c.text;
+  }
 
   // ===================== STATE =====================
   let RAW_ROWS = []; // {date: dayjs, event, school, notes}
@@ -149,35 +185,74 @@
   }
   function fmt(d, pat){ return d.format(pat); }
 
+  function parseDateFlexible(v){
+    if(v==null) return null;
+    const s = String(v).trim();
+    if(!s) return null;
+    // Try fast paths
+    let d = dayjs(s);
+    if(d.isValid()) return d;
+    const formats = ['M/D/YYYY','MM/DD/YYYY','M/D/YY','MMM D, YYYY','MMMM D, YYYY','YYYY-MM-DD'];
+    for(const f of formats){ d = dayjs(s, f, true); if(d.isValid()) return d; }
+    if(/^\d{4,6}$/.test(s)){ const serial = parseInt(s,10); const excelEpoch = dayjs('1899-12-30'); return excelEpoch.add(serial,'day'); }
+    return null;
+  }
   function parseCsvToRows(csv){
     const out=[];
     const parsed = Papa.parse(csv, { header:true, skipEmptyLines:true });
     const headers = parsed.meta.fields || [];
     const col = {
-      date: findHeader(headers,["Date","date"]) ,
-      event: findHeader(headers,["Event","Type","Event (No School / Half Day / Holiday / Teacher PD)","Event Type"]) ,
-      school: findHeader(headers,["School Name","School","District","Building"]) ,
-      notes: findHeader(headers,["Notes","Description","Reason"]) ,
+      date: findHeader(headers,[
+        "Date","date","Start Date","Start","Event Date","Date (YYYY-MM-DD)"
+      ],["date","start"]),
+      event: findHeader(headers,[
+        "Event","Type","Event (No School / Half Day / Holiday / Teacher PD)",
+        "Event (No School / Half Day / Holiday / PD)",
+        "Event Type","Event Name","Category","Title"
+      ],["event","type","category","title"]),
+      school: findHeader(headers,[
+        "School Name","School","District","Building","School District"
+      ],["school","district","building"]),
+      notes: findHeader(headers,[
+        "Notes","Description","Reason","Details"
+      ],["note","desc","reason","detail","description"]),
     };
     for(const r of parsed.data){
       const dateStr = (r[col.date]||'').trim();
       const event = (r[col.event]||'').trim();
       const school= (r[col.school]||'').trim();
       const notes = (r[col.notes]||'').trim();
-      const d = dayjs(dateStr);
+      const d = parseDateFlexible(dateStr) || dayjs(dateStr);
       if(!d.isValid() || !event || !school) continue;
       out.push({ date:d.startOf('day'), event, school, notes });
     }
     out.sort((a,b)=>a.date.valueOf()-b.date.valueOf());
     return out;
   }
-  function findHeader(headers,cands){
-    const norm = s=>String(s||'').trim().toLowerCase();
+  function findHeader(headers, cands, hints){
+    const norm = s => String(s||'').trim().toLowerCase();
+    const simplify = s => norm(s)
+      .replace(/\(.*?\)/g, '')      // drop parenthetical hints
+      .replace(/[^a-z0-9]/g, '');     // strip non-alphanumerics
+    // 1) exact or simplified matches
     for(const c of cands){
-      const hit = headers.find(h=>norm(h)===norm(c));
+      const sc = simplify(c);
+      const hit = headers.find(h => {
+        const sh = simplify(h);
+        return sh === sc || sh.includes(sc) || sc.includes(sh);
+      });
       if(hit) return hit;
     }
-    return cands[0];
+    // 2) keyword hints (contains)
+    if (hints && hints.length){
+      const hs = hints.map(simplify);
+      for(const h of headers){
+        const sh = simplify(h);
+        if (hs.some(k => sh.includes(k))) return h;
+      }
+    }
+    // 3) fallback
+    return headers[0] || cands[0];
   }
   function groupByDate(rows){
     const map={};
@@ -256,7 +331,8 @@
         chips.style.display='flex';chips.style.flexWrap='wrap';chips.style.gap='6px';
         for(const [i,it] of list.slice(0,6).entries()){
           const span = document.createElement('span');
-          span.className = (EVENT_CLASS[it.event]||'badge');
+          span.className = 'badge';
+          applySchoolColor(span, it.school);
           span.title = `${it.event} • ${it.school}${it.notes? ' — '+it.notes: ''}`;
           span.textContent = `${it.event} · ${it.school}`;
           chips.appendChild(span);
@@ -319,7 +395,8 @@
         cell.appendChild(top);
         for(const it of items.slice(0,3)){
           const div = document.createElement('div');
-          div.className = (EVENT_CLASS[it.event]||'badge');
+          div.className = 'badge';
+          applySchoolColor(div, it.school);
           div.style.display='block';
           div.style.marginBottom='4px';
           div.title = `${it.event} • ${it.school}${it.notes? ' — '+it.notes: ''}`;
@@ -394,6 +471,19 @@
     const weekdays = getWeekdays(wMon);
     tests.push(['Weekdays length=5', weekdays.length===5]);
     tests.push(['Weekdays Mon..Fri', weekdays[0].day()===1 && weekdays[4].day()===5]);
+
+    // Test with user's simplified headers and first row
+    const userCsv = `Date,Event,School
+2025-08-25,First Day (Half Day),Clio Schools`;
+    try{
+      const rows = parseCsvToRows(userCsv);
+      tests.push(['User CSV parses 1 row', rows.length===1]);
+      if(rows.length){
+        const cls = classForEvent(rows[0].event);
+        tests.push(['Event classifier detects Half Day', cls.includes('yellow')]);
+      }
+    }catch(e){ tests.push(['User CSV parsing exception', false]); }
+
     console.groupCollapsed('GCI Weekdays‑Only • Self‑tests');
     for(const [name,pass] of tests){ console.log((pass?'✅':'❌'), name); }
     const all = tests.every(t=>t[1]); console.log(all?'All tests passed':'Some tests failed');
