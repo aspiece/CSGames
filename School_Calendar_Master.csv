@@ -1,0 +1,834 @@
+Date (YYYY-MM-DD),Event (No School / Half Day / Holiday / PD),School
+2025-08-25 00:00:00,First Day (Half Day),Clio Schools
+2025-08-28 00:00:00,No School,Clio Schools
+2025-08-29 00:00:00,No School,Clio Schools
+2025-09-01 00:00:00,No School,Clio Schools
+2025-09-15 00:00:00,Early Release,Clio Schools
+2025-10-14 00:00:00,Early Release,Clio Schools
+2025-10-23 00:00:00,Half Day,Clio Schools
+2025-10-24 00:00:00,No School,Clio Schools
+2025-11-18 00:00:00,Early Release,Clio Schools
+2025-11-26 00:00:00,No School,Clio Schools
+2025-11-27 00:00:00,No School,Clio Schools
+2025-11-28 00:00:00,No School,Clio Schools
+2025-12-16 00:00:00,Early Release,Clio Schools
+2025-12-22 00:00:00,No School,Clio Schools
+2025-12-23 00:00:00,No School,Clio Schools
+2025-12-24 00:00:00,No School,Clio Schools
+2025-12-25 00:00:00,No School,Clio Schools
+2025-12-26 00:00:00,No School,Clio Schools
+2025-12-29 00:00:00,No School,Clio Schools
+2025-12-30 00:00:00,No School,Clio Schools
+2025-12-31 00:00:00,No School,Clio Schools
+2026-01-01 00:00:00,No School,Clio Schools
+2026-01-02 00:00:00,No School,Clio Schools
+2026-01-12 00:00:00,Half Day,Clio Schools
+2026-01-13 00:00:00,Half Day,Clio Schools
+2026-01-19 00:00:00,No School,Clio Schools
+2026-01-20 00:00:00,Early Release,Clio Schools
+2026-02-13 00:00:00,Half Day,Clio Schools
+2026-02-16 00:00:00,No School,Clio Schools
+2026-02-17 00:00:00,Early Release,Clio Schools
+2026-03-13 00:00:00,Half Day,Clio Schools
+2026-03-16 00:00:00,Early Release,Clio Schools
+2026-03-30 00:00:00,No School,Clio Schools
+2026-03-31 00:00:00,No School,Clio Schools
+2026-04-01 00:00:00,No School,Clio Schools
+2026-04-02 00:00:00,No School,Clio Schools
+2026-04-03 00:00:00,No School,Clio Schools
+2026-04-20 00:00:00,Early Release,Clio Schools
+2026-05-19 00:00:00,Early Release,Clio Schools
+2026-05-25 00:00:00,No School,Clio Schools
+2026-06-04 00:00:00,Half Day (Last Day),Clio Schools
+2026-06-05 00:00:00,Half Day (Last Day),Clio Schools
+2025-09-01 00:00:00,No School,Kearsley Schools
+2025-09-26 00:00:00,No School,Kearsley Schools
+2025-10-31 00:00:00,Half Day,Kearsley Schools
+2025-11-05 00:00:00,No School,Kearsley Schools
+2025-11-26 00:00:00,Half Day,Kearsley Schools
+2025-11-27 00:00:00,No School,Kearsley Schools
+2025-11-28 00:00:00,No School,Kearsley Schools
+2025-12-19 00:00:00,Half Day,Kearsley Schools
+2025-12-22 00:00:00,No School,Kearsley Schools
+2025-12-23 00:00:00,No School,Kearsley Schools
+2025-12-24 00:00:00,No School,Kearsley Schools
+2025-12-25 00:00:00,No School,Kearsley Schools
+2025-12-26 00:00:00,No School,Kearsley Schools
+2025-12-29 00:00:00,No School,Kearsley Schools
+2025-12-30 00:00:00,No School,Kearsley Schools
+2025-12-31 00:00:00,No School,Kearsley Schools
+2026-01-01 00:00:00,No School,Kearsley Schools
+2026-01-02 00:00:00,No School,Kearsley Schools
+2026-01-19 00:00:00,No School,Kearsley Schools
+2026-01-23 00:00:00,Half Day,Kearsley Schools
+2026-02-13 00:00:00,Half Day,Kearsley Schools
+2026-02-16 00:00:00,No School,Kearsley Schools
+2026-03-06 00:00:00,No School,Kearsley Schools
+2026-03-27 00:00:00,Half Day,Kearsley Schools
+2026-03-30 00:00:00,No School,Kearsley Schools
+2026-03-31 00:00:00,No School,Kearsley Schools
+2026-04-01 00:00:00,No School,Kearsley Schools
+2026-04-02 00:00:00,No School,Kearsley Schools
+2026-04-03 00:00:00,No School,Kearsley Schools
+2026-05-22 00:00:00,Half Day,Kearsley Schools
+2026-05-25 00:00:00,No School,Kearsley Schools
+2026-06-09 00:00:00,Half Day,Kearsley Schools
+2026-06-10 00:00:00,Half Day (Last Day of School),Kearsley Schools
+2025-09-01 00:00:00,No School,Fenton Area Public Schools
+2025-11-26 00:00:00,No School,Fenton Area Public Schools
+2025-11-27 00:00:00,No School,Fenton Area Public Schools
+2025-11-28 00:00:00,No School,Fenton Area Public Schools
+2025-12-22 00:00:00,No School,Fenton Area Public Schools
+2025-12-23 00:00:00,No School,Fenton Area Public Schools
+2025-12-24 00:00:00,No School,Fenton Area Public Schools
+2025-12-25 00:00:00,No School,Fenton Area Public Schools
+2025-12-26 00:00:00,No School,Fenton Area Public Schools
+2025-12-29 00:00:00,No School,Fenton Area Public Schools
+2025-12-30 00:00:00,No School,Fenton Area Public Schools
+2025-12-31 00:00:00,No School,Fenton Area Public Schools
+2026-01-01 00:00:00,No School,Fenton Area Public Schools
+2026-01-02 00:00:00,No School,Fenton Area Public Schools
+2026-03-30 00:00:00,No School,Fenton Area Public Schools
+2026-03-31 00:00:00,No School,Fenton Area Public Schools
+2026-04-01 00:00:00,No School,Fenton Area Public Schools
+2026-04-02 00:00:00,No School,Fenton Area Public Schools
+2026-04-03 00:00:00,No School,Fenton Area Public Schools
+2026-05-01 00:00:00,No School,Fenton Area Public Schools
+2026-05-15 00:00:00,Half Day,Fenton Area Public Schools
+2026-05-22 00:00:00,Half Day,Fenton Area Public Schools
+2026-05-29 00:00:00,Half Day,Fenton Area Public Schools
+2025-08-25 00:00:00,Half Day (First Day of School),Bentley Community Schools
+2025-08-29 00:00:00,No School,Bentley Community Schools
+2025-09-01 00:00:00,No School,Bentley Community Schools
+2025-09-24 00:00:00,Half Day,Bentley Community Schools
+2025-10-10 00:00:00,No School,Bentley Community Schools
+2025-10-22 00:00:00,Half Day,Bentley Community Schools
+2025-10-31 00:00:00,Half Day,Bentley Community Schools
+2025-11-19 00:00:00,Half Day,Bentley Community Schools
+2025-11-26 00:00:00,No School,Bentley Community Schools
+2025-11-27 00:00:00,No School,Bentley Community Schools
+2025-11-28 00:00:00,No School,Bentley Community Schools
+2025-12-22 00:00:00,No School,Bentley Community Schools
+2025-12-23 00:00:00,No School,Bentley Community Schools
+2025-12-24 00:00:00,No School,Bentley Community Schools
+2025-12-25 00:00:00,No School,Bentley Community Schools
+2025-12-26 00:00:00,No School,Bentley Community Schools
+2025-12-29 00:00:00,No School,Bentley Community Schools
+2025-12-30 00:00:00,No School,Bentley Community Schools
+2025-12-31 00:00:00,No School,Bentley Community Schools
+2026-01-01 00:00:00,No School,Bentley Community Schools
+2026-01-02 00:00:00,No School,Bentley Community Schools
+2026-01-16 00:00:00,No School,Bentley Community Schools
+2026-01-19 00:00:00,No School,Bentley Community Schools
+2026-02-12 00:00:00,Half Day,Bentley Community Schools
+2026-02-13 00:00:00,No School,Bentley Community Schools
+2026-02-14 00:00:00,No School,Bentley Community Schools
+2026-02-15 00:00:00,No School,Bentley Community Schools
+2026-02-16 00:00:00,No School,Bentley Community Schools
+2026-02-27 00:00:00,No School,Bentley Community Schools
+2026-03-18 00:00:00,Half Day,Bentley Community Schools
+2026-03-27 00:00:00,No School,Bentley Community Schools
+2026-03-30 00:00:00,No School,Bentley Community Schools
+2026-03-31 00:00:00,No School,Bentley Community Schools
+2026-04-01 00:00:00,No School,Bentley Community Schools
+2026-04-02 00:00:00,No School,Bentley Community Schools
+2026-04-03 00:00:00,No School,Bentley Community Schools
+2026-04-06 00:00:00,No School,Bentley Community Schools
+2026-04-15 00:00:00,Half Day (Staff PL),Bentley Community Schools
+2026-05-20 00:00:00,Half Day (Staff PL),Bentley Community Schools
+2026-05-25 00:00:00,No School,Bentley Community Schools
+2026-06-09 00:00:00,Half Day (Last Day of School),Bentley Community Schools
+2025-08-25 00:00:00,First Day (All Students),Goodrich Area Schools
+2025-09-01 00:00:00,No School,Goodrich Area Schools
+2025-09-17 00:00:00,No School,Goodrich Area Schools
+2025-09-26 00:00:00,No School (Homecoming),Goodrich Area Schools
+2025-10-17 00:00:00,No School,Goodrich Area Schools
+2025-10-22 00:00:00,Half Day (All Students),Goodrich Area Schools
+2025-11-18 00:00:00,No School,Goodrich Area Schools
+2025-11-21 00:00:00,No School,Goodrich Area Schools
+2025-11-26 00:00:00,No School,Goodrich Area Schools
+2025-11-27 00:00:00,No School,Goodrich Area Schools
+2025-11-28 00:00:00,No School,Goodrich Area Schools
+2025-12-19 00:00:00,Half Day (All Students),Goodrich Area Schools
+2025-12-22 00:00:00,No School,Goodrich Area Schools
+2025-12-23 00:00:00,No School,Goodrich Area Schools
+2025-12-24 00:00:00,No School,Goodrich Area Schools
+2025-12-25 00:00:00,No School,Goodrich Area Schools
+2025-12-26 00:00:00,No School,Goodrich Area Schools
+2025-12-29 00:00:00,No School,Goodrich Area Schools
+2025-12-30 00:00:00,No School,Goodrich Area Schools
+2025-12-31 00:00:00,No School,Goodrich Area Schools
+2026-01-01 00:00:00,No School,Goodrich Area Schools
+2026-01-02 00:00:00,No School,Goodrich Area Schools
+2026-01-16 00:00:00,Half Day (End of Semester),Goodrich Area Schools
+2026-02-13 00:00:00,No School,Goodrich Area Schools
+2026-02-16 00:00:00,No School,Goodrich Area Schools
+2026-03-06 00:00:00,No School,Goodrich Area Schools
+2026-03-19 00:00:00,Half Day,Goodrich Area Schools
+2026-03-30 00:00:00,No School,Goodrich Area Schools
+2026-03-31 00:00:00,No School,Goodrich Area Schools
+2026-04-01 00:00:00,No School,Goodrich Area Schools
+2026-04-02 00:00:00,No School,Goodrich Area Schools
+2026-04-03 00:00:00,No School,Goodrich Area Schools
+2026-05-22 00:00:00,No School,Goodrich Area Schools
+2026-05-25 00:00:00,No School,Goodrich Area Schools
+2026-06-10 00:00:00,Half Day,Goodrich Area Schools
+2026-06-11 00:00:00,Half Day (Last Day),Goodrich Area Schools
+2025-08-18 00:00:00,First Day of School,Davison Community Schools
+2025-08-22 00:00:00,No School,Davison Community Schools
+2025-08-29 00:00:00,No School,Davison Community Schools
+2025-09-01 00:00:00,No School,Davison Community Schools
+2025-09-17 00:00:00,Early Release,Davison Community Schools
+2025-09-29 00:00:00,No School,Davison Community Schools
+2025-10-16 00:00:00,Delayed Start,Davison Community Schools
+2025-10-17 00:00:00,No School,Davison Community Schools
+2025-10-27 00:00:00,No School,Davison Community Schools
+2025-10-28 00:00:00,No School,Davison Community Schools
+2025-10-29 00:00:00,No School,Davison Community Schools
+2025-10-30 00:00:00,No School,Davison Community Schools
+2025-10-31 00:00:00,No School,Davison Community Schools
+2025-11-03 00:00:00,No School,Davison Community Schools
+2025-11-19 00:00:00,Early Release,Davison Community Schools
+2025-11-27 00:00:00,No School,Davison Community Schools
+2025-11-28 00:00:00,No School,Davison Community Schools
+2025-12-22 00:00:00,No School,Davison Community Schools
+2025-12-23 00:00:00,No School,Davison Community Schools
+2025-12-24 00:00:00,No School,Davison Community Schools
+2025-12-25 00:00:00,No School,Davison Community Schools
+2025-12-26 00:00:00,No School,Davison Community Schools
+2025-12-29 00:00:00,No School,Davison Community Schools
+2025-12-30 00:00:00,No School,Davison Community Schools
+2025-12-31 00:00:00,No School,Davison Community Schools
+2026-01-01 00:00:00,No School,Davison Community Schools
+2026-01-02 00:00:00,No School,Davison Community Schools
+2026-01-19 00:00:00,No School,Davison Community Schools
+2026-02-16 00:00:00,No School,Davison Community Schools
+2026-02-17 00:00:00,No School,Davison Community Schools
+2026-02-18 00:00:00,No School,Davison Community Schools
+2026-02-19 00:00:00,No School,Davison Community Schools
+2026-02-20 00:00:00,No School,Davison Community Schools
+2026-02-23 00:00:00,No School,Davison Community Schools
+2026-03-18 00:00:00,Early Release,Davison Community Schools
+2026-03-30 00:00:00,No School,Davison Community Schools
+2026-03-31 00:00:00,No School,Davison Community Schools
+2026-04-01 00:00:00,No School,Davison Community Schools
+2026-04-02 00:00:00,No School,Davison Community Schools
+2026-04-03 00:00:00,No School,Davison Community Schools
+2026-04-06 00:00:00,No School,Davison Community Schools
+2026-05-13 00:00:00,Early Release,Davison Community Schools
+2026-05-22 00:00:00,No School,Davison Community Schools
+2026-05-25 00:00:00,No School,Davison Community Schools
+2026-06-05 00:00:00,No School,Davison Community Schools
+2026-06-12 00:00:00,No School,Davison Community Schools
+2026-06-16 00:00:00,Half Day,Davison Community Schools
+2026-06-17 00:00:00,Half Day,Davison Community Schools
+2026-06-18 00:00:00,Half Day (Last Day of School),Davison Community Schools
+2025-08-25 00:00:00,Early Release (First Day of School),Montrose Community Schools
+2025-08-29 00:00:00,No School,Montrose Community Schools
+2025-09-01 00:00:00,No School,Montrose Community Schools
+2025-11-04 00:00:00,No School,Montrose Community Schools
+2025-11-13 00:00:00,Early Release,Montrose Community Schools
+2025-11-14 00:00:00,No School,Montrose Community Schools
+2025-11-26 00:00:00,No School,Montrose Community Schools
+2025-11-27 00:00:00,No School,Montrose Community Schools
+2025-11-28 00:00:00,No School,Montrose Community Schools
+2025-12-19 00:00:00,Early Release,Montrose Community Schools
+2025-12-22 00:00:00,No School,Montrose Community Schools
+2025-12-23 00:00:00,No School,Montrose Community Schools
+2025-12-24 00:00:00,No School,Montrose Community Schools
+2025-12-25 00:00:00,No School,Montrose Community Schools
+2025-12-26 00:00:00,No School,Montrose Community Schools
+2025-12-29 00:00:00,No School,Montrose Community Schools
+2025-12-30 00:00:00,No School,Montrose Community Schools
+2025-12-31 00:00:00,No School,Montrose Community Schools
+2026-01-15 00:00:00,Early Release,Montrose Community Schools
+2026-01-16 00:00:00,Early Release,Montrose Community Schools
+2026-01-19 00:00:00,No School,Montrose Community Schools
+2026-01-20 00:00:00,No School,Montrose Community Schools
+2026-01-21 00:00:00,No School,Montrose Community Schools
+2026-02-13 00:00:00,Early Release,Montrose Community Schools
+2026-02-16 00:00:00,No School,Montrose Community Schools
+2026-03-27 00:00:00,Early Release,Montrose Community Schools
+2026-03-30 00:00:00,No School,Montrose Community Schools
+2026-03-31 00:00:00,No School,Montrose Community Schools
+2026-04-01 00:00:00,No School,Montrose Community Schools
+2026-04-02 00:00:00,No School,Montrose Community Schools
+2026-04-03 00:00:00,No School,Montrose Community Schools
+2026-04-16 00:00:00,Early Release,Montrose Community Schools
+2026-04-17 00:00:00,No School,Montrose Community Schools
+2026-05-19 00:00:00,Early Release,Montrose Community Schools
+2026-05-22 00:00:00,No School,Montrose Community Schools
+2026-05-25 00:00:00,No School,Montrose Community Schools
+2026-06-04 00:00:00,Early Release,Montrose Community Schools
+2026-06-05 00:00:00,Early Release (Last Day of School),Montrose Community Schools
+2025-08-29 00:00:00,No School,Mt. Morris Consolidated Schools
+2025-09-01 00:00:00,No School,Mt. Morris Consolidated Schools
+2025-09-10 00:00:00,Reduced Day,Mt. Morris Consolidated Schools
+2025-09-24 00:00:00,Reduced Day,Mt. Morris Consolidated Schools
+2025-10-08 00:00:00,Reduced Day,Mt. Morris Consolidated Schools
+2025-10-24 00:00:00,No School,Mt. Morris Consolidated Schools
+2025-10-31 00:00:00,Reduced Day,Mt. Morris Consolidated Schools
+2025-11-05 00:00:00,Reduced Day,Mt. Morris Consolidated Schools
+2025-11-26 00:00:00,No School,Mt. Morris Consolidated Schools
+2025-11-27 00:00:00,No School,Mt. Morris Consolidated Schools
+2025-11-28 00:00:00,No School,Mt. Morris Consolidated Schools
+2025-12-17 00:00:00,Reduced Day,Mt. Morris Consolidated Schools
+2025-12-22 00:00:00,No School,Mt. Morris Consolidated Schools
+2026-01-14 00:00:00,Reduced Day,Mt. Morris Consolidated Schools
+2026-01-16 00:00:00,Half Day,Mt. Morris Consolidated Schools
+2026-01-19 00:00:00,No School,Mt. Morris Consolidated Schools
+2026-01-28 00:00:00,Reduced Day,Mt. Morris Consolidated Schools
+2026-02-16 00:00:00,No School,Mt. Morris Consolidated Schools
+2026-02-18 00:00:00,Reduced Day,Mt. Morris Consolidated Schools
+2026-03-04 00:00:00,Reduced Day,Mt. Morris Consolidated Schools
+2026-03-18 00:00:00,Reduced Day,Mt. Morris Consolidated Schools
+2026-03-20 00:00:00,Reduced Day,Mt. Morris Consolidated Schools
+2026-03-30 00:00:00,No School,Mt. Morris Consolidated Schools
+2026-04-08 00:00:00,Reduced Day,Mt. Morris Consolidated Schools
+2026-04-22 00:00:00,Reduced Day,Mt. Morris Consolidated Schools
+2026-05-06 00:00:00,Reduced Day,Mt. Morris Consolidated Schools
+2026-05-20 00:00:00,Reduced Day,Mt. Morris Consolidated Schools
+2026-05-22 00:00:00,No School,Mt. Morris Consolidated Schools
+2026-05-25 00:00:00,No School,Mt. Morris Consolidated Schools
+2026-06-05 00:00:00,Half Day (Last Day for Students),Mt. Morris Consolidated Schools
+2025-08-25 00:00:00,First Day (Half Day),Atherton Community Schools
+2025-08-29 00:00:00,No School,Atherton Community Schools
+2025-09-01 00:00:00,No School,Atherton Community Schools
+2025-09-17 00:00:00,Half Day,Atherton Community Schools
+2025-10-08 00:00:00,Half Day,Atherton Community Schools
+2025-10-31 00:00:00,Half Day (End of 1st Marking Period),Atherton Community Schools
+2025-11-19 00:00:00,Half Day,Atherton Community Schools
+2025-11-26 00:00:00,No School,Atherton Community Schools
+2025-11-27 00:00:00,No School,Atherton Community Schools
+2025-11-28 00:00:00,No School,Atherton Community Schools
+2025-12-17 00:00:00,Half Day,Atherton Community Schools
+2025-12-19 00:00:00,Half Day,Atherton Community Schools
+2025-12-22 00:00:00,No School,Atherton Community Schools
+2025-12-23 00:00:00,No School,Atherton Community Schools
+2025-12-24 00:00:00,No School,Atherton Community Schools
+2025-12-25 00:00:00,No School,Atherton Community Schools
+2025-12-26 00:00:00,No School,Atherton Community Schools
+2025-12-29 00:00:00,No School,Atherton Community Schools
+2025-12-30 00:00:00,No School,Atherton Community Schools
+2025-12-31 00:00:00,No School,Atherton Community Schools
+2026-01-01 00:00:00,No School,Atherton Community Schools
+2026-01-02 00:00:00,No School,Atherton Community Schools
+2026-01-14 00:00:00,Half Day,Atherton Community Schools
+2026-01-16 00:00:00,Half Day (End of Semester),Atherton Community Schools
+2026-01-19 00:00:00,No School,Atherton Community Schools
+2026-01-28 00:00:00,Half Day,Atherton Community Schools
+2026-02-18 00:00:00,Half Day,Atherton Community Schools
+2026-02-27 00:00:00,No School,Atherton Community Schools
+2026-03-11 00:00:00,Half Day,Atherton Community Schools
+2026-03-25 00:00:00,Half Day,Atherton Community Schools
+2026-03-30 00:00:00,No School,Atherton Community Schools
+2026-03-31 00:00:00,No School,Atherton Community Schools
+2026-04-01 00:00:00,No School,Atherton Community Schools
+2026-04-02 00:00:00,No School,Atherton Community Schools
+2026-04-03 00:00:00,No School,Atherton Community Schools
+2026-04-22 00:00:00,Half Day,Atherton Community Schools
+2026-05-06 00:00:00,Half Day,Atherton Community Schools
+2026-05-20 00:00:00,Half Day,Atherton Community Schools
+2026-05-22 00:00:00,No School,Atherton Community Schools
+2026-05-25 00:00:00,No School,Atherton Community Schools
+2026-06-05 00:00:00,Half Day (Last Day of School),Atherton Community Schools
+2025-08-25 00:00:00,Half Day (First Day of School),Bendle Public Schools
+2025-08-29 00:00:00,No School,Bendle Public Schools
+2025-09-01 00:00:00,No School,Bendle Public Schools
+2025-10-31 00:00:00,Half Day,Bendle Public Schools
+2025-11-04 00:00:00,No School,Bendle Public Schools
+2025-11-26 00:00:00,No School,Bendle Public Schools
+2025-11-27 00:00:00,No School,Bendle Public Schools
+2025-11-28 00:00:00,No School,Bendle Public Schools
+2025-12-18 00:00:00,Half Day,Bendle Public Schools
+2025-12-19 00:00:00,Half Day,Bendle Public Schools
+2025-12-22 00:00:00,No School,Bendle Public Schools
+2025-12-23 00:00:00,No School,Bendle Public Schools
+2025-12-24 00:00:00,No School,Bendle Public Schools
+2025-12-25 00:00:00,No School,Bendle Public Schools
+2025-12-26 00:00:00,No School,Bendle Public Schools
+2025-12-29 00:00:00,No School,Bendle Public Schools
+2025-12-30 00:00:00,No School,Bendle Public Schools
+2025-12-31 00:00:00,No School,Bendle Public Schools
+2026-01-01 00:00:00,No School,Bendle Public Schools
+2026-01-02 00:00:00,No School,Bendle Public Schools
+2026-01-19 00:00:00,No School,Bendle Public Schools
+2026-02-13 00:00:00,No School,Bendle Public Schools
+2026-02-14 00:00:00,No School,Bendle Public Schools
+2026-02-15 00:00:00,No School,Bendle Public Schools
+2026-02-16 00:00:00,No School,Bendle Public Schools
+2026-03-05 00:00:00,Half Day,Bendle Public Schools
+2026-03-06 00:00:00,No School,Bendle Public Schools
+2026-03-20 00:00:00,Half Day,Bendle Public Schools
+2026-03-27 00:00:00,Early Release,Bendle Public Schools
+2026-03-30 00:00:00,No School,Bendle Public Schools
+2026-03-31 00:00:00,No School,Bendle Public Schools
+2026-04-01 00:00:00,No School,Bendle Public Schools
+2026-04-02 00:00:00,No School,Bendle Public Schools
+2026-04-03 00:00:00,No School,Bendle Public Schools
+2026-04-15 00:00:00,Half Day,Bendle Public Schools
+2026-05-01 00:00:00,No School,Bendle Public Schools
+2026-05-22 00:00:00,No School,Bendle Public Schools
+2026-05-25 00:00:00,No School,Bendle Public Schools
+2026-06-09 00:00:00,Half Day,Bendle Public Schools
+2026-06-10 00:00:00,Half Day (Last Day of School),Bendle Public Schools
+2025-08-29 00:00:00,No School,Carman-Ainsworth Community Schools
+2025-09-01 00:00:00,No School,Carman-Ainsworth Community Schools
+2025-10-13 00:00:00,No School,Carman-Ainsworth Community Schools
+2025-10-20 00:00:00,Half Day,Carman-Ainsworth Community Schools
+2025-11-26 00:00:00,No School,Carman-Ainsworth Community Schools
+2025-11-27 00:00:00,No School,Carman-Ainsworth Community Schools
+2025-11-28 00:00:00,No School,Carman-Ainsworth Community Schools
+2025-11-29 00:00:00,No School,Carman-Ainsworth Community Schools
+2025-11-30 00:00:00,No School,Carman-Ainsworth Community Schools
+2025-12-20 00:00:00,No School,Carman-Ainsworth Community Schools
+2025-12-21 00:00:00,No School,Carman-Ainsworth Community Schools
+2025-12-22 00:00:00,No School,Carman-Ainsworth Community Schools
+2025-12-23 00:00:00,No School,Carman-Ainsworth Community Schools
+2025-12-24 00:00:00,No School,Carman-Ainsworth Community Schools
+2025-12-25 00:00:00,No School,Carman-Ainsworth Community Schools
+2025-12-26 00:00:00,No School,Carman-Ainsworth Community Schools
+2025-12-27 00:00:00,No School,Carman-Ainsworth Community Schools
+2025-12-28 00:00:00,No School,Carman-Ainsworth Community Schools
+2025-12-29 00:00:00,No School,Carman-Ainsworth Community Schools
+2025-12-30 00:00:00,No School,Carman-Ainsworth Community Schools
+2025-12-31 00:00:00,No School,Carman-Ainsworth Community Schools
+2026-01-01 00:00:00,No School,Carman-Ainsworth Community Schools
+2026-01-02 00:00:00,No School,Carman-Ainsworth Community Schools
+2026-01-03 00:00:00,No School,Carman-Ainsworth Community Schools
+2026-01-04 00:00:00,No School,Carman-Ainsworth Community Schools
+2026-01-14 00:00:00,Half Day,Carman-Ainsworth Community Schools
+2026-01-15 00:00:00,Half Day,Carman-Ainsworth Community Schools
+2026-01-16 00:00:00,Half Day,Carman-Ainsworth Community Schools
+2026-01-19 00:00:00,No School,Carman-Ainsworth Community Schools
+2026-02-16 00:00:00,No School,Carman-Ainsworth Community Schools
+2026-03-06 00:00:00,Half Day,Carman-Ainsworth Community Schools
+2026-03-28 00:00:00,No School,Carman-Ainsworth Community Schools
+2026-03-29 00:00:00,No School,Carman-Ainsworth Community Schools
+2026-03-30 00:00:00,No School,Carman-Ainsworth Community Schools
+2026-03-31 00:00:00,No School,Carman-Ainsworth Community Schools
+2026-04-01 00:00:00,No School,Carman-Ainsworth Community Schools
+2026-04-02 00:00:00,No School,Carman-Ainsworth Community Schools
+2026-04-03 00:00:00,No School,Carman-Ainsworth Community Schools
+2026-04-04 00:00:00,No School,Carman-Ainsworth Community Schools
+2026-04-05 00:00:00,No School,Carman-Ainsworth Community Schools
+2026-04-08 00:00:00,Half Day,Carman-Ainsworth Community Schools
+2026-05-18 00:00:00,Half Day,Carman-Ainsworth Community Schools
+2026-05-22 00:00:00,No School,Carman-Ainsworth Community Schools
+2026-05-23 00:00:00,No School,Carman-Ainsworth Community Schools
+2026-05-24 00:00:00,No School,Carman-Ainsworth Community Schools
+2026-05-25 00:00:00,No School,Carman-Ainsworth Community Schools
+2026-06-03 00:00:00,Half Day,Carman-Ainsworth Community Schools
+2026-06-04 00:00:00,Half Day,Carman-Ainsworth Community Schools
+2026-06-05 00:00:00,Half Day,Carman-Ainsworth Community Schools
+2025-08-25 00:00:00,First Day of School,Linden Community Schools
+2025-08-29 00:00:00,No School,Linden Community Schools
+2025-09-01 00:00:00,No School,Linden Community Schools
+2025-10-15 00:00:00,Half Day,Linden Community Schools
+2025-10-16 00:00:00,Half Day,Linden Community Schools
+2025-11-05 00:00:00,No School,Linden Community Schools
+2025-11-26 00:00:00,No School,Linden Community Schools
+2025-11-27 00:00:00,No School,Linden Community Schools
+2025-11-28 00:00:00,No School,Linden Community Schools
+2025-12-19 00:00:00,Half Day,Linden Community Schools
+2025-12-22 00:00:00,No School,Linden Community Schools
+2025-12-23 00:00:00,No School,Linden Community Schools
+2025-12-24 00:00:00,No School,Linden Community Schools
+2025-12-25 00:00:00,No School,Linden Community Schools
+2025-12-26 00:00:00,No School,Linden Community Schools
+2025-12-29 00:00:00,No School,Linden Community Schools
+2025-12-30 00:00:00,No School,Linden Community Schools
+2025-12-31 00:00:00,No School,Linden Community Schools
+2026-01-01 00:00:00,No School,Linden Community Schools
+2026-01-02 00:00:00,No School,Linden Community Schools
+2026-01-16 00:00:00,Half Day,Linden Community Schools
+2026-01-19 00:00:00,No School,Linden Community Schools
+2026-02-13 00:00:00,Half Day,Linden Community Schools
+2026-02-16 00:00:00,No School,Linden Community Schools
+2026-03-04 00:00:00,Half Day,Linden Community Schools
+2026-03-27 00:00:00,Half Day,Linden Community Schools
+2026-03-30 00:00:00,No School,Linden Community Schools
+2026-03-31 00:00:00,No School,Linden Community Schools
+2026-04-01 00:00:00,No School,Linden Community Schools
+2026-04-02 00:00:00,No School,Linden Community Schools
+2026-04-03 00:00:00,No School,Linden Community Schools
+2026-05-22 00:00:00,No School,Linden Community Schools
+2026-05-25 00:00:00,No School,Linden Community Schools
+2026-06-05 00:00:00,Half Day,Linden Community Schools
+2026-06-12 00:00:00,Half Day (Last Day of School),Linden Community Schools
+2025-09-01 00:00:00,No School,Southwestern Academy
+2025-09-02 00:00:00,Half Day (First Day of School),Southwestern Academy
+2025-11-04 00:00:00,No School,Southwestern Academy
+2025-11-26 00:00:00,No School,Southwestern Academy
+2025-11-27 00:00:00,No School,Southwestern Academy
+2025-11-28 00:00:00,No School,Southwestern Academy
+2025-12-22 00:00:00,No School,Southwestern Academy
+2025-12-23 00:00:00,No School,Southwestern Academy
+2025-12-24 00:00:00,No School,Southwestern Academy
+2025-12-25 00:00:00,No School,Southwestern Academy
+2025-12-26 00:00:00,No School,Southwestern Academy
+2025-12-29 00:00:00,No School,Southwestern Academy
+2025-12-30 00:00:00,No School,Southwestern Academy
+2025-12-31 00:00:00,No School,Southwestern Academy
+2026-01-01 00:00:00,No School,Southwestern Academy
+2026-01-02 00:00:00,No School,Southwestern Academy
+2026-01-13 00:00:00,Half Day,Southwestern Academy
+2026-01-14 00:00:00,Half Day,Southwestern Academy
+2026-01-15 00:00:00,Half Day,Southwestern Academy
+2026-01-15 00:00:00,No School,Southwestern Academy
+2026-01-19 00:00:00,No School,Southwestern Academy
+2026-02-13 00:00:00,No School,Southwestern Academy
+2026-02-14 00:00:00,No School,Southwestern Academy
+2026-02-15 00:00:00,No School,Southwestern Academy
+2026-02-16 00:00:00,No School,Southwestern Academy
+2026-02-25 00:00:00,No School,Southwestern Academy
+2026-03-18 00:00:00,No School,Southwestern Academy
+2026-03-24 00:00:00,No School,Southwestern Academy
+2026-03-30 00:00:00,No School,Southwestern Academy
+2026-03-31 00:00:00,No School,Southwestern Academy
+2026-04-01 00:00:00,No School,Southwestern Academy
+2026-04-02 00:00:00,No School,Southwestern Academy
+2026-04-03 00:00:00,No School,Southwestern Academy
+2026-04-14 00:00:00,Half Day,Southwestern Academy
+2026-04-15 00:00:00,Half Day,Southwestern Academy
+2026-04-16 00:00:00,Half Day,Southwestern Academy
+2026-05-22 00:00:00,No School,Southwestern Academy
+2026-05-25 00:00:00,No School,Southwestern Academy
+2026-06-09 00:00:00,Half Day,Southwestern Academy
+2026-06-10 00:00:00,Half Day,Southwestern Academy
+2026-06-11 00:00:00,Half Day (Last Day of School),Southwestern Academy
+2025-08-25 00:00:00,Half Day (First Day),Grand Blanc Community Schools
+2025-08-29 00:00:00,No School,Grand Blanc Community Schools
+2025-09-01 00:00:00,No School,Grand Blanc Community Schools
+2025-09-19 00:00:00,Half Day,Grand Blanc Community Schools
+2025-10-03 00:00:00,Half Day,Grand Blanc Community Schools
+2025-10-08 00:00:00,No School,Grand Blanc Community Schools
+2025-10-09 00:00:00,Half Day,Grand Blanc Community Schools
+2025-10-10 00:00:00,Half Day,Grand Blanc Community Schools
+2025-10-31 00:00:00,Half Day,Grand Blanc Community Schools
+2025-11-04 00:00:00,No School,Grand Blanc Community Schools
+2025-11-26 00:00:00,No School,Grand Blanc Community Schools
+2025-11-27 00:00:00,No School,Grand Blanc Community Schools
+2025-11-28 00:00:00,No School,Grand Blanc Community Schools
+2025-12-24 00:00:00,No School,Grand Blanc Community Schools
+2025-12-25 00:00:00,No School,Grand Blanc Community Schools
+2025-12-26 00:00:00,No School,Grand Blanc Community Schools
+2025-12-29 00:00:00,No School,Grand Blanc Community Schools
+2025-12-30 00:00:00,No School,Grand Blanc Community Schools
+2025-12-31 00:00:00,No School,Grand Blanc Community Schools
+2026-01-01 00:00:00,No School,Grand Blanc Community Schools
+2026-01-02 00:00:00,No School,Grand Blanc Community Schools
+2026-01-14 00:00:00,Half Day,Grand Blanc Community Schools
+2026-01-15 00:00:00,Half Day,Grand Blanc Community Schools
+2026-01-16 00:00:00,Half Day,Grand Blanc Community Schools
+2026-01-19 00:00:00,No School,Grand Blanc Community Schools
+2026-01-20 00:00:00,No School,Grand Blanc Community Schools
+,Half Day,Grand Blanc Community Schools
+2026-02-13 00:00:00,No School,Grand Blanc Community Schools
+2026-02-16 00:00:00,No School,Grand Blanc Community Schools
+2026-02-26 00:00:00,No School,Grand Blanc Community Schools
+2026-02-27 00:00:00,Half Day,Grand Blanc Community Schools
+2026-03-06 00:00:00,Half Day,Grand Blanc Community Schools
+2026-03-27 00:00:00,Half Day,Grand Blanc Community Schools
+2026-03-30 00:00:00,No School,Grand Blanc Community Schools
+2026-03-31 00:00:00,No School,Grand Blanc Community Schools
+2026-04-01 00:00:00,No School,Grand Blanc Community Schools
+2026-04-02 00:00:00,No School,Grand Blanc Community Schools
+2026-04-03 00:00:00,No School,Grand Blanc Community Schools
+2026-04-24 00:00:00,Half Day,Grand Blanc Community Schools
+2026-05-05 00:00:00,No School,Grand Blanc Community Schools
+2026-05-22 00:00:00,No School,Grand Blanc Community Schools
+2026-05-25 00:00:00,No School,Grand Blanc Community Schools
+2026-06-09 00:00:00,Half Day,Grand Blanc Community Schools
+2026-06-10 00:00:00,Half Day,Grand Blanc Community Schools
+2026-06-11 00:00:00,Half Day (Last Day of School),Grand Blanc Community Schools
+2025-09-01 00:00:00,No School,Genesee Early College
+2025-10-30 00:00:00,Half Day,Genesee Early College
+2025-10-31 00:00:00,Half Day,Genesee Early College
+2025-11-26 00:00:00,No School,Genesee Early College
+2025-11-27 00:00:00,No School,Genesee Early College
+2025-11-28 00:00:00,No School,Genesee Early College
+2025-12-11 00:00:00,Half Day,Genesee Early College
+2025-12-19 00:00:00,Half Day,Genesee Early College
+2025-12-22 00:00:00,No School,Genesee Early College
+2025-12-23 00:00:00,No School,Genesee Early College
+2025-12-24 00:00:00,No School,Genesee Early College
+2025-12-25 00:00:00,No School,Genesee Early College
+2025-12-26 00:00:00,No School,Genesee Early College
+2025-12-29 00:00:00,No School,Genesee Early College
+2025-12-30 00:00:00,No School,Genesee Early College
+2025-12-31 00:00:00,No School,Genesee Early College
+2026-01-01 00:00:00,No School,Genesee Early College
+2026-01-02 00:00:00,No School,Genesee Early College
+2026-01-19 00:00:00,No School,Genesee Early College
+2026-02-12 00:00:00,Half Day,Genesee Early College
+2026-02-13 00:00:00,No School,Genesee Early College
+2026-02-14 00:00:00,No School,Genesee Early College
+2026-02-15 00:00:00,No School,Genesee Early College
+2026-02-16 00:00:00,No School,Genesee Early College
+2026-03-05 00:00:00,Half Day,Genesee Early College
+2026-03-06 00:00:00,Half Day,Genesee Early College
+2026-03-30 00:00:00,No School,Genesee Early College
+2026-03-31 00:00:00,No School,Genesee Early College
+2026-04-01 00:00:00,No School,Genesee Early College
+2026-04-02 00:00:00,No School,Genesee Early College
+2026-04-03 00:00:00,No School,Genesee Early College
+2026-04-17 00:00:00,No School,Genesee Early College
+2026-05-01 00:00:00,Half Day,Genesee Early College
+2026-05-21 00:00:00,Half Day,Genesee Early College
+2026-05-25 00:00:00,No School,Genesee Early College
+2026-06-11 00:00:00,Half Day,Genesee Early College
+2025-08-25 00:00:00,First Day of School,Genesee School District
+2025-09-01 00:00:00,No School,Genesee School District
+2025-10-24 00:00:00,Half Day (End of 1st Marking Period),Genesee School District
+2025-11-05 00:00:00,No School,Genesee School District
+2025-11-26 00:00:00,Half Day,Genesee School District
+2025-11-27 00:00:00,No School,Genesee School District
+2025-11-28 00:00:00,No School,Genesee School District
+2025-12-19 00:00:00,Half Day,Genesee School District
+2025-12-22 00:00:00,No School,Genesee School District
+2025-12-23 00:00:00,No School,Genesee School District
+2025-12-24 00:00:00,No School,Genesee School District
+2025-12-25 00:00:00,No School,Genesee School District
+2025-12-26 00:00:00,No School,Genesee School District
+2025-12-29 00:00:00,No School,Genesee School District
+2025-12-30 00:00:00,No School,Genesee School District
+2025-12-31 00:00:00,No School,Genesee School District
+2026-01-01 00:00:00,No School,Genesee School District
+2026-01-02 00:00:00,No School,Genesee School District
+2026-01-16 00:00:00,Half Day (End of 2nd Marking Period),Genesee School District
+2026-01-19 00:00:00,No School,Genesee School District
+2026-02-13 00:00:00,Half Day,Genesee School District
+2026-02-16 00:00:00,No School,Genesee School District
+2026-03-13 00:00:00,Half Day (End of 3rd Marking Period),Genesee School District
+2026-03-26 00:00:00,Half Day,Genesee School District
+2026-03-30 00:00:00,No School,Genesee School District
+2026-03-31 00:00:00,No School,Genesee School District
+2026-04-01 00:00:00,No School,Genesee School District
+2026-04-02 00:00:00,No School,Genesee School District
+2026-04-03 00:00:00,No School,Genesee School District
+2026-05-22 00:00:00,No School,Genesee School District
+2026-05-25 00:00:00,No School,Genesee School District
+2026-06-09 00:00:00,Half Day (Last Day of School),Genesee School District
+2025-09-01 00:00:00,No School,Madison Academy
+2025-10-06 00:00:00,No School,Madison Academy
+2025-10-07 00:00:00,No School,Madison Academy
+2025-10-08 00:00:00,No School,Madison Academy
+2025-10-09 00:00:00,No School,Madison Academy
+2025-10-10 00:00:00,No School,Madison Academy
+2025-11-11 00:00:00,No School,Madison Academy
+2025-11-24 00:00:00,No School,Madison Academy
+2025-11-25 00:00:00,No School,Madison Academy
+2025-11-26 00:00:00,No School,Madison Academy
+2025-11-27 00:00:00,No School,Madison Academy
+2025-11-28 00:00:00,No School,Madison Academy
+2025-12-17 00:00:00,Half Day (Exams 6–12),Madison Academy
+2025-12-18 00:00:00,Half Day (Exams 6–12),Madison Academy
+2025-12-19 00:00:00,Half Day (Exams 6–12 / End of Quarter 2),Madison Academy
+2025-12-22 00:00:00,No School,Madison Academy
+2025-12-23 00:00:00,No School,Madison Academy
+2025-12-24 00:00:00,No School,Madison Academy
+2025-12-25 00:00:00,No School,Madison Academy
+2025-12-26 00:00:00,No School,Madison Academy
+2025-12-29 00:00:00,No School,Madison Academy
+2025-12-30 00:00:00,No School,Madison Academy
+2025-12-31 00:00:00,No School,Madison Academy
+2026-01-01 00:00:00,No School,Madison Academy
+2026-01-02 00:00:00,No School,Madison Academy
+2026-01-05 00:00:00,No School,Madison Academy
+2026-01-19 00:00:00,No School,Madison Academy
+2026-02-13 00:00:00,No School,Madison Academy
+2026-02-16 00:00:00,No School,Madison Academy
+2026-03-16 00:00:00,No School,Madison Academy
+2026-03-17 00:00:00,No School,Madison Academy
+2026-03-18 00:00:00,No School,Madison Academy
+2026-03-19 00:00:00,No School,Madison Academy
+2026-03-20 00:00:00,No School,Madison Academy
+2026-04-03 00:00:00,No School,Madison Academy
+2026-05-18 00:00:00,Half Day,Madison Academy
+2026-05-19 00:00:00,Half Day,Madison Academy
+2026-05-20 00:00:00,Half Day (Last Day of School),Madison Academy
+2025-08-20 00:00:00,Half Day (First Day of School),Swartz Creek Community Schools
+2025-08-22 00:00:00,No School,Swartz Creek Community Schools
+2025-08-29 00:00:00,No School,Swartz Creek Community Schools
+2025-09-01 00:00:00,No School,Swartz Creek Community Schools
+2025-10-09 00:00:00,No School,Swartz Creek Community Schools
+2025-10-31 00:00:00,Half Day,Swartz Creek Community Schools
+2025-11-14 00:00:00,No School,Swartz Creek Community Schools
+2025-11-26 00:00:00,No School,Swartz Creek Community Schools
+2025-11-27 00:00:00,No School,Swartz Creek Community Schools
+2025-11-28 00:00:00,No School,Swartz Creek Community Schools
+2026-01-21 00:00:00,Half Day,Swartz Creek Community Schools
+2026-01-22 00:00:00,Half Day,Swartz Creek Community Schools
+2026-01-23 00:00:00,Half Day,Swartz Creek Community Schools
+2026-02-13 00:00:00,No School,Swartz Creek Community Schools
+2026-02-16 00:00:00,No School,Swartz Creek Community Schools
+2026-03-13 00:00:00,No School,Swartz Creek Community Schools
+2026-03-27 00:00:00,Half Day,Swartz Creek Community Schools
+2026-05-08 00:00:00,No School,Swartz Creek Community Schools
+2026-05-22 00:00:00,No School,Swartz Creek Community Schools
+2026-05-25 00:00:00,No School,Swartz Creek Community Schools
+2026-05-29 00:00:00,No School,Swartz Creek Community Schools
+2026-06-08 00:00:00,Half Day,Swartz Creek Community Schools
+2026-06-09 00:00:00,Half Day,Swartz Creek Community Schools
+2026-06-10 00:00:00,Half Day (Last Day of School),Swartz Creek Community Schools
+2025-10-23 00:00:00,Half Day,Flushing Community Schools
+2025-11-14 00:00:00,Half Day,Flushing Community Schools
+2025-11-27 00:00:00,No School,Flushing Community Schools
+2025-11-28 00:00:00,No School,Flushing Community Schools
+2025-12-17 00:00:00,Early Dismissal,Flushing Community Schools
+2026-01-15 00:00:00,Half Day (HS dismiss 12:10),Flushing Community Schools
+2026-01-16 00:00:00,Half Day (HS dismiss 12:10),Flushing Community Schools
+2026-02-13 00:00:00,Half Day,Flushing Community Schools
+2026-03-18 00:00:00,Half Day,Flushing Community Schools
+2026-03-20 00:00:00,Half Day,Flushing Community Schools
+2026-04-08 00:00:00,No School,Flushing Community Schools
+2026-04-09 00:00:00,Half Day,Flushing Community Schools
+2026-06-09 00:00:00,Half Day,Flushing Community Schools
+2026-06-10 00:00:00,Half Day,Flushing Community Schools
+2025-08-25 00:00:00,First Day,Lake Fenton High School
+2025-09-01 00:00:00,No School,Lake Fenton High School
+2025-10-16 00:00:00,Half Day,Lake Fenton High School
+2025-11-26 00:00:00,No School,Lake Fenton High School
+2025-11-27 00:00:00,No School,Lake Fenton High School
+2025-11-28 00:00:00,No School,Lake Fenton High School
+2025-12-18 00:00:00,Half Day,Lake Fenton High School
+2025-12-19 00:00:00,Half Day,Lake Fenton High School
+2025-12-22 00:00:00,No School,Lake Fenton High School
+2025-12-23 00:00:00,No School,Lake Fenton High School
+2025-12-24 00:00:00,No School,Lake Fenton High School
+2025-12-25 00:00:00,No School,Lake Fenton High School
+2025-12-26 00:00:00,No School,Lake Fenton High School
+2025-12-29 00:00:00,No School,Lake Fenton High School
+2025-12-30 00:00:00,No School,Lake Fenton High School
+2025-12-31 00:00:00,No School,Lake Fenton High School
+2026-01-01 00:00:00,No School,Lake Fenton High School
+2026-01-02 00:00:00,No School,Lake Fenton High School
+2026-01-19 00:00:00,No School,Lake Fenton High School
+2026-02-13 00:00:00,No School,Lake Fenton High School
+2026-02-16 00:00:00,No School,Lake Fenton High School
+2026-03-12 00:00:00,Half Day,Lake Fenton High School
+2026-03-30 00:00:00,No School,Lake Fenton High School
+2026-03-31 00:00:00,No School,Lake Fenton High School
+2026-04-01 00:00:00,No School,Lake Fenton High School
+2026-04-02 00:00:00,No School,Lake Fenton High School
+2026-04-03 00:00:00,No School,Lake Fenton High School
+2026-05-25 00:00:00,No School,Lake Fenton High School
+2026-06-04 00:00:00,Half Day,Lake Fenton High School
+2026-06-05 00:00:00,Half Day (Last Day of School),Lake Fenton High School
+2025-08-18 00:00:00,First Day (Half Day),Beecher High School
+2025-08-29 00:00:00,No School,Beecher High School
+2025-09-01 00:00:00,No School,Beecher High School
+2025-09-17 00:00:00,Half Day,Beecher High School
+2025-10-02 00:00:00,Half Day,Beecher High School
+2025-10-27 00:00:00,No School,Beecher High School
+2025-10-28 00:00:00,No School,Beecher High School
+2025-10-29 00:00:00,No School,Beecher High School
+2025-10-30 00:00:00,No School,Beecher High School
+2025-10-31 00:00:00,No School,Beecher High School
+2025-11-12 00:00:00,No School,Beecher High School
+2025-11-26 00:00:00,Half Day,Beecher High School
+2025-11-27 00:00:00,No School,Beecher High School
+2025-11-28 00:00:00,No School,Beecher High School
+2025-12-10 00:00:00,Half Day,Beecher High School
+2025-12-22 00:00:00,No School,Beecher High School
+2025-12-23 00:00:00,No School,Beecher High School
+2025-12-24 00:00:00,No School,Beecher High School
+2025-12-25 00:00:00,No School,Beecher High School
+2025-12-26 00:00:00,No School,Beecher High School
+2025-12-29 00:00:00,No School,Beecher High School
+2025-12-30 00:00:00,No School,Beecher High School
+2025-12-31 00:00:00,No School,Beecher High School
+2026-01-01 00:00:00,No School,Beecher High School
+2026-01-02 00:00:00,No School,Beecher High School
+2026-01-14 00:00:00,Half Day,Beecher High School
+2026-01-15 00:00:00,Half Day,Beecher High School
+2026-01-16 00:00:00,Half Day,Beecher High School
+2026-01-19 00:00:00,No School,Beecher High School
+2026-02-16 00:00:00,No School,Beecher High School
+2026-02-17 00:00:00,No School,Beecher High School
+2026-02-18 00:00:00,No School,Beecher High School
+2026-02-19 00:00:00,No School,Beecher High School
+2026-02-20 00:00:00,No School,Beecher High School
+2026-03-12 00:00:00,Half Day,Beecher High School
+2026-03-18 00:00:00,No School,Beecher High School
+2026-03-27 00:00:00,Half Day,Beecher High School
+2026-03-30 00:00:00,No School,Beecher High School
+2026-03-31 00:00:00,No School,Beecher High School
+2026-04-01 00:00:00,No School,Beecher High School
+2026-04-02 00:00:00,No School,Beecher High School
+2026-04-03 00:00:00,No School,Beecher High School
+2026-04-06 00:00:00,No School,Beecher High School
+2026-05-22 00:00:00,No School,Beecher High School
+2026-05-25 00:00:00,No School,Beecher High School
+2026-06-10 00:00:00,Half Day,Beecher High School
+2026-06-11 00:00:00,Half Day,Beecher High School
+2026-06-12 00:00:00,Half Day - Last Day,Beecher High School
+2025-08-25 00:00:00,First Day of School,Lakeville High School
+2025-08-29 00:00:00,No School,Lakeville High School
+2025-09-01 00:00:00,No School,Lakeville High School
+2025-09-26 00:00:00,No School,Lakeville High School
+2025-10-24 00:00:00,Half Day,Lakeville High School
+2025-10-31 00:00:00,No School,Lakeville High School
+2025-11-03 00:00:00,No School,Lakeville High School
+2025-11-26 00:00:00,No School,Lakeville High School
+2025-11-27 00:00:00,No School,Lakeville High School
+2025-11-28 00:00:00,No School,Lakeville High School
+2025-12-22 00:00:00,No School,Lakeville High School
+2025-12-23 00:00:00,No School,Lakeville High School
+2025-12-24 00:00:00,No School,Lakeville High School
+2025-12-25 00:00:00,No School,Lakeville High School
+2025-12-26 00:00:00,No School,Lakeville High School
+2025-12-29 00:00:00,No School,Lakeville High School
+2025-12-30 00:00:00,No School,Lakeville High School
+2025-12-31 00:00:00,No School,Lakeville High School
+2026-01-01 00:00:00,No School,Lakeville High School
+2026-01-02 00:00:00,No School,Lakeville High School
+2026-01-19 00:00:00,No School,Lakeville High School
+2026-01-21 00:00:00,Half Day,Lakeville High School
+2026-01-22 00:00:00,Half Day,Lakeville High School
+2026-01-23 00:00:00,No School,Lakeville High School
+2026-02-13 00:00:00,No School,Lakeville High School
+2026-02-16 00:00:00,No School,Lakeville High School
+2026-03-13 00:00:00,No School,Lakeville High School
+2026-03-30 00:00:00,No School,Lakeville High School
+2026-03-31 00:00:00,No School,Lakeville High School
+2026-04-01 00:00:00,No School,Lakeville High School
+2026-04-02 00:00:00,No School,Lakeville High School
+2026-04-03 00:00:00,No School,Lakeville High School
+2026-04-06 00:00:00,No School,Lakeville High School
+2026-05-01 00:00:00,No School,Lakeville High School
+2026-05-22 00:00:00,No School,Lakeville High School
+2026-05-25 00:00:00,No School,Lakeville High School
+2026-06-08 00:00:00,Half Day,Lakeville High School
+2026-06-09 00:00:00,Half Day,Lakeville High School
+2025-08-18,Half Day,Powers Catholic High School
+2025-08-19,Half Day,Powers Catholic High School
+2025-08-20,First Full Day of School,Powers Catholic High School
+2025-08-29,No School,Powers Catholic High School
+2025-09-01,No School,Powers Catholic High School
+2025-09-18,No School,Powers Catholic High School
+2025-09-19,No School,Powers Catholic High School
+2025-10-23,Early Dismissal,Powers Catholic High School
+2025-10-24,No School,Powers Catholic High School
+2025-11-26,No School,Powers Catholic High School
+2025-11-27,No School,Powers Catholic High School
+2025-11-28,No School,Powers Catholic High School
+2025-12-16,Half Day,Powers Catholic High School
+2025-12-17,Half Day,Powers Catholic High School
+2025-12-18,Half Day,Powers Catholic High School
+2025-12-19,No School,Powers Catholic High School
+2026-01-05,No School,Powers Catholic High School
+2026-01-19,No School,Powers Catholic High School
+2026-01-28,Half Day,Powers Catholic High School
+2026-02-09,No School,Powers Catholic High School
+2026-02-12,Early Dismissal,Powers Catholic High School
+2026-02-13,No School,Powers Catholic High School
+2026-02-16,No School,Powers Catholic High School
+2026-03-10,Seniors No School,Powers Catholic High School
+2026-03-23,No School,Powers Catholic High School
+2026-03-27,No School,Powers Catholic High School
+2026-05-25,No School,Powers Catholic High School
+2026-06-02,Half Day,Powers Catholic High School
+2026-06-03,Half Day,Powers Catholic High School
+2026-06-04,Half Day,Powers Catholic High School
