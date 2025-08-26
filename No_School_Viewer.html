@@ -34,7 +34,7 @@
     .badge.green{background:var(--green-100);color:var(--green-800);border-color:var(--green-200)}
     .badge.indigo{background:var(--indigo-100);color:var(--indigo-800);border-color:var(--indigo-200)}
     .week-title{font-weight:600;font-size:13px}
-    .chip-more{border:1px solid var(--border);background:#f8fafc;border-radius:8px;padding:2px 6px;font-size:11px}
+    .chip-more{border:1px solid var(--border);background:#f8fafc;border-radius:8px;padding:2px 6px;font-size:11px;cursor:pointer;user-select:none}
     .legend{display:flex;gap:8px;flex-wrap:wrap}
     .legend .badge{cursor:default}
     .header{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;margin-bottom:10px}
@@ -275,11 +275,62 @@
     });
   }
 
+  // ==== Expand/collapse helpers ====
+  function makeChip(it){
+    const span = document.createElement('span');
+    span.className='badge';
+    applySchoolColor(span, it.school);
+    span.title = `${it.event} • ${it.school}${it.notes? ' — '+it.notes: ''}`;
+    span.textContent = `${it.event} · ${it.school}`;
+    return span;
+  }
+  function makeMonthChip(it){
+    const div = document.createElement('div');
+    div.className='badge';
+    applySchoolColor(div, it.school);
+    div.style.display='block';
+    div.style.marginBottom='4px';
+    div.title = `${it.event} • ${it.school}${it.notes? ' — '+it.notes: ''}`;
+    div.textContent = `${it.event} · ${it.school}`;
+    return div;
+  }
+  function attachExpand(container, list, startIndex, makeFn){
+    const restCount = list.length - startIndex;
+    const more = document.createElement('span');
+    more.className='chip-more';
+    more.setAttribute('role','button');
+    more.setAttribute('aria-expanded','false');
+    more.tabIndex = 0;
+    more.textContent = `+${restCount} more`;
+    const expand = ()=>{
+      for(const it of list.slice(startIndex)){
+        const el = makeFn(it);
+        el.classList.add('extra-chip');
+        container.appendChild(el);
+      }
+      more.textContent = 'Show less';
+      more.setAttribute('aria-expanded','true');
+    };
+    const collapse = ()=>{
+      container.querySelectorAll('.extra-chip').forEach(el=>el.remove());
+      more.textContent = `+${restCount} more`;
+      more.setAttribute('aria-expanded','false');
+    };
+    more.addEventListener('click', ()=>{
+      const expanded = more.getAttribute('aria-expanded')==='true';
+      if(expanded) collapse(); else expand();
+    });
+    more.addEventListener('keydown', (e)=>{
+      if(e.key==='Enter' || e.key===' '){ e.preventDefault(); more.click(); }
+    });
+    container.appendChild(more);
+  }
+
   // ===================== RENDER =====================
   function render(){
     applyFilters();
     renderWeeks();
-    renderMonth();
+    renderMonthFixed();
   }
 
   function renderWeeks(){
@@ -297,18 +348,16 @@
       { label:'Next week', start:nextStart, muted:true },
     ];
 
-    for(const b of blocks){
+    blocks.forEach(b=>{
       const card = document.createElement('div');
       card.className='panel p-4';
       if(b.highlight) card.style.outline = '2px solid var(--blue-300)';
 
       const weekEnd = b.start.add(4,'day');
-      const title = `${fmt(b.start,'MMM D')} – ${fmt(weekEnd,'MMM D')}`;
-
       const header = document.createElement('div');
       header.className='row';
       header.style.justifyContent='space-between';
-      header.innerHTML = `<div><div class="muted" style="text-transform:uppercase;font-size:11px">${b.label}</div><div class="week-title">${title}</div></div>`;
+      header.innerHTML = `<div><div class="muted" style="text-transform:uppercase;font-size:11px">${b.label}</div><div class="week-title">${b.start.format('MMM D')} – ${weekEnd.format('MMM D')}</div></div>`;
       card.appendChild(header);
 
       const daysWrap = document.createElement('div');
@@ -321,27 +370,18 @@
         const list = byDate[key] || [];
         const dayDiv = document.createElement('div');
         dayDiv.className = 'day' + (d.isSame(dayjs(),'day') ? ' today' : '');
-        const count = `${list.length} event${list.length===1?'':'s'}`;
+
         const top = document.createElement('div');
         top.className='row';
         top.style.justifyContent='space-between';
-        top.innerHTML = `<div style="font-size:12px;font-weight:600;color:#334155">${fmt(d,'ddd, MMM D')}</div><div class="muted" style="font-size:11px">${count}</div>`;
+        top.innerHTML = `<div style="font-size:12px;font-weight:600;color:#334155">${d.format('ddd, MMM D')}</div><div class="muted" style="font-size:11px">${list.length} event${list.length===1?'':'s'}</div>`;
         dayDiv.appendChild(top);
+
         const chips = document.createElement('div');
-        chips.style.display='flex';chips.style.flexWrap='wrap';chips.style.gap='6px';
-        for(const [i,it] of list.slice(0,6).entries()){
-          const span = document.createElement('span');
-          span.className = 'badge';
-          applySchoolColor(span, it.school);
-          span.title = `${it.event} • ${it.school}${it.notes? ' — '+it.notes: ''}`;
-          span.textContent = `${it.event} · ${it.school}`;
-          chips.appendChild(span);
-        }
+        chips.style.display='flex'; chips.style.flexWrap='wrap'; chips.style.gap='6px';
+        list.slice(0,6).forEach(it => chips.appendChild(makeChip(it)));
         if(list.length>6){
-          const more = document.createElement('span');
-          more.className='chip-more';
-          more.textContent = `+${list.length-6} more`;
-          chips.appendChild(more);
+          attachExpand(chips, list, 6, makeChip);
         }
         dayDiv.appendChild(chips);
         daysWrap.appendChild(dayDiv);
@@ -349,10 +389,10 @@
 
       card.appendChild(daysWrap);
       weeksEl.appendChild(card);
-    }
+    });
   }
 
-  function renderMonth(){
+  function renderMonthFixed(){
     const byDate = groupByDate(FILTERED);
     const monthCursor = ANCHOR_DAY;
     document.getElementById('monthLabel').textContent = monthCursor.format('MMMM YYYY');
@@ -393,22 +433,16 @@
         const todayTag = d.isSame(dayjs(),'day') ? '<span style="background:var(--blue-200);color:#1e40af;border-radius:6px;padding:0 4px">Today</span>' : '';
         top.innerHTML = `<span>${d.date()}</span>${todayTag}`;
         cell.appendChild(top);
+
+        const chipsWrap = document.createElement('div');
         for(const it of items.slice(0,3)){
-          const div = document.createElement('div');
-          div.className = 'badge';
-          applySchoolColor(div, it.school);
-          div.style.display='block';
-          div.style.marginBottom='4px';
-          div.title = `${it.event} • ${it.school}${it.notes? ' — '+it.notes: ''}`;
-          div.textContent = `${it.event} · ${it.school}`;
-          cell.appendChild(div);
+          chipsWrap.appendChild(makeMonthChip(it));
         }
         if(items.length>3){
-          const more = document.createElement('div');
-          more.className='muted'; more.style.fontSize='11px';
-          more.textContent = `+${items.length-3} more…`;
-          cell.appendChild(more);
+          attachExpand(chipsWrap, items, 3, makeMonthChip);
         }
+        cell.appendChild(chipsWrap);
+
         row.appendChild(cell);
       }
       gridEl.appendChild(row);
