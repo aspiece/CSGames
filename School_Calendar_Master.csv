@@ -134,16 +134,16 @@ Date,Event,School
 2026-04-02,No School,Bentley Community Schools
 2026-04-03,No School,Bentley Community Schools
 2026-04-06,No School,Bentley Community Schools
-2026-04-15,Half Day (Staff PL),Bentley Community Schools
-2026-05-20,Half Day (Staff PL),Bentley Community Schools
+2026-04-15,Half Day,Bentley Community Schools
+2026-05-20,Half Day,Bentley Community Schools
 2026-05-25,No School,Bentley Community Schools
 2026-06-09,Half Day (Last Day of School),Bentley Community Schools
-2025-08-25,First Day (All Students),Goodrich Area Schools
+2025-08-25,First Day,Goodrich Area Schools
 2025-09-01,No School,Goodrich Area Schools
 2025-09-17,No School,Goodrich Area Schools
-2025-09-26,No School (Homecoming),Goodrich Area Schools
+2025-09-26,No School,Goodrich Area Schools
 2025-10-17,No School,Goodrich Area Schools
-2025-10-22,Half Day (All Students),Goodrich Area Schools
+2025-10-22,Half Day,Goodrich Area Schools
 2025-11-18,No School,Goodrich Area Schools
 2025-11-21,No School,Goodrich Area Schools
 2025-11-26,No School,Goodrich Area Schools
@@ -832,5 +832,6 @@ Date,Event,School
 2026-06-02,Half Day,Powers Catholic High School
 2026-06-03,Half Day,Powers Catholic High School
 2026-06-04,Half Day,Powers Catholic High School
+
 
 
