@@ -5,13 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Pacing Guide</title>
   <style>
-    /* Force PDF/print to landscape when possible (browser dependent) */
-    @page { size: landscape; margin: 12mm; }
-    /* WebKit/Chromium color handling for print */
-    @media print {
-      html, body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-      @page { size: landscape; }
-    }
+    /* Removed forced landscape @page rules per request */
     :root{--bg:#0f172a;--card:#111827;--text:#e5e7eb;--muted:#9ca3af;--accent:#22d3ee;--table:#1f2937}
     html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Helvetica,Arial,sans-serif}
     .wrap{max-width:1400px;margin:40px auto;padding:0 20px}
