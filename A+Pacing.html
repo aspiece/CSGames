@@ -45,7 +45,13 @@
     <div class="card">
       <div class="hint">Click a day number to reveal that day's plan. Sub materials and all student documents live in Google Classroom; slides are used to project any prompts or timers.</div>
 
-      <div id="day-nav" class="day-nav" aria-hidden="false"></div>
+      <!-- CSV controls -->
+      <div style="margin:10px 0;display:flex;gap:8px;align-items:center">
+        <label class="small" style="margin:0">Load pacing from CSV:</label>
+        <input id="csv-file" type="file" accept=".csv" />
+        <button id="try-fetch-csv" type="button" class="day-btn" style="padding:6px 10px">Fetch ./pacing.csv</button>
+        <span class="small" style="margin-left:8px;color:var(--muted)">CSV headers: Day,Lesson,Topics,Agenda,BrainBreak,Summative,SubActions,TeacherPrep</span>
+      </div>
 
       <table id="pacing-table" role="table" aria-label="16 day pacing guide">
         <thead>
@@ -60,7 +66,8 @@
             <th>Teacher Prep (Before class)</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody id="pacing-body">
+          <!-- existing static rows remain as fallback; JS will replace tbody if CSV is loaded -->
           <!-- Day 1 -->
           <tr class="day-row" data-day="1">
             <td class="sticky day-toggle">1</td>
@@ -389,38 +396,106 @@
   </div>
 
   <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    // CSV utilities (handles quoted fields/newlines)
+    function parseCSV(text) {
+      const rows = [];
+      let cur = '';
+      let row = [];
+      let inQuotes = false;
+      for (let i = 0; i < text.length; i++) {
+        const ch = text[i];
+        const next = text[i+1];
+        if (ch === '"' ) {
+          if (inQuotes && next === '"') { cur += '"'; i++; } // escaped quote
+          else inQuotes = !inQuotes;
+          continue;
+        }
+        if (ch === ',' && !inQuotes) {
+          row.push(cur); cur = ''; continue;
+        }
+        if ((ch === '\n' || ch === '\r') && !inQuotes) {
+          if (ch === '\r' && next === '\n') { /* skip paired */ }
+          if (cur !== '' || row.length) { row.push(cur); cur = ''; rows.push(row); row = []; }
+          continue;
+        }
+        cur += ch;
+      }
+      if (cur !== '' || row.length) { row.push(cur); rows.push(row); }
+      return rows;
+    }
+
+    // Render rows array of objects into table body
+    function renderRows(data) {
+      const tbody = document.getElementById('pacing-body');
+      tbody.innerHTML = ''; // clear
+      data.forEach(item => {
+        const tr = document.createElement('tr');
+        tr.className = 'day-row';
+        tr.setAttribute('data-day', item.Day || '');
+        tr.innerHTML = `
+          <td class="sticky day-toggle">${item.Day || ''}</td>
+          <td>${item.Lesson || ''}</td>
+          <td>${item.Topics || ''}</td>
+          <td>${item.Agenda || ''}</td>
+          <td>${item.BrainBreak || ''}</td>
+          <td class="small">${item.Summative || '—'}</td>
+          <td>${item.SubActions || ''}</td>
+          <td>${item.TeacherPrep || ''}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+      initCollapsibleUI(); // re-init nav/buttons/toggles
+    }
+
+    // Convert CSV text to data objects using header row
+    function csvToObjects(text) {
+      const rows = parseCSV(text).filter(r => r.length > 0);
+      if (rows.length < 1) return [];
+      const headers = rows[0].map(h => h.trim());
+      return rows.slice(1).map(r => {
+        const obj = {};
+        headers.forEach((h, i) => obj[h] = (r[i] || '').trim());
+        return obj;
+      });
+    }
+
+    // Attempt to fetch ./pacing.csv (same folder). Returns promise.
+    function fetchCsvFallback() {
+      return fetch('pacing.csv').then(resp => {
+        if (!resp.ok) throw new Error('Not found');
+        return resp.text();
+      });
+    }
+
+    // Collapsible UI builder (same behavior as previously)
+    function initCollapsibleUI() {
       const rows = Array.from(document.querySelectorAll('.day-row'));
       const dayNav = document.getElementById('day-nav');
-
-      // Build day nav buttons
+      dayNav.innerHTML = '';
       rows.forEach((row, idx) => {
         const day = row.getAttribute('data-day') || (idx+1);
         const btn = document.createElement('button');
         btn.className = 'day-btn';
         btn.type = 'button';
         btn.textContent = day;
-        btn.setAttribute('aria-controls', 'day-'+day);
         btn.addEventListener('click', () => {
           const alreadyVisible = row.classList.contains('visible');
-          // hide all
           rows.forEach(r => r.classList.remove('visible'));
           document.querySelectorAll('.day-btn').forEach(b => b.classList.remove('active'));
           if (!alreadyVisible) {
             row.classList.add('visible');
             btn.classList.add('active');
-            // ensure row is scrolled into view
             row.scrollIntoView({behavior: 'smooth', block: 'center'});
           } else {
-            // collapse (no active)
             btn.classList.remove('active');
           }
         });
         dayNav.appendChild(btn);
       });
 
-      // Also make clicking the day number cell toggle the row
+      // day-number clicks toggle too
       document.querySelectorAll('td.day-toggle').forEach(td => {
+        td.style.cursor = 'pointer';
         td.addEventListener('click', () => {
           const tr = td.closest('tr');
           const day = tr.getAttribute('data-day');
@@ -428,8 +503,36 @@
           btn && btn.click();
         });
       });
+    }
 
-      // Initially collapsed: nothing visible
+    document.addEventListener('DOMContentLoaded', function() {
+      initCollapsibleUI(); // initialize with fallback static rows (if any)
+
+      // File input upload
+      const input = document.getElementById('csv-file');
+      input.addEventListener('change', (e) => {
+        const f = e.target.files[0];
+        if (!f) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          try {
+            const objs = csvToObjects(reader.result);
+            if (objs.length) renderRows(objs);
+          } catch (err) { console.error(err); alert('CSV parse error'); }
+        };
+        reader.readAsText(f);
+      });
+
+      // Try fetching pacing.csv in same folder
+      document.getElementById('try-fetch-csv').addEventListener('click', () => {
+        fetchCsvFallback().then(text => {
+          const objs = csvToObjects(text);
+          if (objs.length) renderRows(objs);
+        }).catch(()=> alert('pacing.csv not found at site root.'));
+      });
+
+      // Optional: auto-fetch on load (commented out). Uncomment to auto-load if you host pacing.csv.
+      // fetchCsvFallback().then(text => { const objs = csvToObjects(text); if (objs.length) renderRows(objs); }).catch(()=>{/*ignore*/});
     });
   </script>
 </body>
