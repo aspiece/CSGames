@@ -117,9 +117,22 @@
       const rows = parseCSV(text).filter(r => r.length > 0);
       if (rows.length < 1) return [];
       const headers = rows[0].map(h => h.trim());
+      // expected base columns (without Video)
+      const expectedBaseCount = 8; // Day,Lesson,Topics,Agenda,BrainBreak,Summative,duringclass,TeacherPrep
+      const videoIndex = headers.findIndex(h => h.toLowerCase() === 'video');
+      const treatLastAsVideo = videoIndex === -1 && headers.length > expectedBaseCount;
+
       return rows.slice(1).map(r => {
         const obj = {};
         headers.forEach((h, i) => obj[h] = (r[i] || '').trim());
+        // ensure there's always a Video property
+        if (videoIndex !== -1) {
+          obj.Video = (r[videoIndex] || '').trim();
+        } else if (treatLastAsVideo) {
+          obj.Video = (r[headers.length - 1] || '').trim();
+        } else {
+          obj.Video = '';
+        }
         return obj;
       });
     }
