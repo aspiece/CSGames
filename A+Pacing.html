@@ -266,7 +266,10 @@
         tr.setAttribute('data-date', iso); // normalized ISO date for routing
         // build video + slides cells showing only the extracted links (if any)
         const videoCell = item.video ? `<a href="${escapeAttr(item.video)}" target="_blank" rel="noopener noreferrer">${escapeHtml(item.video)}</a>` : '';
-        const slidesCell = item.slides ? `<a href="${escapeAttr(item.slides)}" target="_blank" rel="noopener noreferrer">${escapeHtml(item.slides)}</a>` : '';
+        // Slides: show a concise "Download" link and include the download attribute (browser support varies)
+        const slidesCell = item.slides
+          ? `<a href="${escapeAttr(item.slides)}" target="_blank" rel="noopener noreferrer" download>Download</a>`
+          : '';
         tr.innerHTML = `
           <td class="sticky day-toggle">${escapeHtml(item.day || iso || '')}</td>
           <td>${escapeHtml(item.lesson || '')}</td>
