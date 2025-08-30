@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>CompTIA A+ Accelerated Pacing Guide</title>
+  <title>CompTIA A+ Pacing Guide</title>
   <style>
     :root{--bg:#0f172a;--card:#111827;--text:#e5e7eb;--muted:#9ca3af;--accent:#22d3ee;--table:#1f2937}
     html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Helvetica,Arial,sans-serif}
@@ -67,6 +67,7 @@
             <th class="sticky">Day</th>
             <th>Lesson</th>
             <th>Topics</th>
+            <th>Video</th>
             <th>Agenda (Merrill’s Principles)</th>
             <th>Brain Break (for slides to project)</th>
             <th>Summative</th>
@@ -167,10 +168,13 @@
         tr.setAttribute('data-day', item.Day || '');
         tr.setAttribute('data-date', iso); // normalized ISO date for routing
         // Agenda and other rich fields may contain HTML from CSV
+        // New: include Video column (expect CSV header "Video" with a link)
+        const videoCell = item.Video ? `<a href="${escapeAttr(item.Video)}" target="_blank" rel="noopener noreferrer">${escapeHtml(item.Video)}</a>` : '';
         tr.innerHTML = `
           <td class="sticky day-toggle">${escapeHtml(item.Day || iso || '')}</td>
           <td>${escapeHtml(item.Lesson || '')}</td>
           <td>${escapeHtml(item.Topics || '')}</td>
+          <td>${videoCell}</td>
           <td>${item.Agenda || ''}</td>
           <td>${item.BrainBreak || ''}</td>
           <td class="small">${escapeHtml(item.Summative || '—')}</td>
@@ -191,6 +195,11 @@
         .replace(/'/g, '&#039;');
     }
 
+    // escape for attribute values (minimal)
+    function escapeAttr(s) {
+      return String(s).replace(/"/g, '%22').replace(/'/g, '%27');
+    }
+
     // Fetch pacing.csv from same directory and render it
     function fetchPacingCsv() {
       const statusEl = document.getElementById('status');
@@ -209,7 +218,7 @@
         .catch(err => {
           console.error(err);
           document.getElementById('status').textContent = 'Error loading pacing.csv — see console for details.';
-          alert('Could not load pacing.csv from the same directory. Ensure pacing.csv exists and uses headers: Day,Lesson,Topics,Agenda,BrainBreak,Summative,duringclass,TeacherPrep');
+          alert('Could not load pacing.csv from the same directory. Ensure pacing.csv exists and uses headers: Day,Lesson,Topics,Video,Agenda,BrainBreak,Summative,duringclass,TeacherPrep');
         });
     }
 
