@@ -38,6 +38,27 @@
     .status{color:var(--muted);margin-bottom:12px}
     .permalink {margin-left:12px;padding:6px 10px;border-radius:8px;background:rgba(255,255,255,.04);color:var(--muted);cursor:pointer;font-size:13px}
     .permalink.copied {background:var(--accent);color:#042023}
+
+    /* Print / PDF layout */
+    @media print {
+      /* page background and text for PDF */
+      html,body { background: #fff; color:#000; }
+      /* hide interactive controls */
+      .day-nav, #date-picker, #today-btn, #clear-btn, #copy-permalink, .hint, #status { display: none !important; }
+      .permalink { display: none !important; }
+      /* show all days in table */
+      .day-row { display: table-row !important; }
+      .day-row.visible { display: table-row !important; }
+      /* make table printable and compact */
+      table { width:100%; border-collapse:collapse; font-size:12px; color:#000; page-break-inside: auto; }
+      thead { background: none !important; color:#000; }
+      th, td { color:#000; border:1px solid #bbb; padding:8px; vertical-align:top; }
+      .sticky { position:static !important; background:transparent !important; }
+      /* avoid page break inside agenda items */
+      td { page-break-inside: avoid; }
+      /* optional: expand agenda lists readability */
+      ul.agenda { padding-left:16px; }
+    }
   </style>
 </head>
 <body>
@@ -56,6 +77,7 @@
         <button id="today-btn" class="day-btn" type="button" title="Go to today">Today</button>
         <button id="clear-btn" class="day-btn" type="button" title="Collapse all" style="background:transparent">Clear</button>
         <div style="flex:1"></div>
+        <button id="download-pdf" class="permalink" title="Download page as PDF">Download PDF</button>
         <button id="copy-permalink" class="permalink" title="Copy permalink for the currently open day" style="display:none">Copy link</button>
       </div>
 
@@ -369,8 +391,26 @@
       });
     }
 
+    // Download PDF (uses browser print -> Save as PDF)
+    function setupPdfDownload() {
+      const btn = document.getElementById('download-pdf');
+      btn.addEventListener('click', () => {
+        // ensure all rows are visible for the print preview
+        document.querySelectorAll('.day-row').forEach(r => r.classList.add('visible'));
+        // small delay to ensure DOM updates then print
+        setTimeout(() => {
+          window.print();
+          // collapse back to previous state after print dialog closes (best-effort)
+          setTimeout(() => {
+            document.querySelectorAll('.day-row').forEach(r => r.classList.remove('visible'));
+          }, 500);
+        }, 150);
+      });
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
       setupPermalink();
+      setupPdfDownload();
       fetchPacingCsv();
     });
   </script>
