@@ -3,8 +3,9 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>CompTIA A+ Accelerated Pacing Guide (16 Days)</title>
+  <title>Pacing Guide</title>
   <style>
+    /* Removed forced landscape @page rules per request */
     :root{--bg:#0f172a;--card:#111827;--text:#e5e7eb;--muted:#9ca3af;--accent:#22d3ee;--table:#1f2937}
     html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Helvetica,Arial,sans-serif}
     .wrap{max-width:1400px;margin:40px auto;padding:0 20px}
@@ -38,19 +39,50 @@
     .status{color:var(--muted);margin-bottom:12px}
     .permalink {margin-left:12px;padding:6px 10px;border-radius:8px;background:rgba(255,255,255,.04);color:var(--muted);cursor:pointer;font-size:13px}
     .permalink.copied {background:var(--accent);color:#042023}
+
+    /* Print / PDF layout */
+    @media print {
+      /* page background and text for PDF */
+      html,body { background: #fff; color:#000; }
+      /* hide interactive controls */
+      .day-nav, #date-picker, #today-btn, #clear-btn, #copy-permalink, .hint, #status { display: none !important; }
+      .permalink { display: none !important; }
+      /* show all days in table */
+      .day-row { display: table-row !important; }
+      .day-row.visible { display: table-row !important; }
+      /* make table printable and compact */
+      table { width:100%; border-collapse:collapse; font-size:12px; color:#000; page-break-inside: auto; }
+      thead { background: none !important; color:#000; }
+      th, td { color:#000; border:1px solid #bbb; padding:8px; vertical-align:top; }
+      .sticky { position:static !important; background:transparent !important; }
+      /* avoid page break inside agenda items */
+      td { page-break-inside: avoid; }
+      /* optional: expand agenda lists readability */
+      ul.agenda { padding-left:16px; }
+    }
   </style>
 </head>
 <body>
   <div class="wrap">
-    <h1>CompTIA A+ Pacing Guide (16 Days)</h1>
-    <p>Each day is a 1.5 hour session. Each agenda follows Merrill’s Effective Instruction (Activation → Demonstration → Application → Integration). All worksheets, videos, and assessments are distributed via Google Classroom. The substitute will use a slide deck (projected) to pace class time and display discussion prompts, timers, and brain-break instructions.</p>
+    <h1>CompTIA A+ Pacing Guide</h1>
+    <p>Each session follows Merrill’s Effective Instruction (Activation → Demonstration → Application → Integration). All worksheets, videos, and assessments are distributed via Google Classroom. Slides are used to pace class time and display prompts, timers, and brain‑break instructions.</p>
 
     <div class="card">
-      <div class="hint">This page loads its content exclusively from pacing.csv in the same directory. The slide deck and Classroom links referenced in the CSV are used by the substitute to run class. Click a day number to reveal that day's plan. Each day has a unique URL (hash).</div>
+      <div class="hint">This page loads its content from pacing.csv in the same directory. Click a date to reveal that day's plan. Each day gets a unique URL (hash).</div>
       <div id="status" class="status">Loading pacing.csv …</div>
 
-      <div id="day-nav" class="day-nav" aria-hidden="false"></div>
-      <button id="copy-permalink" class="permalink" title="Copy permalink for the currently open day" style="display:none">Copy link</button>
+      <!-- calendar-style selection: date picker + available-dates grid -->
+      <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:12px">
+        <label class="small" for="date-picker" style="margin:0">Jump to date:</label>
+        <input id="date-picker" type="date" style="padding:6px;border-radius:8px;border:1px solid rgba(255,255,255,.06);background:transparent;color:var(--text)" />
+        <button id="today-btn" class="day-btn" type="button" title="Go to today">Today</button>
+        <button id="clear-btn" class="day-btn" type="button" title="Collapse all" style="background:transparent">Clear</button>
+        <div style="flex:1"></div>
+        <button id="download-pdf" class="permalink" title="Download page as PDF">Download PDF</button>
+        <button id="copy-permalink" class="permalink" title="Copy permalink for the currently open day" style="display:none">Copy link</button>
+      </div>
+
+      <div id="day-nav" class="day-nav" aria-hidden="false" style="gap:6px;max-width:100%;overflow:auto;padding-bottom:6px"></div>
 
       <table id="pacing-table" role="table" aria-label="pacing guide">
         <thead>
@@ -58,11 +90,13 @@
             <th class="sticky">Day</th>
             <th>Lesson</th>
             <th>Topics</th>
-            <th>Agenda (Merrill’s Principles)</th>
-            <th>Brain Break (for sub to project)</th>
+            <th>Video</th>
+            <th>Slides</th>
+            <th>Agenda</th>
+            <th>Brain Break</th>
             <th>Summative</th>
-            <th>Substitute Actions (During class)</th>
-            <th>Teacher Prep (Before class)</th>
+            <th>During class</th>
+            <th>Teacher Prep</th>
           </tr>
         </thead>
         <tbody id="pacing-body">
@@ -75,7 +109,17 @@
   </div>
 
   <script>
-    // CSV utilities (handles quoted fields/newlines)
+    // extract first http/https url from a string (returns empty string if none)
+    function extractFirstUrl(s) {
+      if (!s) return '';
+      // match http/https links, allow typical URL characters, stop at whitespace or pipe or quote
+      const m = String(s).match(/https?:\/\/[^\s\|"')<>]+/i);
+      if (!m) return '';
+      // trim common trailing punctuation
+      return m[0].replace(/[.,)\]]+$/, '');
+    }
+
+    // CSV parser (handles quoted fields and newlines)
     function parseCSV(text) {
       const rows = [];
       let cur = '';
@@ -106,31 +150,134 @@
     function csvToObjects(text) {
       const rows = parseCSV(text).filter(r => r.length > 0);
       if (rows.length < 1) return [];
-      const headers = rows[0].map(h => h.trim());
+      const rawHeaders = rows[0].map(h => h.trim());
+
+      // normalize headers into safe keys: lowercased, remove non-alphanum
+      const headers = rawHeaders.map(h => h.toLowerCase().replace(/[^a-z0-9]+/g, ''));
+
+      // helper name lists
+      const videoNames = ['video','videos','videolink','videolinks'];
+      const slideNames = ['slide','slides','slidedeck','slidedecklink','slidelink','deck','presentation'];
+
+      // detect explicit indices
+      let videoIndex = headers.findIndex(h => videoNames.includes(h));
+      let slideIndex = headers.findIndex(h => slideNames.includes(h));
+
+      const expectedBaseCount = 8; // day,lesson,topics,agenda,brainbreak,summative,duringclass,teacherprep
+      // handle common cases when headers don't explicitly include video/slides:
+      if (videoIndex === -1 && slideIndex === -1) {
+        if (rawHeaders.length === expectedBaseCount + 1) {
+          // single extra column -> assume it's video
+          videoIndex = expectedBaseCount;
+        } else if (rawHeaders.length === expectedBaseCount + 2) {
+          // two extra -> assume video then slides
+          videoIndex = expectedBaseCount;
+          slideIndex = expectedBaseCount + 1;
+        }
+      } else if (videoIndex === -1 && slideIndex !== -1) {
+        // slides found but video missing, if there is an extra column before slide, assume that is video
+        if (rawHeaders.length > expectedBaseCount) {
+          const candidate = rawHeaders.length - 1;
+          if (slideIndex !== candidate && candidate >= expectedBaseCount) videoIndex = candidate;
+        }
+      } else if (slideIndex === -1 && videoIndex !== -1) {
+        // video found and there's another extra column after base -> assume last extra is slides
+        if (rawHeaders.length > expectedBaseCount + 1) {
+          slideIndex = rawHeaders.length - 1;
+        }
+      }
+
       return rows.slice(1).map(r => {
         const obj = {};
-        headers.forEach((h, i) => obj[h] = (r[i] || '').trim());
+        // map normalized header keys to their raw column values
+        headers.forEach((key, i) => {
+          obj[key] = (r[i] || '').trim();
+        });
+
+        // canonical keys fallback (if original headers used different names)
+        // lowercased canonical accessors (may already exist in obj)
+        obj.day = obj.day || obj['day'] || obj['1'] || '';
+        obj.lesson = obj.lesson || obj['lesson'] || '';
+        obj.topics = obj.topics || obj['topics'] || '';
+        obj.agenda = obj.agenda || obj['agenda'] || '';
+        obj.brainbreak = obj.brainbreak || obj['brainbreak'] || obj['brainbreak'] || '';
+        obj.summative = obj.summative || obj['summative'] || '';
+        obj.duringclass = obj.duringclass || obj['duringclass'] || '';
+        obj.teacherprep = obj.teacherprep || obj['teacherprep'] || '';
+
+        // extract video and slides URLs (first URL found)
+        let rawVideo = '';
+        let rawSlide = '';
+        if (videoIndex !== -1) rawVideo = (r[videoIndex] || '').trim();
+        if (slideIndex !== -1) rawSlide = (r[slideIndex] || '').trim();
+        // if video not found but there's a header named 'video' key in obj, prefer that
+        if (!rawVideo && obj.video) rawVideo = obj.video;
+        obj.video = extractFirstUrl(rawVideo);
+        obj.slides = extractFirstUrl(rawSlide);
         return obj;
       });
     }
 
-    // render rows of arbitrary length
+    // Parse various date formats and normalize to ISO (yyyy-mm-dd).
+    function parseDateString(s) {
+      if (!s) return null;
+      s = s.trim();
+      // if the value is a simple integer (day number like "1", "16"), treat as NOT a date
+      if (/^\d+$/.test(s)) return null;
+      // If already ISO-like yyyy-mm-dd
+      if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+      // Try common US format mm/dd/yyyy or m/d/yyyy
+      const m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/);
+      if (m) {
+        let mm = m[1].padStart(2,'0'), dd = m[2].padStart(2,'0'), yy = m[3];
+        if (yy.length === 2) yy = '20' + yy;
+        return `${yy}-${mm}-${dd}`;
+      }
+      // Try Date.parse fallback (may accept formats like "Aug 29 2025")
+      const d = new Date(s);
+      if (!isNaN(d.getTime())) {
+        const y = d.getFullYear();
+        const mm = String(d.getMonth()+1).padStart(2,'0');
+        const dd = String(d.getDate()).padStart(2,'0');
+        return `${y}-${mm}-${dd}`;
+      }
+      return null;
+    }
+
+    function formatDisplayDate(iso) {
+      if (!iso) return '';
+      const d = new Date(iso);
+      if (isNaN(d.getTime())) return iso;
+      const opts = {month:'short', day:'numeric'};
+      return d.toLocaleDateString(undefined, opts);
+    }
+
+    // Render rows dynamically from CSV. Accepts arbitrary number of days.
     function renderRows(data) {
       const tbody = document.getElementById('pacing-body');
       tbody.innerHTML = '';
+      // normalize and enrich items with isoDate
       data.forEach(item => {
+        // use canonical keys created by csvToObjects (lowercased, no spaces)
+        const iso = parseDateString(item.day) || '';
         const tr = document.createElement('tr');
         tr.className = 'day-row';
-        tr.setAttribute('data-day', item.Day || '');
+        tr.setAttribute('data-day', item.day || '');
+        tr.setAttribute('data-date', iso); // normalized ISO date for routing
+        // build video + slides cells showing only the extracted links (if any)
+        const videoCell = item.video ? `<a href="${escapeAttr(item.video)}" target="_blank" rel="noopener noreferrer">${escapeHtml(item.video)}</a>` : '';
+        const slidesCell = item.slides ? `<a href="${escapeAttr(item.slides)}" target="_blank" rel="noopener noreferrer">${escapeHtml(item.slides)}</a>` : '';
         tr.innerHTML = `
-          <td class="sticky day-toggle">${escapeHtml(item.Day || '')}</td>
-          <td>${escapeHtml(item.Lesson || '')}</td>
-          <td>${escapeHtml(item.Topics || '')}</td>
-          <td>${item.Agenda || ''}</td>
-          <td>${item.BrainBreak || ''}</td>
-          <td class="small">${escapeHtml(item.Summative || '—')}</td>
-          <td>${item.SubActions || ''}</td>
-          <td>${item.TeacherPrep || ''}</td>
+          <td class="sticky day-toggle">${escapeHtml(item.day || iso || '')}</td>
+          <td>${escapeHtml(item.lesson || '')}</td>
+          <td>${escapeHtml(item.topics || '')}</td>
+          <td>${videoCell}</td>
+          <td>${slidesCell}</td>
+          <td>${item.agenda || ''}</td>
+          <td>${item.brainbreak || ''}</td>
+          <td class="small">${escapeHtml(item.summative || '—')}</td>
+          <td>${item.duringclass || ''}</td>
+          <td>${item.teacherprep || ''}</td>
         `;
         tbody.appendChild(tr);
       });
@@ -146,6 +293,12 @@
         .replace(/'/g, '&#039;');
     }
 
+    // escape for attribute values (minimal)
+    function escapeAttr(s) {
+      return String(s).replace(/"/g, '%22').replace(/'/g, '%27');
+    }
+
+    // Fetch pacing.csv from same directory and render it
     function fetchPacingCsv() {
       const statusEl = document.getElementById('status');
       return fetch('pacing.csv', {cache: 'no-store'})
@@ -158,73 +311,112 @@
           if (!objs.length) throw new Error('pacing.csv is empty or malformed');
           renderRows(objs);
           statusEl.textContent = `Loaded pacing.csv (${objs.length} day${objs.length===1?'':'s'})`;
-          // If hash present or query param present, open that day
           setTimeout(() => applyInitialRoute(), 20);
         })
         .catch(err => {
           console.error(err);
           document.getElementById('status').textContent = 'Error loading pacing.csv — see console for details.';
-          alert('Could not load pacing.csv from the same directory. Check that pacing.csv exists and uses header: Day,Lesson,Topics,Agenda,BrainBreak,Summative,SubActions,TeacherPrep');
+          alert('Could not load pacing.csv from the same directory. Ensure pacing.csv exists and uses expected headers.');
         });
     }
 
-    // open a day by value (Day cell content). If not found, try numeric index (1-based)
+    // Open a day by its Day value (exact match), ISO date (yyyy-mm-dd), or numeric index (1-based)
     function openDay(dayValue) {
       const rows = Array.from(document.querySelectorAll('.day-row'));
       if (!rows.length) return;
-      // find row by data-day exact match
-      let target = rows.find(r => r.getAttribute('data-day') === String(dayValue));
+      let target = null;
+      const val = String(dayValue || '');
+      // try exact data-date match first (ISO)
+      target = rows.find(r => (r.getAttribute('data-date') || '') === val);
       if (!target) {
-        // fallback: treat as 1-based index
-        const idx = parseInt(dayValue, 10);
+        // try data-day exact match (original string)
+        target = rows.find(r => r.getAttribute('data-day') === val);
+      }
+      if (!target) {
+        // try numeric index
+        const idx = parseInt(val, 10);
         if (!Number.isNaN(idx) && idx >= 1 && idx <= rows.length) target = rows[idx-1];
       }
       if (!target) return false;
-      // hide all and show target
       rows.forEach(r => r.classList.remove('visible'));
       target.classList.add('visible');
-      // update nav active state
       document.querySelectorAll('.day-btn').forEach(b => b.classList.remove('active'));
-      const btn = Array.from(document.querySelectorAll('.day-btn')).find(b => b.dataset.day === (target.getAttribute('data-day') || ''));
+      const btn = Array.from(document.querySelectorAll('.day-btn')).find(b => b.dataset.date === (target.getAttribute('data-date') || b.dataset.date));
       if (btn) btn.classList.add('active');
-      // set hash (unique URL)
-      const hash = `day-${encodeURIComponent(target.getAttribute('data-day')||'')}`;
+      const hash = `day-${encodeURIComponent(target.getAttribute('data-date')||target.getAttribute('data-day')||'')}`;
       if (location.hash !== `#${hash}`) location.hash = hash;
-      // show permalink button
       document.getElementById('copy-permalink').style.display = 'inline-block';
-      // scroll into view
       target.scrollIntoView({behavior: 'smooth', block: 'center'});
       return true;
     }
 
-    // initialize nav/buttons and day-number toggles
+    // Build navigation and wire up toggles
     function initCollapsibleUI() {
       const rows = Array.from(document.querySelectorAll('.day-row'));
       const dayNav = document.getElementById('day-nav');
       dayNav.innerHTML = '';
+      // create a calendar-style pill for each available date
       rows.forEach((row, idx) => {
-        const day = row.getAttribute('data-day') || (idx+1).toString();
+        const iso = row.getAttribute('data-date') || '';
+        const label = iso ? formatDisplayDate(iso) : (row.getAttribute('data-day') || (idx+1).toString());
         const btn = document.createElement('button');
         btn.className = 'day-btn';
         btn.type = 'button';
-        btn.textContent = day;
-        btn.dataset.day = day;
-        btn.addEventListener('click', () => openDay(day));
+        btn.textContent = label;
+        btn.title = row.getAttribute('data-day') || iso || label;
+        btn.dataset.date = iso;
+        btn.dataset.day = row.getAttribute('data-day') || '';
+        btn.addEventListener('click', () => {
+          // prefer iso date when available
+          openDay(iso || row.getAttribute('data-day') || (idx+1).toString());
+        });
         dayNav.appendChild(btn);
       });
 
-      // day-number clicks toggle too (in-table)
+      // populate date-picker min/max and list of available dates
+      const picker = document.getElementById('date-picker');
+      const dates = rows.map(r => r.getAttribute('data-date')).filter(Boolean).sort();
+      if (dates.length) {
+        picker.min = dates[0];
+        picker.max = dates[dates.length-1];
+      } else {
+        picker.removeAttribute('min'); picker.removeAttribute('max');
+      }
+
+      // wire picker change to open day
+      picker.addEventListener('change', (e) => {
+        if (e.target.value) openDay(e.target.value);
+      });
+      // today and clear buttons
+      document.getElementById('today-btn').addEventListener('click', () => {
+        const todayIso = new Date().toISOString().slice(0,10);
+        // if exact match exists open it else try nearest
+        if (!openDay(todayIso)) {
+          // try to find nearest date >= today, else first available
+          const next = dates.find(d => d >= todayIso) || dates[0];
+          if (next) openDay(next);
+        }
+      });
+      document.getElementById('clear-btn').addEventListener('click', () => {
+        // collapse all and clear hash
+        rows.forEach(r => r.classList.remove('visible'));
+        document.querySelectorAll('.day-btn').forEach(b => b.classList.remove('active'));
+        history.replaceState(null, '', location.pathname + location.search);
+        document.getElementById('copy-permalink').style.display = 'none';
+      });
+
       document.querySelectorAll('td.day-toggle').forEach(td => {
         td.style.cursor = 'pointer';
         td.addEventListener('click', () => {
           const tr = td.closest('tr');
-          const day = tr.getAttribute('data-day');
-          openDay(day);
-        });
-      });
-    }
+          // when clicking the left cell prefer data-date then data-day
+          const date = tr.getAttribute('data-date') || tr.getAttribute('data-day');
+          openDay(date);
+         });
+       });
+     }
 
-    // Parse hash like #day-3 or #day-Intro and open matching day
+    // Hash helpers
     function parseHash() {
       if (!location.hash) return null;
       const h = location.hash.replace(/^#/, '');
@@ -237,36 +429,51 @@
       if (dayFromHash) {
         const opened = openDay(dayFromHash);
         if (!opened) {
-          // if not matched, try numeric part (e.g., hash day-3 -> 3)
           const num = dayFromHash.match(/\d+/);
           if (num) openDay(num[0]);
         }
       }
     }
 
-    // copy current URL (with hash) to clipboard
+    // Permalink copy
     function setupPermalink() {
       const btn = document.getElementById('copy-permalink');
       btn.addEventListener('click', async () => {
         try {
           await navigator.clipboard.writeText(location.href);
-          btn.classList.add('copied');
-          btn.textContent = 'Copied';
+          btn.classList.add('copied'); btn.textContent = 'Copied';
           setTimeout(() => { btn.classList.remove('copied'); btn.textContent = 'Copy link'; }, 1500);
         } catch (e) {
           alert('Could not copy link. Please copy manually: ' + location.href);
         }
       });
 
-      // respond to hashchange (open day accordingly)
       window.addEventListener('hashchange', () => {
         const dayFromHash = parseHash();
         if (dayFromHash) openDay(dayFromHash);
       });
     }
 
+    // Download PDF (uses browser print -> Save as PDF)
+    function setupPdfDownload() {
+      const btn = document.getElementById('download-pdf');
+      btn.addEventListener('click', () => {
+        // ensure all rows are visible for the print preview
+        document.querySelectorAll('.day-row').forEach(r => r.classList.add('visible'));
+        // small delay to ensure DOM updates then print
+        setTimeout(() => {
+          window.print();
+          // collapse back to previous state after print dialog closes (best-effort)
+          setTimeout(() => {
+            document.querySelectorAll('.day-row').forEach(r => r.classList.remove('visible'));
+          }, 500);
+        }, 150);
+      });
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
       setupPermalink();
+      setupPdfDownload();
       fetchPacingCsv();
     });
   </script>
