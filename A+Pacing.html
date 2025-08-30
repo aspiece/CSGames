@@ -111,8 +111,11 @@
     // extract first http/https url from a string (returns empty string if none)
     function extractFirstUrl(s) {
       if (!s) return '';
-      const m = String(s).match(/https?:\/\/[^\s,")']+/i);
-      return m ? m[0].replace(/[.,)]+$/,'') : '';
+      // match http/https links, allow typical URL characters, stop at whitespace or pipe or quote
+      const m = String(s).match(/https?:\/\/[^\s\|"')<>]+/i);
+      if (!m) return '';
+      // trim common trailing punctuation
+      return m[0].replace(/[.,)\]]+$/, '');
     }
 
     // CSV parser (handles quoted fields and newlines)
@@ -146,20 +149,29 @@
     function csvToObjects(text) {
       const rows = parseCSV(text).filter(r => r.length > 0);
       if (rows.length < 1) return [];
-      const headers = rows[0].map(h => h.trim());
-      // expected base columns (without Video)
-      const expectedBaseCount = 8; // Day,Lesson,Topics,Agenda,BrainBreak,Summative,duringclass,TeacherPrep
-      const videoIndex = headers.findIndex(h => h.toLowerCase() === 'video');
-      const treatLastAsVideo = videoIndex === -1 && headers.length > expectedBaseCount;
+      const rawHeaders = rows[0].map(h => h.trim());
+
+      // normalize headers into safe keys: lowercased, remove non-alphanum
+      const headers = rawHeaders.map(h => h.toLowerCase().replace(/[^a-z0-9]+/g, ''));
+
+      // detect video column index (either header explicitly 'video' or last extra column)
+      const videoIndex = headers.indexOf('video');
+      const expectedBaseCount = 8; // day,lesson,topics,agenda,brainbreak,summative,duringclass,teacherprep
+      const treatLastAsVideo = videoIndex === -1 && rawHeaders.length > expectedBaseCount;
 
       return rows.slice(1).map(r => {
         const obj = {};
-        headers.forEach((h, i) => obj[h] = (r[i] || '').trim());
-        // normalize Video -> extract only the first URL (if present)
+        headers.forEach((key, i) => {
+          obj[key] = (r[i] || '').trim();
+        });
+        // ensure canonical keys exist even if header names varied (backwards compatibility)
+        // map common variations to canonical names
+        if (!obj.day && obj['day']) obj.day = obj['day'];
+        // extract Video as canonical 'video' key (only first URL)
         let rawVideo = '';
         if (videoIndex !== -1) rawVideo = (r[videoIndex] || '').trim();
-        else if (treatLastAsVideo) rawVideo = (r[headers.length - 1] || '').trim();
-        obj.Video = extractFirstUrl(rawVideo);
+        else if (treatLastAsVideo) rawVideo = (r[rawHeaders.length - 1] || '').trim();
+        obj.video = extractFirstUrl(rawVideo);
         return obj;
       });
     }
@@ -168,6 +180,8 @@
     function parseDateString(s) {
       if (!s) return null;
       s = s.trim();
+      // if the value is a simple integer (day number like "1", "16"), treat as NOT a date
+      if (/^\d+$/.test(s)) return null;
       // If already ISO-like yyyy-mm-dd
       if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
       // Try common US format mm/dd/yyyy or m/d/yyyy
@@ -202,24 +216,24 @@
       tbody.innerHTML = '';
       // normalize and enrich items with isoDate
       data.forEach(item => {
-        const iso = parseDateString(item.Day) || '';
+        // use canonical keys created by csvToObjects (lowercased, no spaces)
+        const iso = parseDateString(item.day) || '';
         const tr = document.createElement('tr');
         tr.className = 'day-row';
-        tr.setAttribute('data-day', item.Day || '');
+        tr.setAttribute('data-day', item.day || '');
         tr.setAttribute('data-date', iso); // normalized ISO date for routing
-        // Agenda and other rich fields may contain HTML from CSV
-        // New: include Video column (expect CSV header "Video" with a link)
-        const videoCell = item.Video ? `<a href="${escapeAttr(item.Video)}" target="_blank" rel="noopener noreferrer">${escapeHtml(item.Video)}</a>` : '';
+        // build video cell showing only the extracted link (if any)
+        const videoCell = item.video ? `<a href="${escapeAttr(item.video)}" target="_blank" rel="noopener noreferrer">${escapeHtml(item.video)}</a>` : '';
         tr.innerHTML = `
-          <td class="sticky day-toggle">${escapeHtml(item.Day || iso || '')}</td>
-          <td>${escapeHtml(item.Lesson || '')}</td>
-          <td>${escapeHtml(item.Topics || '')}</td>
+          <td class="sticky day-toggle">${escapeHtml(item.day || iso || '')}</td>
+          <td>${escapeHtml(item.lesson || '')}</td>
+          <td>${escapeHtml(item.topics || '')}</td>
           <td>${videoCell}</td>
-          <td>${item.Agenda || ''}</td>
-          <td>${item.BrainBreak || ''}</td>
-          <td class="small">${escapeHtml(item.Summative || '—')}</td>
+          <td>${item.agenda || ''}</td>
+          <td>${item.brainbreak || ''}</td>
+          <td class="small">${escapeHtml(item.summative || '—')}</td>
           <td>${item.duringclass || ''}</td>
-          <td>${item.TeacherPrep || ''}</td>
+          <td>${item.teacherprep || ''}</td>
         `;
         tbody.appendChild(tr);
       });
