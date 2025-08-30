@@ -28,13 +28,16 @@
     ul.agenda{margin:6px 0;padding-left:18px;font-size:13px;line-height:1.4}
 
     /* Collapsible UI */
-    .day-nav{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+    .day-nav{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;align-items:center}
     .day-btn{background:transparent;border:1px solid rgba(255,255,255,.06);color:var(--text);padding:8px 12px;border-radius:8px;cursor:pointer;font-weight:700}
     .day-btn.active{background:var(--accent);color:#042023;border:none}
     .day-row{display:none}
     .day-row.visible{display:table-row}
     td.day-toggle{cursor:pointer;width:48px;text-align:center;font-weight:700;border-right:1px solid rgba(255,255,255,.03)}
     .hint{color:var(--muted);font-size:13px;margin-bottom:8px}
+    .status{color:var(--muted);margin-bottom:12px}
+    .permalink {margin-left:12px;padding:6px 10px;border-radius:8px;background:rgba(255,255,255,.04);color:var(--muted);cursor:pointer;font-size:13px}
+    .permalink.copied {background:var(--accent);color:#042023}
   </style>
 </head>
 <body>
@@ -43,351 +46,27 @@
     <p>Each day is a 1.5 hour session. Each agenda follows Merrill’s Effective Instruction (Activation → Demonstration → Application → Integration). All worksheets, videos, and assessments are distributed via Google Classroom. The substitute will use a slide deck (projected) to pace class time and display discussion prompts, timers, and brain-break instructions.</p>
 
     <div class="card">
-      <div class="hint">Click a day number to reveal that day's plan. Sub materials and all student documents live in Google Classroom; slides are used to project any prompts or timers.</div>
+      <div class="hint">This page loads its content exclusively from pacing.csv in the same directory. The slide deck and Classroom links referenced in the CSV are used by the substitute to run class. Click a day number to reveal that day's plan. Each day has a unique URL (hash).</div>
+      <div id="status" class="status">Loading pacing.csv …</div>
 
-      <!-- CSV controls -->
-      <div style="margin:10px 0;display:flex;gap:8px;align-items:center">
-        <label class="small" style="margin:0">Load pacing from CSV:</label>
-        <input id="csv-file" type="file" accept=".csv" />
-        <button id="try-fetch-csv" type="button" class="day-btn" style="padding:6px 10px">Fetch ./pacing.csv</button>
-        <span class="small" style="margin-left:8px;color:var(--muted)">CSV headers: Day,Lesson,Topics,Agenda,BrainBreak,Summative,SubActions,TeacherPrep</span>
-      </div>
+      <div id="day-nav" class="day-nav" aria-hidden="false"></div>
+      <button id="copy-permalink" class="permalink" title="Copy permalink for the currently open day" style="display:none">Copy link</button>
 
-      <table id="pacing-table" role="table" aria-label="16 day pacing guide">
+      <table id="pacing-table" role="table" aria-label="pacing guide">
         <thead>
           <tr>
             <th class="sticky">Day</th>
             <th>Lesson</th>
             <th>Topics</th>
             <th>Agenda (Merrill’s Principles)</th>
-            <th>Brain Break (12:50pm — for sub to project)</th>
+            <th>Brain Break (for sub to project)</th>
             <th>Summative</th>
             <th>Substitute Actions (During class)</th>
             <th>Teacher Prep (Before class)</th>
           </tr>
         </thead>
         <tbody id="pacing-body">
-          <!-- existing static rows remain as fallback; JS will replace tbody if CSV is loaded -->
-          <!-- Day 1 -->
-          <tr class="day-row" data-day="1">
-            <td class="sticky day-toggle">1</td>
-            <td>Intro to Troubleshooting</td>
-            <td>7-step method, error messages</td>
-            <td>
-              <ul class="agenda">
-                <li><b>Activation (15m):</b> Students share personal tech problem stories (slide with prompts).</li>
-                <li><b>Demonstration (30m):</b> Play posted video from Google Classroom; sub facilitates discussion using projected slide questions.</li>
-                <li><b>Application (25m):</b> Hands-on troubleshooting on provided VMs (lab manager assists).</li>
-                <li><b>Integration (10m):</b> Volunteers share fixes; class discussion guided by slides.</li>
-                <li><b>Formative:</b> Quick exit activity submitted in Google Classroom.</li>
-              </ul>
-            </td>
-            <td><b>Stretch & Chat</b>: Project slide with 3 stretches (arms up, touch toes, neck rolls), then a single prompt for each student to share a favorite hobby. Timer on slide (5 minutes).</td>
-            <td class="small">—</td>
-            <td>Play video from Classroom, monitor VM activity, prompt students to submit exit activity in Classroom.</td>
-            <td>Post video and exit activity to Google Classroom. Add stretch & chat slide and activation prompts to the slide deck.</td>
-          </tr>
-
-          <!-- Day 2 -->
-          <tr class="day-row" data-day="2">
-            <td class="sticky day-toggle">2</td>
-            <td>Frozen Systems &amp; BSODs</td>
-            <td>App freezes, blue screens</td>
-            <td>
-              <ul class="agenda">
-                <li><b>Activation (15m):</b> Show screenshot on slide; class suggests steps.</li>
-                <li><b>Demonstration (20m):</b> Play Classroom video; project discussion prompts.</li>
-                <li><b>Application (35m):</b> Diagnose BSODs in VMs or case scenarios (lab manager assists).</li>
-                <li><b>Integration (10m):</b> Group share guided by slides.</li>
-                <li><b>Formative:</b> Short quiz/response in Google Classroom.</li>
-              </ul>
-            </td>
-            <td><b>Riddle Challenge</b>: Project slide with 2 riddles (egg, candle). Read, allow guesses, reveal answers on slide. Timer on slide (5 minutes).</td>
-            <td class="small">—</td>
-            <td>Show screenshot from slide, run Classroom quiz, monitor student submissions.</td>
-            <td>Post video and Classroom quiz. Add screenshots, riddles, and answer slides to the slide deck.</td>
-          </tr>
-
-          <!-- Day 3 -->
-          <tr class="day-row" data-day="3">
-            <td class="sticky day-toggle">3</td>
-            <td>Boot Failures &amp; Hardware Issues</td>
-            <td>Boot device errors, PSU/RAM, BIOS</td>
-            <td>
-              <ul class="agenda">
-                <li><b>Activation (15m):</b> Play POST beep audio (hosted in Classroom); students guess causes via slide prompts.</li>
-                <li><b>Demonstration (20m):</b> Classroom video + projected explanation slides.</li>
-                <li><b>Application (35m):</b> BIOS boot order lab in VMs or guided checklist in Classroom.</li>
-                <li><b>Integration (10m):</b> Short share-out using slide prompts.</li>
-                <li><b>Formative:</b> Reflection submitted in Classroom.</li>
-              </ul>
-            </td>
-            <td><b>Would You Rather</b>: Project slide with 3 scenarios. Tally via show of hands; result slide. Timer (5 minutes).</td>
-            <td>Checkpoint Quiz #1 (posted to Classroom)</td>
-            <td>Play POST beep audio from Classroom, guide BIOS activity, collect reflection and quiz submissions in Classroom.</td>
-            <td>Post video, beep audio, BIOS lab guide and checkpoint quiz to Classroom. Add Would You Rather slides and tally instructions to deck.</td>
-          </tr>
-
-          <!-- Day 4 -->
-          <tr class="day-row" data-day="4">
-            <td class="sticky day-toggle">4</td>
-            <td>Power Supply Issues</td>
-            <td>PSU failures, symptoms</td>
-            <td>
-              <ul class="agenda">
-                <li><b>Activation (15m):</b> Discuss PSU symptoms using slide prompts.</li>
-                <li><b>Demonstration (20m):</b> Classroom video; project key slides.</li>
-                <li><b>Application (35m):</b> Paper-free activity: identify symptoms in case study posted to Classroom.</li>
-                <li><b>Integration (10m):</b> Group debrief via projected questions.</li>
-                <li><b>Formative:</b> Exit submission in Classroom.</li>
-              </ul>
-            </td>
-            <td><b>Trivia</b>: Project slide with 5 trivia questions; reveal answers on slide. Timer (5 minutes).</td>
-            <td class="small">—</td>
-            <td>Run trivia from slides, collect exit submissions in Classroom.</td>
-            <td>Post video and exit activity to Classroom. Add trivia slides and PSU lab guide to the deck.</td>
-          </tr>
-
-          <!-- Day 5 -->
-          <tr class="day-row" data-day="5">
-            <td class="sticky day-toggle">5</td>
-            <td>Storage Devices</td>
-            <td>HDD vs SSD, partitioning, errors</td>
-            <td>
-              <ul class="agenda">
-                <li><b>Activation (15m):</b> Project images/examples of HDD and SSD.</li>
-                <li><b>Demonstration (20m):</b> Classroom video + slides.</li>
-                <li><b>Application (35m):</b> Case study activity posted to Classroom.</li>
-                <li><b>Integration (10m):</b> Group findings shared via projected prompts.</li>
-                <li><b>Formative:</b> Short Worksheet in Classroom.</li>
-              </ul>
-            </td>
-            <td><b>Quick Draw</b>: Project slide with prompt and timer (2 minutes). Students draw on paper or device and optionally photograph to share in Classroom. Timer (5 minutes total).</td>
-            <td class="small">—</td>
-            <td>Guide Quick Draw, ensure submissions or photos are uploaded to Classroom, monitor worksheet completions.</td>
-            <td>Post video, worksheets and Quick Draw prompt to Classroom. Add images and drawing prompt slide to deck.</td>
-          </tr>
-
-          <!-- Day 6 -->
-          <tr class="day-row" data-day="6">
-            <td class="sticky day-toggle">6</td>
-            <td>Operating Systems Intro</td>
-            <td>Windows, Linux, macOS basics</td>
-            <td>
-              <ul class="agenda">
-                <li><b>Activation (15m):</b> Poll which OS students use (slide poll or raise hands).</li>
-                <li><b>Demonstration (20m):</b> Classroom video + feature slides.</li>
-                <li><b>Application (35m):</b> Match features to screenshots activity in Classroom.</li>
-                <li><b>Integration (10m):</b> Discuss answers via projected review.</li>
-                <li><b>Formative:</b> Exit slip in Classroom.</li>
-              </ul>
-            </td>
-            <td><b>Charades</b>: Project slide with 3 actions; act and guess. Timer on slide (5 minutes).</td>
-            <td class="small">—</td>
-            <td>Run matching activity in Classroom, collect exit slips.</td>
-            <td>Post video, screenshots and exit slip to Classroom. Add charades actions to slide deck.</td>
-          </tr>
-
-          <!-- Day 7 -->
-          <tr class="day-row" data-day="7">
-            <td class="sticky day-toggle">7</td>
-            <td>Windows Installation</td>
-            <td>Clean install, upgrade paths</td>
-            <td>
-              <ul class="agenda">
-                <li><b>Activation (15m):</b> Discuss reinstall scenarios on slide prompts.</li>
-                <li><b>Demonstration (20m):</b> Classroom install video projected.</li>
-                <li><b>Application (35m):</b> Walkthrough steps using a guided checklist in Classroom.</li>
-                <li><b>Integration (10m):</b> Debrief via projected Q&A.</li>
-                <li><b>Summative:</b> Short quiz in Classroom.</li>
-              </ul>
-            </td>
-            <td><b>Story Chain</b>: Project starter prompt on slide; students add lines verbally. Timer on slide (10 minutes), wrap-up 5 min.</td>
-            <td>Install quiz (Classroom)</td>
-            <td>Deliver the walkthrough and monitor quiz submissions in Classroom.</td>
-            <td>Post video, install walkthrough and quiz to Classroom. Add story chain starter slide to deck.</td>
-          </tr>
-
-          <!-- Day 8 -->
-          <tr class="day-row" data-day="8">
-            <td class="sticky day-toggle">8</td>
-            <td>Windows Tools</td>
-            <td>CMD, Task Manager, msconfig</td>
-            <td>
-              <ul class="agenda">
-                <li><b>Activation (15m):</b> Quick poll on tools used (slide).</li>
-                <li><b>Demonstration (20m):</b> Tools demo video from Classroom; projected examples.</li>
-                <li><b>Application (35m):</b> Scenario matching activity in Classroom.</li>
-                <li><b>Integration (10m):</b> Review answers on slide.</li>
-                <li><b>Formative:</b> Worksheet in Classroom.</li>
-              </ul>
-            </td>
-            <td><b>Simon Says</b>: Project slide with instructions; sub leads for 10 minutes. Timer on slide (5 minute cool down).</td>
-            <td class="small">—</td>
-            <td>Hand out digital worksheet link in Classroom and run Simon Says from slides.</td>
-            <td>Post tools video and worksheet to Classroom. Add Simon Says slide and tool scenario cards to deck.</td>
-          </tr>
-
-          <!-- Day 9 -->
-          <tr class="day-row" data-day="9">
-            <td class="sticky day-toggle">9</td>
-            <td>Networking Basics</td>
-            <td>LAN/WAN, IP addressing</td>
-            <td>
-              <ul class="agenda">
-                <li><b>Activation (15m):</b> Ask how students connect at home via slide prompts.</li>
-                <li><b>Demonstration (20m):</b> Classroom networking video; projected notes.</li>
-                <li><b>Application (35m):</b> Scenario activity in Classroom.</li>
-                <li><b>Integration (10m):</b> Group share guided by slides.</li>
-                <li><b>Formative:</b> Exit ticket in Classroom.</li>
-              </ul>
-            </td>
-            <td><b>Guess the Song</b>: Project playlist slide; play 10s clips (hosted or linked in slides); students guess. Timer on slide (5 minutes).</td>
-            <td class="small">—</td>
-            <td>Play clips from slides, collect exit tickets in Classroom.</td>
-            <td>Post video, exit ticket and playlist to Classroom. Add song guessing slide to deck.</td>
-          </tr>
-
-          <!-- Day 10 -->
-          <tr class="day-row" data-day="10">
-            <td class="sticky day-toggle">10</td>
-            <td>Networking Hardware</td>
-            <td>Routers, switches, cabling</td>
-            <td>
-              <ul class="agenda">
-                <li><b>Activation (15m):</b> Project photos of devices.</li>
-                <li><b>Demonstration (20m):</b> Classroom video + device slides.</li>
-                <li><b>Application (35m):</b> Identify devices activity in Classroom.</li>
-                <li><b>Integration (10m):</b> Discuss results via slides.</li>
-                <li><b>Summative:</b> Hardware ID quiz in Classroom.</li>
-              </ul>
-            </td>
-            <td><b>Pictionary</b>: Project slide with words; students draw and others guess. Timer on slide (5 minutes).</td>
-            <td>Hardware quiz (Classroom)</td>
-            <td>Run Pictionary from slides and monitor quiz submissions in Classroom.</td>
-            <td>Post video and quiz to Classroom. Add device photos and Pictionary words to slides.</td>
-          </tr>
-
-          <!-- Day 11 -->
-          <tr class="day-row" data-day="11">
-            <td class="sticky day-toggle">11</td>
-            <td>Printers</td>
-            <td>Types, maintenance, errors</td>
-            <td>
-              <ul class="agenda">
-                <li><b>Activation (15m):</b> Discuss printer fixes using slide prompts.</li>
-                <li><b>Demonstration (20m):</b> Classroom video + projected examples.</li>
-                <li><b>Application (35m):</b> Case studies posted to Classroom.</li>
-                <li><b>Integration (10m):</b> Debrief using slides.</li>
-                <li><b>Formative:</b> Short reflection in Classroom.</li>
-              </ul>
-            </td>
-            <td><b>Two Truths &amp; a Lie</b>: Project slide with instructions; students share statements verbally. Timer on slide (5 minutes).</td>
-            <td class="small">—</td>
-            <td>Collect reflections in Classroom and run the game from slides.</td>
-            <td>Post video and case studies to Classroom. Add game instructions to slide deck.</td>
-          </tr>
-
-          <!-- Day 12 -->
-          <tr class="day-row" data-day="12">
-            <td class="sticky day-toggle">12</td>
-            <td>Mobile Devices</td>
-            <td>Smartphones, tablets, configs</td>
-            <td>
-              <ul class="agenda">
-                <li><b>Activation (15m):</b> Poll devices used at home (slide).</li>
-                <li><b>Demonstration (20m):</b> Classroom video + slides.</li>
-                <li><b>Application (35m):</b> Match device specs activity in Classroom.</li>
-                <li><b>Integration (10m):</b> Share-outs guided by slides.</li>
-                <li><b>Formative:</b> Worksheet in Classroom.</li>
-              </ul>
-            </td>
-            <td><b>Would You Rather (Round 2)</b>: Project slide with prompts; tally via hands. Timer on slide (5 minutes).</td>
-            <td class="small">—</td>
-            <td>Run activity and collect worksheet submissions in Classroom.</td>
-            <td>Post video, worksheet and prompts to Classroom. Add Would You Rather slides to the deck.</td>
-          </tr>
-
-          <!-- Day 13 -->
-          <tr class="day-row" data-day="13">
-            <td class="sticky day-toggle">13</td>
-            <td>Security Basics</td>
-            <td>Threats, best practices</td>
-            <td>
-              <ul class="agenda">
-                <li><b>Activation (15m):</b> Discuss password habits via slide prompts.</li>
-                <li><b>Demonstration (20m):</b> Classroom video + slides.</li>
-                <li><b>Application (35m):</b> Good vs bad practice activity in Classroom.</li>
-                <li><b>Integration (10m):</b> Review answers on slide.</li>
-                <li><b>Formative:</b> Exit ticket in Classroom.</li>
-              </ul>
-            </td>
-            <td><b>Mindfulness</b>: Project breathing exercise slide and timer (3 minutes). Then 5 minute transition.</td>
-            <td class="small">—</td>
-            <td>Lead breathing exercise from slides and collect exit tickets in Classroom.</td>
-            <td>Post security materials to Classroom and add mindfulness slide to deck.</td>
-          </tr>
-
-          <!-- Day 14 -->
-          <tr class="day-row" data-day="14">
-            <td class="sticky day-toggle">14</td>
-            <td>Troubleshooting Networks</td>
-            <td>Connectivity issues, IP conflicts</td>
-            <td>
-              <ul class="agenda">
-                <li><b>Activation (15m):</b> Share Wi‑Fi issue experiences using slide prompts.</li>
-                <li><b>Demonstration (20m):</b> Classroom video + projected examples.</li>
-                <li><b>Application (35m):</b> IP conflict case study activity in Classroom.</li>
-                <li><b>Integration (10m):</b> Share strategies guided by slides.</li>
-                <li><b>Summative:</b> Quiz in Classroom.</li>
-              </ul>
-            </td>
-            <td><b>Riddle Challenge 2</b>: Project slide with 2 riddles and answers; timer on slide (5 min).</td>
-            <td>Network troubleshooting quiz (Classroom)</td>
-            <td>Run case study and quiz via Classroom; use slides for prompts.</td>
-            <td>Post video, worksheet and quiz to Classroom. Add riddles to slide deck.</td>
-          </tr>
-
-          <!-- Day 15 -->
-          <tr class="day-row" data-day="15">
-            <td class="sticky day-toggle">15</td>
-            <td>Professionalism &amp; Ethics</td>
-            <td>Customer service, safety</td>
-            <td>
-              <ul class="agenda">
-                <li><b>Activation (15m):</b> Discuss service stories using slide prompts.</li>
-                <li><b>Demonstration (20m):</b> Classroom video + examples.</li>
-                <li><b>Application (35m):</b> Role-play scenarios (directions on slide).</li>
-                <li><b>Integration (10m):</b> Debrief via projected questions.</li>
-                <li><b>Formative:</b> Reflection submitted in Classroom.</li>
-              </ul>
-            </td>
-            <td><b>Trivia 2</b>: Project slide with 5 trivia questions; reveal answers. Timer (5 minutes).</td>
-            <td class="small">—</td>
-            <td>Facilitate role-plays using slides and collect reflections in Classroom.</td>
-            <td>Post video, role-play prompts and reflection to Classroom. Add trivia slides to deck.</td>
-          </tr>
-
-          <!-- Day 16 -->
-          <tr class="day-row" data-day="16">
-            <td class="sticky day-toggle">16</td>
-            <td>Review &amp; Exam Prep</td>
-            <td>All topics</td>
-            <td>
-              <ul class="agenda">
-                <li><b>Activation (15m):</b> Students share topics they're confident about (slide prompts).</li>
-                <li><b>Demonstration (20m):</b> Instructor reviews key concepts with slides.</li>
-                <li><b>Application (35m):</b> Practice exam questions in small groups (questions posted in Classroom).</li>
-                <li><b>Integration (10m):</b> Group discussion of strategies and tips guided by slides.</li>
-                <li><b>Formative:</b> Self-assessment checklist in Classroom.</li>
-                <li><b>Summative:</b> Final practice exam in Classroom.</li>
-              </ul>
-            </td>
-            <td><b>Gratitude Circle</b>: Project slide with prompt; each student shares something they're grateful for. Timer on slide (5 minutes).</td>
-            <td>Final practice exam (Classroom)</td>
-            <td>Facilitate group practice and gratitude circle using slides. Collect self-assessments and exam submissions in Classroom.</td>
-            <td>Post final exam, self-assessment checklist, and review materials to Classroom. Add review and gratitude slides to deck.</td>
-          </tr>
+          <!-- Rows rendered from pacing.csv -->
         </tbody>
       </table>
     </div>
@@ -405,7 +84,7 @@
       for (let i = 0; i < text.length; i++) {
         const ch = text[i];
         const next = text[i+1];
-        if (ch === '"' ) {
+        if (ch === '"') {
           if (inQuotes && next === '"') { cur += '"'; i++; } // escaped quote
           else inQuotes = !inQuotes;
           continue;
@@ -424,30 +103,6 @@
       return rows;
     }
 
-    // Render rows array of objects into table body
-    function renderRows(data) {
-      const tbody = document.getElementById('pacing-body');
-      tbody.innerHTML = ''; // clear
-      data.forEach(item => {
-        const tr = document.createElement('tr');
-        tr.className = 'day-row';
-        tr.setAttribute('data-day', item.Day || '');
-        tr.innerHTML = `
-          <td class="sticky day-toggle">${item.Day || ''}</td>
-          <td>${item.Lesson || ''}</td>
-          <td>${item.Topics || ''}</td>
-          <td>${item.Agenda || ''}</td>
-          <td>${item.BrainBreak || ''}</td>
-          <td class="small">${item.Summative || '—'}</td>
-          <td>${item.SubActions || ''}</td>
-          <td>${item.TeacherPrep || ''}</td>
-        `;
-        tbody.appendChild(tr);
-      });
-      initCollapsibleUI(); // re-init nav/buttons/toggles
-    }
-
-    // Convert CSV text to data objects using header row
     function csvToObjects(text) {
       const rows = parseCSV(text).filter(r => r.length > 0);
       if (rows.length < 1) return [];
@@ -459,80 +114,160 @@
       });
     }
 
-    // Attempt to fetch ./pacing.csv (same folder). Returns promise.
-    function fetchCsvFallback() {
-      return fetch('pacing.csv').then(resp => {
-        if (!resp.ok) throw new Error('Not found');
-        return resp.text();
+    // render rows of arbitrary length
+    function renderRows(data) {
+      const tbody = document.getElementById('pacing-body');
+      tbody.innerHTML = '';
+      data.forEach(item => {
+        const tr = document.createElement('tr');
+        tr.className = 'day-row';
+        tr.setAttribute('data-day', item.Day || '');
+        tr.innerHTML = `
+          <td class="sticky day-toggle">${escapeHtml(item.Day || '')}</td>
+          <td>${escapeHtml(item.Lesson || '')}</td>
+          <td>${escapeHtml(item.Topics || '')}</td>
+          <td>${item.Agenda || ''}</td>
+          <td>${item.BrainBreak || ''}</td>
+          <td class="small">${escapeHtml(item.Summative || '—')}</td>
+          <td>${item.SubActions || ''}</td>
+          <td>${item.TeacherPrep || ''}</td>
+        `;
+        tbody.appendChild(tr);
       });
+      initCollapsibleUI();
     }
 
-    // Collapsible UI builder (same behavior as previously)
+    function escapeHtml(s) {
+      return String(s)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function fetchPacingCsv() {
+      const statusEl = document.getElementById('status');
+      return fetch('pacing.csv', {cache: 'no-store'})
+        .then(resp => {
+          if (!resp.ok) throw new Error('pacing.csv not found (HTTP ' + resp.status + ')');
+          return resp.text();
+        })
+        .then(text => {
+          const objs = csvToObjects(text);
+          if (!objs.length) throw new Error('pacing.csv is empty or malformed');
+          renderRows(objs);
+          statusEl.textContent = `Loaded pacing.csv (${objs.length} day${objs.length===1?'':'s'})`;
+          // If hash present or query param present, open that day
+          setTimeout(() => applyInitialRoute(), 20);
+        })
+        .catch(err => {
+          console.error(err);
+          document.getElementById('status').textContent = 'Error loading pacing.csv — see console for details.';
+          alert('Could not load pacing.csv from the same directory. Check that pacing.csv exists and uses header: Day,Lesson,Topics,Agenda,BrainBreak,Summative,SubActions,TeacherPrep');
+        });
+    }
+
+    // open a day by value (Day cell content). If not found, try numeric index (1-based)
+    function openDay(dayValue) {
+      const rows = Array.from(document.querySelectorAll('.day-row'));
+      if (!rows.length) return;
+      // find row by data-day exact match
+      let target = rows.find(r => r.getAttribute('data-day') === String(dayValue));
+      if (!target) {
+        // fallback: treat as 1-based index
+        const idx = parseInt(dayValue, 10);
+        if (!Number.isNaN(idx) && idx >= 1 && idx <= rows.length) target = rows[idx-1];
+      }
+      if (!target) return false;
+      // hide all and show target
+      rows.forEach(r => r.classList.remove('visible'));
+      target.classList.add('visible');
+      // update nav active state
+      document.querySelectorAll('.day-btn').forEach(b => b.classList.remove('active'));
+      const btn = Array.from(document.querySelectorAll('.day-btn')).find(b => b.dataset.day === (target.getAttribute('data-day') || ''));
+      if (btn) btn.classList.add('active');
+      // set hash (unique URL)
+      const hash = `day-${encodeURIComponent(target.getAttribute('data-day')||'')}`;
+      if (location.hash !== `#${hash}`) location.hash = hash;
+      // show permalink button
+      document.getElementById('copy-permalink').style.display = 'inline-block';
+      // scroll into view
+      target.scrollIntoView({behavior: 'smooth', block: 'center'});
+      return true;
+    }
+
+    // initialize nav/buttons and day-number toggles
     function initCollapsibleUI() {
       const rows = Array.from(document.querySelectorAll('.day-row'));
       const dayNav = document.getElementById('day-nav');
       dayNav.innerHTML = '';
       rows.forEach((row, idx) => {
-        const day = row.getAttribute('data-day') || (idx+1);
+        const day = row.getAttribute('data-day') || (idx+1).toString();
         const btn = document.createElement('button');
         btn.className = 'day-btn';
         btn.type = 'button';
         btn.textContent = day;
-        btn.addEventListener('click', () => {
-          const alreadyVisible = row.classList.contains('visible');
-          rows.forEach(r => r.classList.remove('visible'));
-          document.querySelectorAll('.day-btn').forEach(b => b.classList.remove('active'));
-          if (!alreadyVisible) {
-            row.classList.add('visible');
-            btn.classList.add('active');
-            row.scrollIntoView({behavior: 'smooth', block: 'center'});
-          } else {
-            btn.classList.remove('active');
-          }
-        });
+        btn.dataset.day = day;
+        btn.addEventListener('click', () => openDay(day));
         dayNav.appendChild(btn);
       });
 
-      // day-number clicks toggle too
+      // day-number clicks toggle too (in-table)
       document.querySelectorAll('td.day-toggle').forEach(td => {
         td.style.cursor = 'pointer';
         td.addEventListener('click', () => {
           const tr = td.closest('tr');
           const day = tr.getAttribute('data-day');
-          const btn = Array.from(document.querySelectorAll('.day-btn')).find(b => b.textContent === day);
-          btn && btn.click();
+          openDay(day);
         });
       });
     }
 
+    // Parse hash like #day-3 or #day-Intro and open matching day
+    function parseHash() {
+      if (!location.hash) return null;
+      const h = location.hash.replace(/^#/, '');
+      if (h.startsWith('day-')) return decodeURIComponent(h.slice(4));
+      return null;
+    }
+
+    function applyInitialRoute() {
+      const dayFromHash = parseHash();
+      if (dayFromHash) {
+        const opened = openDay(dayFromHash);
+        if (!opened) {
+          // if not matched, try numeric part (e.g., hash day-3 -> 3)
+          const num = dayFromHash.match(/\d+/);
+          if (num) openDay(num[0]);
+        }
+      }
+    }
+
+    // copy current URL (with hash) to clipboard
+    function setupPermalink() {
+      const btn = document.getElementById('copy-permalink');
+      btn.addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(location.href);
+          btn.classList.add('copied');
+          btn.textContent = 'Copied';
+          setTimeout(() => { btn.classList.remove('copied'); btn.textContent = 'Copy link'; }, 1500);
+        } catch (e) {
+          alert('Could not copy link. Please copy manually: ' + location.href);
+        }
+      });
+
+      // respond to hashchange (open day accordingly)
+      window.addEventListener('hashchange', () => {
+        const dayFromHash = parseHash();
+        if (dayFromHash) openDay(dayFromHash);
+      });
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
-      initCollapsibleUI(); // initialize with fallback static rows (if any)
-
-      // File input upload
-      const input = document.getElementById('csv-file');
-      input.addEventListener('change', (e) => {
-        const f = e.target.files[0];
-        if (!f) return;
-        const reader = new FileReader();
-        reader.onload = () => {
-          try {
-            const objs = csvToObjects(reader.result);
-            if (objs.length) renderRows(objs);
-          } catch (err) { console.error(err); alert('CSV parse error'); }
-        };
-        reader.readAsText(f);
-      });
-
-      // Try fetching pacing.csv in same folder
-      document.getElementById('try-fetch-csv').addEventListener('click', () => {
-        fetchCsvFallback().then(text => {
-          const objs = csvToObjects(text);
-          if (objs.length) renderRows(objs);
-        }).catch(()=> alert('pacing.csv not found at site root.'));
-      });
-
-      // Optional: auto-fetch on load (commented out). Uncomment to auto-load if you host pacing.csv.
-      // fetchCsvFallback().then(text => { const objs = csvToObjects(text); if (objs.length) renderRows(objs); }).catch(()=>{/*ignore*/});
+      setupPermalink();
+      fetchPacingCsv();
     });
   </script>
 </body>
