@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>CompTIA A+ Accelerated Pacing Guide (16 Days)</title>
+  <title>CompTIA A+ Accelerated Pacing Guide</title>
   <style>
     :root{--bg:#0f172a;--card:#111827;--text:#e5e7eb;--muted:#9ca3af;--accent:#22d3ee;--table:#1f2937}
     html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Helvetica,Arial,sans-serif}
@@ -42,11 +42,11 @@
 </head>
 <body>
   <div class="wrap">
-    <h1>CompTIA A+ Pacing Guide (16 Days)</h1>
-    <p>Each day is a 1.5 hour session. Each agenda follows Merrill’s Effective Instruction (Activation → Demonstration → Application → Integration). All worksheets, videos, and assessments are distributed via Google Classroom. The substitute will use a slide deck (projected) to pace class time and display discussion prompts, timers, and brain-break instructions.</p>
+    <h1>CompTIA A+ Pacing Guide</h1>
+    <p>Each session follows Merrill’s Effective Instruction (Activation → Demonstration → Application → Integration). All worksheets, videos, and assessments are distributed via Google Classroom. Slides are used to pace class time and display prompts, timers, and brain‑break instructions.</p>
 
     <div class="card">
-      <div class="hint">This page loads its content exclusively from pacing.csv in the same directory. The slide deck and Classroom links referenced in the CSV are used by the substitute to run class. Click a day number to reveal that day's plan. Each day has a unique URL (hash).</div>
+      <div class="hint">This page loads its content exclusively from pacing.csv located in the same directory. Click a day number to reveal that day's plan. Each day has a unique URL (hash).</div>
       <div id="status" class="status">Loading pacing.csv …</div>
 
       <div id="day-nav" class="day-nav" aria-hidden="false"></div>
@@ -59,9 +59,9 @@
             <th>Lesson</th>
             <th>Topics</th>
             <th>Agenda (Merrill’s Principles)</th>
-            <th>Brain Break (for sub to project)</th>
+            <th>Brain Break (for slides to project)</th>
             <th>Summative</th>
-            <th>Substitute Actions (During class)</th>
+            <th>During class</th>
             <th>Teacher Prep (Before class)</th>
           </tr>
         </thead>
@@ -75,7 +75,7 @@
   </div>
 
   <script>
-    // CSV utilities (handles quoted fields/newlines)
+    // CSV parser (handles quoted fields and newlines)
     function parseCSV(text) {
       const rows = [];
       let cur = '';
@@ -114,7 +114,7 @@
       });
     }
 
-    // render rows of arbitrary length
+    // Render rows dynamically from CSV. Accepts arbitrary number of days.
     function renderRows(data) {
       const tbody = document.getElementById('pacing-body');
       tbody.innerHTML = '';
@@ -122,6 +122,7 @@
         const tr = document.createElement('tr');
         tr.className = 'day-row';
         tr.setAttribute('data-day', item.Day || '');
+        // Use CSV headers directly. Note: CSV should include header "duringclass" for the during-class column.
         tr.innerHTML = `
           <td class="sticky day-toggle">${escapeHtml(item.Day || '')}</td>
           <td>${escapeHtml(item.Lesson || '')}</td>
@@ -129,7 +130,7 @@
           <td>${item.Agenda || ''}</td>
           <td>${item.BrainBreak || ''}</td>
           <td class="small">${escapeHtml(item.Summative || '—')}</td>
-          <td>${item.SubActions || ''}</td>
+          <td>${item.duringclass || ''}</td>
           <td>${item.TeacherPrep || ''}</td>
         `;
         tbody.appendChild(tr);
@@ -146,6 +147,7 @@
         .replace(/'/g, '&#039;');
     }
 
+    // Fetch pacing.csv from same directory and render it
     function fetchPacingCsv() {
       const statusEl = document.getElementById('status');
       return fetch('pacing.csv', {cache: 'no-store'})
@@ -158,46 +160,38 @@
           if (!objs.length) throw new Error('pacing.csv is empty or malformed');
           renderRows(objs);
           statusEl.textContent = `Loaded pacing.csv (${objs.length} day${objs.length===1?'':'s'})`;
-          // If hash present or query param present, open that day
           setTimeout(() => applyInitialRoute(), 20);
         })
         .catch(err => {
           console.error(err);
           document.getElementById('status').textContent = 'Error loading pacing.csv — see console for details.';
-          alert('Could not load pacing.csv from the same directory. Check that pacing.csv exists and uses header: Day,Lesson,Topics,Agenda,BrainBreak,Summative,SubActions,TeacherPrep');
+          alert('Could not load pacing.csv from the same directory. Ensure pacing.csv exists and uses headers: Day,Lesson,Topics,Agenda,BrainBreak,Summative,duringclass,TeacherPrep');
         });
     }
 
-    // open a day by value (Day cell content). If not found, try numeric index (1-based)
+    // Open a day by its Day value (exact match) or numeric index (1-based)
     function openDay(dayValue) {
       const rows = Array.from(document.querySelectorAll('.day-row'));
       if (!rows.length) return;
-      // find row by data-day exact match
       let target = rows.find(r => r.getAttribute('data-day') === String(dayValue));
       if (!target) {
-        // fallback: treat as 1-based index
         const idx = parseInt(dayValue, 10);
         if (!Number.isNaN(idx) && idx >= 1 && idx <= rows.length) target = rows[idx-1];
       }
       if (!target) return false;
-      // hide all and show target
       rows.forEach(r => r.classList.remove('visible'));
       target.classList.add('visible');
-      // update nav active state
       document.querySelectorAll('.day-btn').forEach(b => b.classList.remove('active'));
       const btn = Array.from(document.querySelectorAll('.day-btn')).find(b => b.dataset.day === (target.getAttribute('data-day') || ''));
       if (btn) btn.classList.add('active');
-      // set hash (unique URL)
       const hash = `day-${encodeURIComponent(target.getAttribute('data-day')||'')}`;
       if (location.hash !== `#${hash}`) location.hash = hash;
-      // show permalink button
       document.getElementById('copy-permalink').style.display = 'inline-block';
-      // scroll into view
       target.scrollIntoView({behavior: 'smooth', block: 'center'});
       return true;
     }
 
-    // initialize nav/buttons and day-number toggles
+    // Build navigation and wire up toggles
     function initCollapsibleUI() {
       const rows = Array.from(document.querySelectorAll('.day-row'));
       const dayNav = document.getElementById('day-nav');
@@ -213,7 +207,6 @@
         dayNav.appendChild(btn);
       });
 
-      // day-number clicks toggle too (in-table)
       document.querySelectorAll('td.day-toggle').forEach(td => {
         td.style.cursor = 'pointer';
         td.addEventListener('click', () => {
@@ -224,7 +217,7 @@
       });
     }
 
-    // Parse hash like #day-3 or #day-Intro and open matching day
+    // Hash helpers
     function parseHash() {
       if (!location.hash) return null;
       const h = location.hash.replace(/^#/, '');
@@ -237,28 +230,25 @@
       if (dayFromHash) {
         const opened = openDay(dayFromHash);
         if (!opened) {
-          // if not matched, try numeric part (e.g., hash day-3 -> 3)
           const num = dayFromHash.match(/\d+/);
           if (num) openDay(num[0]);
         }
       }
     }
 
-    // copy current URL (with hash) to clipboard
+    // Permalink copy
     function setupPermalink() {
       const btn = document.getElementById('copy-permalink');
       btn.addEventListener('click', async () => {
         try {
           await navigator.clipboard.writeText(location.href);
-          btn.classList.add('copied');
-          btn.textContent = 'Copied';
+          btn.classList.add('copied'); btn.textContent = 'Copied';
           setTimeout(() => { btn.classList.remove('copied'); btn.textContent = 'Copy link'; }, 1500);
         } catch (e) {
           alert('Could not copy link. Please copy manually: ' + location.href);
         }
       });
 
-      // respond to hashchange (open day accordingly)
       window.addEventListener('hashchange', () => {
         const dayFromHash = parseHash();
         if (dayFromHash) openDay(dayFromHash);
