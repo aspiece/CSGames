@@ -108,6 +108,13 @@
   </div>
 
   <script>
+    // extract first http/https url from a string (returns empty string if none)
+    function extractFirstUrl(s) {
+      if (!s) return '';
+      const m = String(s).match(/https?:\/\/[^\s,")']+/i);
+      return m ? m[0].replace(/[.,)]+$/,'') : '';
+    }
+
     // CSV parser (handles quoted fields and newlines)
     function parseCSV(text) {
       const rows = [];
@@ -148,14 +155,11 @@
       return rows.slice(1).map(r => {
         const obj = {};
         headers.forEach((h, i) => obj[h] = (r[i] || '').trim());
-        // ensure there's always a Video property
-        if (videoIndex !== -1) {
-          obj.Video = (r[videoIndex] || '').trim();
-        } else if (treatLastAsVideo) {
-          obj.Video = (r[headers.length - 1] || '').trim();
-        } else {
-          obj.Video = '';
-        }
+        // normalize Video -> extract only the first URL (if present)
+        let rawVideo = '';
+        if (videoIndex !== -1) rawVideo = (r[videoIndex] || '').trim();
+        else if (treatLastAsVideo) rawVideo = (r[headers.length - 1] || '').trim();
+        obj.Video = extractFirstUrl(rawVideo);
         return obj;
       });
     }
