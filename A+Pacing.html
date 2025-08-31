@@ -524,15 +524,16 @@
     // Download PDF (uses browser print -> Save as PDF)
     function setupPdfDownload() {
       const btn = document.getElementById('download-pdf');
+      if (!btn) return;
       btn.addEventListener('click', () => {
-        // ensure all rows are visible for the print preview
-        document.querySelectorAll('.day-row').forEach(r => r.classList.add('visible'));
+        // ensure all day cards are visible for the print preview
+        document.querySelectorAll('.day-card').forEach(r => r.classList.add('visible'));
         // small delay to ensure DOM updates then print
         setTimeout(() => {
           window.print();
           // collapse back to previous state after print dialog closes (best-effort)
           setTimeout(() => {
-            document.querySelectorAll('.day-row').forEach(r => r.classList.remove('visible'));
+            document.querySelectorAll('.day-card').forEach(r => r.classList.remove('visible'));
           }, 500);
         }, 150);
       });
@@ -540,10 +541,9 @@
 
     document.addEventListener('DOMContentLoaded', function() {
       setupPermalink();
-      fetchPacingCsv();      setupPdfDownload();
-      setupPdfDownload();      fetchPacingCsv();
-    });    });
-  </script>  </script>
-</body></body>
-</html></html>
-</html></body>  </script>    });      fetchPacingCsv();      setupPdfDownload();      setupPdfDownload();      fetchPacingCsv();    });  </script></body></html>
+      setupPdfDownload();
+      fetchPacingCsv();
+    });
+  </script>
+</body>
+</html>
