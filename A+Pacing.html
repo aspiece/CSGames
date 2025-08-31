@@ -350,7 +350,13 @@
               contentHtml = `<a href="${escapeAttr(url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(url)}</a>`;
             }
           } else {
-            contentHtml = escapeHtml(raw) || '<span class="small">—</span>';
+            // place each sentence on its own line (use paragraph per sentence)
+            const sentences = splitSentences(raw);
+            if (sentences.length === 0) {
+              contentHtml = '<span class="small">—</span>';
+            } else {
+              contentHtml = sentences.map(s => `<p>${escapeHtml(s)}</p>`).join('');
+            }
           }
           inner += `<div class="section"><h3>${escapeHtml(header)}</h3><p>${contentHtml}</p></div>`;
         });
@@ -374,6 +380,14 @@
     // escape for attribute values (minimal)
     function escapeAttr(s) {
       return String(s).replace(/"/g, '%22').replace(/'/g, '%27');
+    }
+
+    // split raw text into sentences, preserving punctuation
+    function splitSentences(text) {
+      if (!text) return [];
+      // match sequences ending with . ! ? or end of string
+      const parts = text.match(/[^.!?]+[.!?]*/g);
+      return parts ? parts.map(p => p.trim()).filter(Boolean) : [text.trim()];
     }
 
     // Fetch pacing.csv from same directory and render it
