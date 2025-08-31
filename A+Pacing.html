@@ -109,6 +109,9 @@
   </div>
 
   <script>
+    // store the CSV header order so renderRows can display columns dynamically
+    let CSV_HEADERS = [];
+
     // extract first http/https url from a string (returns empty string if none)
     function extractFirstUrl(s) {
       if (!s) return '';
@@ -150,7 +153,8 @@
     function csvToObjects(text) {
       const rows = parseCSV(text).filter(r => r.length > 0);
       if (rows.length < 1) return [];
-      const rawHeaders = rows[0].map(h => h.trim());
+      const rawHeaders = rows[0].map(h => (h||'').trim());
+      CSV_HEADERS = rawHeaders.slice(); // preserve original header order & labels
 
       // normalize headers into safe keys: lowercased, remove non-alphanum
       const headers = rawHeaders.map(h => h.toLowerCase().replace(/[^a-z0-9]+/g, ''));
@@ -258,41 +262,79 @@
       const content = document.getElementById('content-area');
       dayNav.innerHTML = '';
       content.innerHTML = '';
+
+      // helper to find a value for a header name with several fallbacks
+      function getField(item, header) {
+        if (!header) return '';
+        // direct match (exact header text)
+        if (Object.prototype.hasOwnProperty.call(item, header) && item[header]) return item[header];
+        // common normalized keys
+        const norm = header.toLowerCase().replace(/[^a-z0-9]+/g, '');
+        const tryKeys = [
+          header,
+          header.replace(/\s+/g, ''),
+          header.toLowerCase(),
+          header.charAt(0).toUpperCase() + header.slice(1),
+          norm,
+          norm.charAt(0).toUpperCase() + norm.slice(1)
+        ];
+        for (const k of tryKeys) {
+          if (k && Object.prototype.hasOwnProperty.call(item, k) && item[k]) return item[k];
+        }
+        // fallback known canonical keys
+        if ((/day/i).test(header) && (item.Day || item.day)) return item.Day || item.day;
+        if ((/lesson/i).test(header) && (item.Lesson || item.lesson)) return item.Lesson || item.lesson;
+        if ((/topic/i).test(header) && (item.Topics || item.topics)) return item.Topics || item.topics;
+        if ((/agenda/i).test(header) && (item.Agenda || item.agenda)) return item.Agenda || item.agenda;
+        if ((/brain/i).test(header) && (item.BrainBreak || item.brainbreak)) return item.BrainBreak || item.brainbreak;
+        if ((/summative|assessment/i).test(header) && (item.Summative || item.summative)) return item.Summative || item.summative;
+        if ((/during|duringclass/i).test(header) && (item.DuringClass || item.duringclass)) return item.DuringClass || item.duringclass;
+        if ((/teacher|prep/i).test(header) && (item.TeacherPrep || item.teacherprep)) return item.TeacherPrep || item.teacherprep;
+        if ((/video/i).test(header) && (item.Video || item.video)) return item.Video || item.video;
+        if ((/slide|deck|slide deck/i).test(header) && (item.Slides || item.slides)) return item.Slides || item.slides;
+        return '';
+      }
+
       data.forEach((item, idx) => {
-        const id = item.Day || String(idx+1);
-        const iso = parseDateString(item.Day) || '';
+        const id = getField(item, CSV_HEADERS[0]) || String(idx+1);
+        const iso = parseDateString(getField(item, 'Day') || getField(item, CSV_HEADERS[0])) || '';
 
         // nav button (left column)
         const btn = document.createElement('button');
         btn.className = 'day-btn';
         btn.type = 'button';
         btn.textContent = iso ? formatDisplayDate(iso) : id;
-        btn.title = item.Day || id;
+        btn.title = id;
         btn.dataset.day = id;
         btn.dataset.date = iso;
         btn.addEventListener('click', () => openDay(id));
         dayNav.appendChild(btn);
 
-        // content card (right column): vertical sections
+        // content card (right column): build a section for each CSV header in order
         const card = document.createElement('article');
         card.className = 'day-card';
         card.setAttribute('data-day', id);
         card.setAttribute('data-date', iso);
-        const videoLink = item.Video ? `<a href="${escapeAttr(item.Video)}" target="_blank" rel="noopener noreferrer">${escapeHtml(item.Video)}</a>` : '';
-        const slidesLink = item.Slides ? `<a href="${escapeAttr(item.Slides)}" target="_blank" rel="noopener noreferrer" download>Download</a>` : '';
-        card.innerHTML = `
-          <div class="card-inner">
-            <div class="section"><h3>Lesson</h3><p>${escapeHtml(item.Lesson || '')}</p></div>
-            <div class="section"><h3>Topics</h3><p>${escapeHtml(item.Topics || '')}</p></div>
-            <div class="section"><h3>Video</h3><p>${videoLink || '<span class="small">—</span>'}</p></div>
-            <div class="section"><h3>Slides</h3><p>${slidesLink || '<span class="small">—</span>'}</p></div>
-            <div class="section"><h3>Agenda</h3><p>${item.Agenda || ''}</p></div>
-            <div class="section"><h3>Brain Break</h3><p>${item.BrainBreak || ''}</p></div>
-            <div class="section"><h3>Summative</h3><p class="small">${escapeHtml(item.Summative || '—')}</p></div>
-            <div class="section"><h3>During class</h3><p>${item.DuringClass || ''}</p></div>
-            <div class="section"><h3>Teacher Prep</h3><p>${item.TeacherPrep || ''}</p></div>
-          </div>
-        `;
+        let inner = '<div class="card-inner">';
+        CSV_HEADERS.forEach(header => {
+          const raw = getField(item, header) || '';
+          const keyNorm = (header || '').toLowerCase();
+          // if field looks like a URL, show as link; slides get Download label
+          const url = extractFirstUrl(raw);
+          let contentHtml = '';
+          if (url) {
+            if (keyNorm.includes('slide') || keyNorm.includes('deck')) {
+              contentHtml = `<a href="${escapeAttr(url)}" target="_blank" rel="noopener noreferrer" download>Download</a>`;
+            } else {
+              contentHtml = `<a href="${escapeAttr(url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(url)}</a>`;
+            }
+          } else {
+            contentHtml = escapeHtml(raw) || '<span class="small">—</span>';
+          }
+          inner += `<div class="section"><h3>${escapeHtml(header)}</h3><p>${contentHtml}</p></div>`;
+        });
+        inner += '</div>';
+        card.innerHTML = inner;
         content.appendChild(card);
       });
       // wire up date-picker and other UI based on created cards
