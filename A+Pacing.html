@@ -59,6 +59,27 @@
       td { page-break-inside: avoid; }
       /* optional: expand agenda lists readability */
       ul.agenda { padding-left:16px; }
+
+      /* Adjust card layout for print */
+      .card-inner {
+        max-width: 100%; /* Use full width of the page */
+        padding: 20px; /* Add more padding for readability */
+        margin: 0 auto; /* Center the content */
+      }
+
+      .section {
+        margin-bottom: 16px; /* Add more spacing between sections */
+      }
+
+      .section h3 {
+        font-size: 14px; /* Slightly larger font for headers */
+        margin-bottom: 8px;
+      }
+
+      .section .section-content {
+        font-size: 13px; /* Slightly larger font for content */
+        line-height: 1.5; /* Improve readability */
+      }
     }
 
     /* Layout: left rail for day links, right column for vertical lesson sections */
