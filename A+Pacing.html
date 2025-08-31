@@ -91,6 +91,8 @@
     .section h3 { margin:0 0 6px; font-size:13px; font-weight:700; color:var(--text); }
     .section p, .section a { margin:0; color:var(--muted); font-size:13px; line-height:1.3; }
     .section a { color:var(--accent); }
+    .section .section-content { margin:0; color:var(--muted); font-size:13px; line-height:1.3; }
+    .section .section-content p { margin:6px 0; }
     /* hide table if present (keeps backward compatibility) */
     #pacing-table { display:none !important; }
   </style>
@@ -128,6 +130,7 @@
 
   <script>
     // store the CSV header order so renderRows can display columns dynamically
+    // ensure CSV_HEADERS only contains non-empty header labels
     let CSV_HEADERS = [];
 
     // extract first http/https url from a string (returns empty string if none)
@@ -181,81 +184,47 @@
         headerRowIndex = 1;
       }
 
-      const rawHeaders = rows[headerRowIndex].map(h => (h||'').trim());
-      CSV_HEADERS = rawHeaders.slice(); // preserve original header order & labels
+      // preserve original header labels, but filter-out any completely-empty headers
+      const rawHeadersAll = rows[headerRowIndex].map(h => (h||'').trim());
+      const rawHeaders = rawHeadersAll.map((h,i)=> h || `Column ${i+1}`);
+      CSV_HEADERS = rawHeaders.slice(); // keep header order and labels
 
-      // create a normalized header list for safe keys
-      const headers = rawHeaders.map(h => h.toLowerCase().replace(/[^a-z0-9]+/g, ''));
+      // normalized keys for convenient lookup
+      const normalizedHeaders = rawHeaders.map(h => h.toLowerCase().replace(/[^a-z0-9]+/g, ''));
 
-      // helper name lists
+      // detect video/slides columns if present (by normalized name)
       const videoNames = ['video','videos','videolink','videolinks'];
-      const slideNames = ['slide','slides','slidedeck','slidedecklink','slidelink','deck','presentation'];
+      const slideNames = ['slide','slides','slidedeck','slidelink','slidedecklink','deck','presentation'];
+      let videoIndex = normalizedHeaders.findIndex(h => videoNames.includes(h));
+      let slideIndex = normalizedHeaders.findIndex(h => slideNames.includes(h));
 
-      // detect explicit indices
-      let videoIndex = headers.findIndex(h => videoNames.includes(h));
-      let slideIndex = headers.findIndex(h => slideNames.includes(h));
-
-      const expectedBaseCount = 8; // day,lesson,topics,agenda,brainbreak,summative,duringclass,teacherprep
-      // if header row doesn't name video/slides but there are extra columns, assume ordering
+      // if no explicit video/slides headers and there are extra columns, guess at the end columns
+      const expectedBaseCount = 8;
       if (videoIndex === -1 && slideIndex === -1) {
-        if (rawHeaders.length === expectedBaseCount + 1) {
-          videoIndex = expectedBaseCount;
-        } else if (rawHeaders.length === expectedBaseCount + 2) {
-          videoIndex = expectedBaseCount;
-          slideIndex = expectedBaseCount + 1;
-        }
-      } else if (videoIndex === -1 && slideIndex !== -1) {
-        if (rawHeaders.length > expectedBaseCount) {
-          const candidate = rawHeaders.length - 1;
-          if (slideIndex !== candidate && candidate >= expectedBaseCount) videoIndex = candidate;
-        }
-      } else if (slideIndex === -1 && videoIndex !== -1) {
-        if (rawHeaders.length > expectedBaseCount + 1) {
-          slideIndex = rawHeaders.length - 1;
-        }
+        if (rawHeaders.length === expectedBaseCount + 1) videoIndex = expectedBaseCount;
+        else if (rawHeaders.length === expectedBaseCount + 2) { videoIndex = expectedBaseCount; slideIndex = expectedBaseCount + 1; }
       }
 
-      // data rows start after the headerRowIndex
       const dataRows = rows.slice(headerRowIndex + 1);
-
       return dataRows.map((r, rowIndex) => {
         const obj = {};
-        // map normalized header keys to their raw column values
-        headers.forEach((key, i) => {
-          obj[key] = (r[i] || '').trim();
-        });
-
-        // Provide canonical keys as well (for older code paths)
-        obj.day = obj.day || obj['day'] || obj['1'] || '';
-        obj.lesson = obj.lesson || obj['lesson'] || '';
-        obj.topics = obj.topics || obj['topics'] || '';
-        obj.agenda = obj.agenda || obj['agenda'] || '';
-        obj.brainbreak = obj.brainbreak || obj['brainbreak'] || '';
-        obj.summative = obj.summative || obj['summative'] || '';
-        obj.duringclass = obj.duringclass || obj['duringclass'] || '';
-        obj.teacherprep = obj.teacherprep || obj['teacherprep'] || '';
-
-        // expose raw header-named fields (exact header label) for renderRows' getField convenience
+        // attach raw header-labeled fields and normalized keys
         rawHeaders.forEach((h, i) => {
-          const key = h || '';
-          if (key && !Object.prototype.hasOwnProperty.call(obj, key)) {
-            obj[key] = (r[i] || '').trim();
-          }
+          const value = (r[i] || '').trim();
+          obj[h] = value;                                   // exact header label
+          obj[normalizedHeaders[i]] = value;                // normalized key
         });
 
-        // extract video and slides URLs (first URL found)
-        let rawVideo = '';
-        let rawSlide = '';
-        if (videoIndex !== -1) rawVideo = (r[videoIndex] || '').trim();
-        if (slideIndex !== -1) rawSlide = (r[slideIndex] || '').trim();
-        if (!rawVideo && obj.video) rawVideo = obj.video;
-        if (!rawSlide && obj.slides) rawSlide = obj.slides;
+        // convenient canonical aliases for older code paths
+        obj.Day = obj.Day || obj.day || obj[normalizedHeaders[0]] || obj[rawHeaders[0]] || String(rowIndex+1);
+        obj.Lesson = obj.Lesson || obj.lesson || obj[normalizedHeaders[1]] || obj[rawHeaders[1]] || '';
+        obj.Topics = obj.Topics || obj.topics || obj[normalizedHeaders[2]] || obj[rawHeaders[2]] || '';
 
-        obj.Video = extractFirstUrl(rawVideo);
-        obj.Slides = extractFirstUrl(rawSlide);
-
-        // fallback: ensure Day exists
-        if (!obj.Day && !obj.day) obj.Day = String(rowIndex + 1);
+        // extract video / slides urls (first URL found)
+        const rawVideo = (typeof videoIndex === 'number' && videoIndex >= 0) ? (r[videoIndex]||'').trim() : (obj.video||obj.Video||'');
+        const rawSlides = (typeof slideIndex === 'number' && slideIndex >= 0) ? (r[slideIndex]||'').trim() : (obj.slides||obj.Slides||'');
+        obj.Video = extractFirstUrl(rawVideo || obj.video || obj.Video || '');
+        obj.Slides = extractFirstUrl(rawSlides || obj.slides || obj.Slides || '');
 
         return obj;
       });
@@ -358,7 +327,6 @@
         CSV_HEADERS.forEach(header => {
           const raw = getField(item, header) || '';
           const keyNorm = (header || '').toLowerCase();
-          // if field looks like a URL, show as link; slides get Download label
           const url = extractFirstUrl(raw);
           let contentHtml = '';
           if (url) {
@@ -368,15 +336,12 @@
               contentHtml = `<a href="${escapeAttr(url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(url)}</a>`;
             }
           } else {
-            // place each sentence on its own line (use paragraph per sentence)
             const sentences = splitSentences(raw);
-            if (sentences.length === 0) {
-              contentHtml = '<span class="small">—</span>';
-            } else {
-              contentHtml = sentences.map(s => `<p>${escapeHtml(s)}</p>`).join('');
-            }
+            if (sentences.length === 0) contentHtml = '<span class="small">—</span>';
+            else contentHtml = sentences.map(s => `<p>${escapeHtml(s)}</p>`).join('');
           }
-          inner += `<div class="section"><h3>${escapeHtml(header)}</h3><p>${contentHtml}</p></div>`;
+          // use a block container (.section-content) instead of nesting <p> tags
+          inner += `<div class="section"><h3>${escapeHtml(header)}</h3><div class="section-content">${contentHtml}</div></div>`;
         });
         inner += '</div>';
         card.innerHTML = inner;
