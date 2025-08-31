@@ -133,10 +133,10 @@
     </div>
 
     <!-- A+ certification alignment: final heading displayed after the pacing card -->
-    <h2 id="a-plus-alignment" style="margin-top:18px;font-size:1.05rem;color:var(--text);">A+ certification Alignment</h2>
+    <!-- <h2 id="a-plus-alignment" style="margin-top:18px;font-size:1.05rem;color:var(--text);">A+ certification Alignment</h2>
     <div id="a-plus-alignment-content" class="card" style="margin:12px 0;padding:12px;">
       <p class="small" style="margin:0;">Use this section to summarize which CompTIA A+ objectives each lesson maps to (CSV header suggestion: "A+ Alignment"). If present in the CSV, the page will render that content under this heading.</p>
-    </div>
+    </div> -->
 
     <p class="small" style="margin-top:24px;">Guide by <b>aspiece</b>. For feedback or updates, contact the author.</p>
   </div>
@@ -504,14 +504,25 @@
       const btn = document.getElementById('download-pdf');
       if (!btn) return;
       btn.addEventListener('click', () => {
-        // ensure all day cards are visible for the print preview
-        document.querySelectorAll('.day-card').forEach(r => r.classList.add('visible'));
-        // small delay to ensure DOM updates then print
+        // Get all day cards and hide non-visible ones
+        const allCards = document.querySelectorAll('.day-card');
+        const visibleCards = document.querySelectorAll('.day-card.visible');
+
+        allCards.forEach(card => {
+          if (!card.classList.contains('visible')) {
+            card.style.display = 'none'; // Temporarily hide non-visible cards
+          }
+        });
+
+        // Trigger print dialog
         setTimeout(() => {
           window.print();
-          // collapse back to previous state after print dialog closes (best-effort)
+
+          // Restore all cards after printing
           setTimeout(() => {
-            document.querySelectorAll('.day-card').forEach(r => r.classList.remove('visible'));
+            allCards.forEach(card => {
+              card.style.display = ''; // Restore original display state
+            });
           }, 500);
         }, 150);
       });
