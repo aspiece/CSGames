@@ -60,6 +60,21 @@
       /* optional: expand agenda lists readability */
       ul.agenda { padding-left:16px; }
     }
+
+    /* Layout: left rail for day links, right column for vertical lesson sections */
+    .layout { display:grid; grid-template-columns:220px 1fr; gap:18px; align-items:start; }
+    #day-nav { display:flex; flex-direction:column; gap:8px; max-height:70vh; overflow:auto; padding-right:4px; }
+    #day-nav .day-btn { width:100%; text-align:left; white-space:normal; }
+    #content-area { min-height:200px; }
+    .day-card { display:none; background:transparent; padding:0; margin:0 0 12px; }
+    .day-card.visible { display:block; }
+    .day-card .card-inner { background:var(--card); padding:14px; border-radius:12px; box-shadow:0 6px 18px rgba(0,0,0,.18); }
+    .section { margin-bottom:10px; }
+    .section h3 { margin:0 0 6px; font-size:13px; font-weight:700; color:var(--text); }
+    .section p, .section a { margin:0; color:var(--muted); font-size:13px; line-height:1.3; }
+    .section a { color:var(--accent); }
+    /* hide table if present (keeps backward compatibility) */
+    #pacing-table { display:none !important; }
   </style>
 </head>
 <body>
@@ -82,27 +97,12 @@
         <button id="copy-permalink" class="permalink" title="Copy permalink for the currently open day" style="display:none">Copy link</button>
       </div>
 
-      <div id="day-nav" class="day-nav" aria-hidden="false" style="gap:6px;max-width:100%;overflow:auto;padding-bottom:6px"></div>
-
-      <table id="pacing-table" role="table" aria-label="pacing guide">
-        <thead>
-          <tr>
-            <th class="sticky">Day</th>
-            <th>Lesson</th>
-            <th>Topics</th>
-            <th>Video</th>
-            <th>Slides</th>
-            <th>Agenda</th>
-            <th>Brain Break</th>
-            <th>Summative</th>
-            <th>During class</th>
-            <th>Teacher Prep</th>
-          </tr>
-        </thead>
-        <tbody id="pacing-body">
-          <!-- Rows rendered from pacing.csv -->
-        </tbody>
-      </table>
+      <div class="layout">
+        <nav id="day-nav" class="day-nav" aria-hidden="false" style="gap:6px;"></nav>
+        <main id="content-area" aria-live="polite">
+          <!-- Selected day content rendered here as vertical sections -->
+        </main>
+      </div>
     </div>
 
     <p class="small" style="margin-top:24px;">Guide by <b>aspiece</b>. For feedback or updates, contact the author.</p>
@@ -254,36 +254,48 @@
 
     // Render rows dynamically from CSV. Accepts arbitrary number of days.
     function renderRows(data) {
-      const tbody = document.getElementById('pacing-body');
-      tbody.innerHTML = '';
-      // normalize and enrich items with isoDate
-      data.forEach(item => {
-        // use canonical keys created by csvToObjects (lowercased, no spaces)
-        const iso = parseDateString(item.day) || '';
-        const tr = document.createElement('tr');
-        tr.className = 'day-row';
-        tr.setAttribute('data-day', item.day || '');
-        tr.setAttribute('data-date', iso); // normalized ISO date for routing
-        // build video + slides cells showing only the extracted links (if any)
-        const videoCell = item.video ? `<a href="${escapeAttr(item.video)}" target="_blank" rel="noopener noreferrer">${escapeHtml(item.video)}</a>` : '';
-        // Slides: show a concise "Download" link and include the download attribute (browser support varies)
-        const slidesCell = item.slides
-          ? `<a href="${escapeAttr(item.slides)}" target="_blank" rel="noopener noreferrer" download>Download</a>`
-          : '';
-        tr.innerHTML = `
-          <td class="sticky day-toggle">${escapeHtml(item.day || iso || '')}</td>
-          <td>${escapeHtml(item.lesson || '')}</td>
-          <td>${escapeHtml(item.topics || '')}</td>
-          <td>${videoCell}</td>
-          <td>${slidesCell}</td>
-          <td>${item.agenda || ''}</td>
-          <td>${item.brainbreak || ''}</td>
-          <td class="small">${escapeHtml(item.summative || '—')}</td>
-          <td>${item.duringclass || ''}</td>
-          <td>${item.teacherprep || ''}</td>
+      const dayNav = document.getElementById('day-nav');
+      const content = document.getElementById('content-area');
+      dayNav.innerHTML = '';
+      content.innerHTML = '';
+      data.forEach((item, idx) => {
+        const id = item.Day || String(idx+1);
+        const iso = parseDateString(item.Day) || '';
+
+        // nav button (left column)
+        const btn = document.createElement('button');
+        btn.className = 'day-btn';
+        btn.type = 'button';
+        btn.textContent = iso ? formatDisplayDate(iso) : id;
+        btn.title = item.Day || id;
+        btn.dataset.day = id;
+        btn.dataset.date = iso;
+        btn.addEventListener('click', () => openDay(id));
+        dayNav.appendChild(btn);
+
+        // content card (right column): vertical sections
+        const card = document.createElement('article');
+        card.className = 'day-card';
+        card.setAttribute('data-day', id);
+        card.setAttribute('data-date', iso);
+        const videoLink = item.Video ? `<a href="${escapeAttr(item.Video)}" target="_blank" rel="noopener noreferrer">${escapeHtml(item.Video)}</a>` : '';
+        const slidesLink = item.Slides ? `<a href="${escapeAttr(item.Slides)}" target="_blank" rel="noopener noreferrer" download>Download</a>` : '';
+        card.innerHTML = `
+          <div class="card-inner">
+            <div class="section"><h3>Lesson</h3><p>${escapeHtml(item.Lesson || '')}</p></div>
+            <div class="section"><h3>Topics</h3><p>${escapeHtml(item.Topics || '')}</p></div>
+            <div class="section"><h3>Video</h3><p>${videoLink || '<span class="small">—</span>'}</p></div>
+            <div class="section"><h3>Slides</h3><p>${slidesLink || '<span class="small">—</span>'}</p></div>
+            <div class="section"><h3>Agenda</h3><p>${item.Agenda || ''}</p></div>
+            <div class="section"><h3>Brain Break</h3><p>${item.BrainBreak || ''}</p></div>
+            <div class="section"><h3>Summative</h3><p class="small">${escapeHtml(item.Summative || '—')}</p></div>
+            <div class="section"><h3>During class</h3><p>${item.DuringClass || ''}</p></div>
+            <div class="section"><h3>Teacher Prep</h3><p>${item.TeacherPrep || ''}</p></div>
+          </div>
         `;
-        tbody.appendChild(tr);
+        content.appendChild(card);
       });
+      // wire up date-picker and other UI based on created cards
       initCollapsibleUI();
     }
 
@@ -325,26 +337,22 @@
 
     // Open a day by its Day value (exact match), ISO date (yyyy-mm-dd), or numeric index (1-based)
     function openDay(dayValue) {
-      const rows = Array.from(document.querySelectorAll('.day-row'));
-      if (!rows.length) return;
+      const cards = Array.from(document.querySelectorAll('.day-card'));
+      if (!cards.length) return;
       let target = null;
       const val = String(dayValue || '');
-      // try exact data-date match first (ISO)
-      target = rows.find(r => (r.getAttribute('data-date') || '') === val);
+      // try data-date then data-day then numeric index
+      target = cards.find(c => (c.getAttribute('data-date') || '') === val) ||
+               cards.find(c => c.getAttribute('data-day') === val);
       if (!target) {
-        // try data-day exact match (original string)
-        target = rows.find(r => r.getAttribute('data-day') === val);
-      }
-      if (!target) {
-        // try numeric index
         const idx = parseInt(val, 10);
-        if (!Number.isNaN(idx) && idx >= 1 && idx <= rows.length) target = rows[idx-1];
+        if (!Number.isNaN(idx) && idx >= 1 && idx <= cards.length) target = cards[idx-1];
       }
       if (!target) return false;
-      rows.forEach(r => r.classList.remove('visible'));
+      cards.forEach(c => c.classList.remove('visible'));
       target.classList.add('visible');
       document.querySelectorAll('.day-btn').forEach(b => b.classList.remove('active'));
-      const btn = Array.from(document.querySelectorAll('.day-btn')).find(b => b.dataset.date === (target.getAttribute('data-date') || b.dataset.date));
+      const btn = Array.from(document.querySelectorAll('.day-btn')).find(b => b.dataset.day === (target.getAttribute('data-day') || b.dataset.day));
       if (btn) btn.classList.add('active');
       const hash = `day-${encodeURIComponent(target.getAttribute('data-date')||target.getAttribute('data-day')||'')}`;
       if (location.hash !== `#${hash}`) location.hash = hash;
@@ -355,69 +363,30 @@
 
     // Build navigation and wire up toggles
     function initCollapsibleUI() {
-      const rows = Array.from(document.querySelectorAll('.day-row'));
-      const dayNav = document.getElementById('day-nav');
-      dayNav.innerHTML = '';
-      // create a calendar-style pill for each available date
-      rows.forEach((row, idx) => {
-        const iso = row.getAttribute('data-date') || '';
-        const label = iso ? formatDisplayDate(iso) : (row.getAttribute('data-day') || (idx+1).toString());
-        const btn = document.createElement('button');
-        btn.className = 'day-btn';
-        btn.type = 'button';
-        btn.textContent = label;
-        btn.title = row.getAttribute('data-day') || iso || label;
-        btn.dataset.date = iso;
-        btn.dataset.day = row.getAttribute('data-day') || '';
-        btn.addEventListener('click', () => {
-          // prefer iso date when available
-          openDay(iso || row.getAttribute('data-day') || (idx+1).toString());
-        });
-        dayNav.appendChild(btn);
-      });
-
-      // populate date-picker min/max and list of available dates
+      const cards = Array.from(document.querySelectorAll('.day-card'));
       const picker = document.getElementById('date-picker');
-      const dates = rows.map(r => r.getAttribute('data-date')).filter(Boolean).sort();
+      const dates = cards.map(c => c.getAttribute('data-date')).filter(Boolean).sort();
       if (dates.length) {
-        picker.min = dates[0];
-        picker.max = dates[dates.length-1];
-      } else {
-        picker.removeAttribute('min'); picker.removeAttribute('max');
-      }
+        picker.min = dates[0]; picker.max = dates[dates.length-1];
+      } else { picker.removeAttribute('min'); picker.removeAttribute('max'); }
 
       // wire picker change to open day
-      picker.addEventListener('change', (e) => {
-        if (e.target.value) openDay(e.target.value);
-      });
-      // today and clear buttons
-      document.getElementById('today-btn').addEventListener('click', () => {
+      picker.onchange = (e) => { if (e.target.value) openDay(e.target.value); };
+
+      document.getElementById('today-btn').onclick = () => {
         const todayIso = new Date().toISOString().slice(0,10);
-        // if exact match exists open it else try nearest
         if (!openDay(todayIso)) {
-          // try to find nearest date >= today, else first available
           const next = dates.find(d => d >= todayIso) || dates[0];
           if (next) openDay(next);
         }
-      });
-      document.getElementById('clear-btn').addEventListener('click', () => {
-        // collapse all and clear hash
-        rows.forEach(r => r.classList.remove('visible'));
+      };
+      document.getElementById('clear-btn').onclick = () => {
+        cards.forEach(c => c.classList.remove('visible'));
         document.querySelectorAll('.day-btn').forEach(b => b.classList.remove('active'));
         history.replaceState(null, '', location.pathname + location.search);
         document.getElementById('copy-permalink').style.display = 'none';
-      });
-
-      document.querySelectorAll('td.day-toggle').forEach(td => {
-        td.style.cursor = 'pointer';
-        td.addEventListener('click', () => {
-          const tr = td.closest('tr');
-          // when clicking the left cell prefer data-date then data-day
-          const date = tr.getAttribute('data-date') || tr.getAttribute('data-day');
-          openDay(date);
-         });
-       });
-     }
+      };
+    }
 
     // Hash helpers
     function parseHash() {
