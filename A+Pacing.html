@@ -153,10 +153,20 @@
     function csvToObjects(text) {
       const rows = parseCSV(text).filter(r => r.length > 0);
       if (rows.length < 1) return [];
-      const rawHeaders = rows[0].map(h => (h||'').trim());
+
+      // If the file contains an initial comment/filepath line (e.g. "// filepath: ..."),
+      // skip it so the real CSV header is used.
+      let headerRowIndex = 0;
+      const firstCell = String(rows[0][0] || '').trim();
+      if (firstCell.startsWith('//') || /filepath:/i.test(firstCell)) {
+        if (rows.length < 2) return []; // nothing after the comment
+        headerRowIndex = 1;
+      }
+
+      const rawHeaders = rows[headerRowIndex].map(h => (h||'').trim());
       CSV_HEADERS = rawHeaders.slice(); // preserve original header order & labels
 
-      // normalize headers into safe keys: lowercased, remove non-alphanum
+      // create a normalized header list for safe keys
       const headers = rawHeaders.map(h => h.toLowerCase().replace(/[^a-z0-9]+/g, ''));
 
       // helper name lists
@@ -168,56 +178,67 @@
       let slideIndex = headers.findIndex(h => slideNames.includes(h));
 
       const expectedBaseCount = 8; // day,lesson,topics,agenda,brainbreak,summative,duringclass,teacherprep
-      // handle common cases when headers don't explicitly include video/slides:
+      // if header row doesn't name video/slides but there are extra columns, assume ordering
       if (videoIndex === -1 && slideIndex === -1) {
         if (rawHeaders.length === expectedBaseCount + 1) {
-          // single extra column -> assume it's video
           videoIndex = expectedBaseCount;
         } else if (rawHeaders.length === expectedBaseCount + 2) {
-          // two extra -> assume video then slides
           videoIndex = expectedBaseCount;
           slideIndex = expectedBaseCount + 1;
         }
       } else if (videoIndex === -1 && slideIndex !== -1) {
-        // slides found but video missing, if there is an extra column before slide, assume that is video
         if (rawHeaders.length > expectedBaseCount) {
           const candidate = rawHeaders.length - 1;
           if (slideIndex !== candidate && candidate >= expectedBaseCount) videoIndex = candidate;
         }
       } else if (slideIndex === -1 && videoIndex !== -1) {
-        // video found and there's another extra column after base -> assume last extra is slides
         if (rawHeaders.length > expectedBaseCount + 1) {
           slideIndex = rawHeaders.length - 1;
         }
       }
 
-      return rows.slice(1).map(r => {
+      // data rows start after the headerRowIndex
+      const dataRows = rows.slice(headerRowIndex + 1);
+
+      return dataRows.map((r, rowIndex) => {
         const obj = {};
         // map normalized header keys to their raw column values
         headers.forEach((key, i) => {
           obj[key] = (r[i] || '').trim();
         });
 
-        // canonical keys fallback (if original headers used different names)
-        // lowercased canonical accessors (may already exist in obj)
+        // Provide canonical keys as well (for older code paths)
         obj.day = obj.day || obj['day'] || obj['1'] || '';
         obj.lesson = obj.lesson || obj['lesson'] || '';
         obj.topics = obj.topics || obj['topics'] || '';
         obj.agenda = obj.agenda || obj['agenda'] || '';
-        obj.brainbreak = obj.brainbreak || obj['brainbreak'] || obj['brainbreak'] || '';
+        obj.brainbreak = obj.brainbreak || obj['brainbreak'] || '';
         obj.summative = obj.summative || obj['summative'] || '';
         obj.duringclass = obj.duringclass || obj['duringclass'] || '';
         obj.teacherprep = obj.teacherprep || obj['teacherprep'] || '';
+
+        // expose raw header-named fields (exact header label) for renderRows' getField convenience
+        rawHeaders.forEach((h, i) => {
+          const key = h || '';
+          if (key && !Object.prototype.hasOwnProperty.call(obj, key)) {
+            obj[key] = (r[i] || '').trim();
+          }
+        });
 
         // extract video and slides URLs (first URL found)
         let rawVideo = '';
         let rawSlide = '';
         if (videoIndex !== -1) rawVideo = (r[videoIndex] || '').trim();
         if (slideIndex !== -1) rawSlide = (r[slideIndex] || '').trim();
-        // if video not found but there's a header named 'video' key in obj, prefer that
         if (!rawVideo && obj.video) rawVideo = obj.video;
-        obj.video = extractFirstUrl(rawVideo);
-        obj.slides = extractFirstUrl(rawSlide);
+        if (!rawSlide && obj.slides) rawSlide = obj.slides;
+
+        obj.Video = extractFirstUrl(rawVideo);
+        obj.Slides = extractFirstUrl(rawSlide);
+
+        // fallback: ensure Day exists
+        if (!obj.Day && !obj.day) obj.Day = String(rowIndex + 1);
+
         return obj;
       });
     }
