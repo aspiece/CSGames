@@ -306,43 +306,11 @@
       dayNav.innerHTML = '';
       content.innerHTML = '';
 
-      // helper to find a value for a header name with several fallbacks
-      function getField(item, header) {
-        if (!header) return '';
-        // direct match (exact header text)
-        if (Object.prototype.hasOwnProperty.call(item, header) && item[header]) return item[header];
-        // common normalized keys
-        const norm = header.toLowerCase().replace(/[^a-z0-9]+/g, '');
-        const tryKeys = [
-          header,
-          header.replace(/\s+/g, ''),
-          header.toLowerCase(),
-          header.charAt(0).toUpperCase() + header.slice(1),
-          norm,
-          norm.charAt(0).toUpperCase() + norm.slice(1)
-        ];
-        for (const k of tryKeys) {
-          if (k && Object.prototype.hasOwnProperty.call(item, k) && item[k]) return item[k];
-        }
-        // fallback known canonical keys
-        if ((/day/i).test(header) && (item.Day || item.day)) return item.Day || item.day;
-        if ((/lesson/i).test(header) && (item.Lesson || item.lesson)) return item.Lesson || item.lesson;
-        if ((/topic/i).test(header) && (item.Topics || item.topics)) return item.Topics || item.topics;
-        if ((/agenda/i).test(header) && (item.Agenda || item.agenda)) return item.Agenda || item.agenda;
-        if ((/brain/i).test(header) && (item.BrainBreak || item.brainbreak)) return item.BrainBreak || item.brainbreak;
-        if ((/summative|assessment/i).test(header) && (item.Summative || item.summative)) return item.Summative || item.summative;
-        if ((/during|duringclass/i).test(header) && (item.DuringClass || item.duringclass)) return item.DuringClass || item.duringclass;
-        if ((/teacher|prep/i).test(header) && (item.TeacherPrep || item.teacherprep)) return item.TeacherPrep || item.teacherprep;
-        if ((/video/i).test(header) && (item.Video || item.video)) return item.Video || item.video;
-        if ((/slide|deck|slide deck/i).test(header) && (item.Slides || item.slides)) return item.Slides || item.slides;
-        return '';
-      }
-
       data.forEach((item, idx) => {
-        const id = getField(item, CSV_HEADERS[0]) || String(idx+1);
-        const iso = parseDateString(getField(item, 'Day') || getField(item, CSV_HEADERS[0])) || '';
+        const id = item.Day || `Day ${idx + 1}`;
+        const iso = parseDateString(item.Day);
 
-        // nav button (left column)
+        // Create navigation button for the day
         const btn = document.createElement('button');
         btn.className = 'day-btn';
         btn.type = 'button';
@@ -353,36 +321,28 @@
         btn.addEventListener('click', () => openDay(id));
         dayNav.appendChild(btn);
 
-        // content card (right column): build a section for each CSV header in order
+        // Create content card for the day
         const card = document.createElement('article');
         card.className = 'day-card';
         card.setAttribute('data-day', id);
         card.setAttribute('data-date', iso);
         let inner = '<div class="card-inner">';
         CSV_HEADERS.forEach(header => {
-          const raw = getField(item, header) || '';
-          const keyNorm = (header || '').toLowerCase();
-          const url = extractFirstUrl(raw);
-          let contentHtml = '';
-          if (url) {
-            if (keyNorm.includes('slide') || keyNorm.includes('deck')) {
-              contentHtml = `<a href="${escapeAttr(url)}" target="_blank" rel="noopener noreferrer" download>Download</a>`;
-            } else {
-              contentHtml = `<a href="${escapeAttr(url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(url)}</a>`;
-            }
-          } else {
-            const sentences = splitSentences(raw);
-            if (sentences.length === 0) contentHtml = '<span class="small">—</span>';
-            else contentHtml = sentences.map(s => `<p>${escapeHtml(s)}</p>`).join('');
+          const value = item[header] || '';
+          if (value) {
+            inner += `
+              <div class="section">
+                <h3>${escapeHtml(header)}</h3>
+                <div class="section-content">${escapeHtml(value)}</div>
+              </div>
+            `;
           }
-          // use a block container (.section-content) instead of nesting <p> tags
-          inner += `<div class="section"><h3>${escapeHtml(header)}</h3><div class="section-content">${contentHtml}</div></div>`;
         });
         inner += '</div>';
         card.innerHTML = inner;
         content.appendChild(card);
       });
-      // wire up date-picker and other UI based on created cards
+
       initCollapsibleUI();
     }
 
@@ -411,7 +371,7 @@
     // Fetch pacing.csv from same directory and render it
     function fetchPacingCsv() {
       const statusEl = document.getElementById('status');
-      return fetch('pacing.csv', {cache: 'no-store'})
+      return fetch('pacing.csv', { cache: 'no-store' })
         .then(resp => {
           if (!resp.ok) throw new Error('pacing.csv not found (HTTP ' + resp.status + ')');
           return resp.text();
@@ -420,7 +380,7 @@
           const objs = csvToObjects(text);
           if (!objs.length) throw new Error('pacing.csv is empty or malformed');
           renderRows(objs);
-          statusEl.textContent = `Loaded pacing.csv (${objs.length} day${objs.length===1?'':'s'})`;
+          statusEl.textContent = `Loaded pacing.csv (${objs.length} day${objs.length === 1 ? '' : 's'})`;
           setTimeout(() => applyInitialRoute(), 20);
         })
         .catch(err => {
@@ -455,108 +415,4 @@
       // Update the active button in the left navigation
       document.querySelectorAll('.day-btn').forEach(b => b.classList.remove('active'));
       const btn = Array.from(document.querySelectorAll('.day-btn')).find(b => b.dataset.day === (target.getAttribute('data-day') || ''));
-      if (btn) btn.classList.add('active');
-
-      // Update the URL hash
-      const hash = `day-${encodeURIComponent(target.getAttribute('data-date') || target.getAttribute('data-day') || '')}`;
-      if (location.hash !== `#${hash}`) location.hash = hash;
-
-      // Scroll to the top of the page after making the day visible
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-
-      return true;
-    }
-
-    // Build navigation and wire up toggles
-    function initCollapsibleUI() {
-      const cards = Array.from(document.querySelectorAll('.day-card'));
-      const picker = document.getElementById('date-picker');
-      const dates = cards.map(c => c.getAttribute('data-date')).filter(Boolean).sort();
-      if (dates.length) {
-        picker.min = dates[0]; picker.max = dates[dates.length-1];
-      } else { picker.removeAttribute('min'); picker.removeAttribute('max'); }
-
-      // wire picker change to open day
-      picker.onchange = (e) => { if (e.target.value) openDay(e.target.value); };
-
-      document.getElementById('today-btn').onclick = () => {
-        const todayIso = new Date().toISOString().slice(0,10);
-        if (!openDay(todayIso)) {
-          const next = dates.find(d => d >= todayIso) || dates[0];
-          if (next) openDay(next);
-        }
-      };
-
-      document.getElementById('clear-btn').onclick = () => {
-        const cards = Array.from(document.querySelectorAll('.day-card'));
-        cards.forEach(c => c.classList.remove('visible'));
-        document.querySelectorAll('.day-btn').forEach(b => b.classList.remove('active'));
-        location.hash = '';
-      };
-
-      // initial hash-based routing
-      applyInitialRoute();
-    }
-
-    // Apply initial routing based on URL hash or date picker
-    function applyInitialRoute() {
-      const hash = location.hash.replace(/^#day-/, '');
-      const cards = Array.from(document.querySelectorAll('.day-card'));
-      const picker = document.getElementById('date-picker');
-      const dates = cards.map(c => c.getAttribute('data-date')).filter(Boolean).sort();
-
-      let targetDate = null;
-      if (hash) {
-        // if hash is present, use it as the target day
-        targetDate = decodeURIComponent(hash);
-      } else if (dates.length) {
-        // if no hash, use the first available date as the target day
-        targetDate = dates[0];
-      }
-
-      if (targetDate) {
-        picker.value = targetDate;
-        openDay(targetDate);
-      } else {
-        // No valid target date found, reset UI
-        picker.value = '';
-        cards.forEach(c => c.classList.remove('visible'));
-        document.querySelectorAll('.day-btn').forEach(b => b.classList.remove('active'));
-      }
-    }
-
-    // Document ready: fetch CSV and initialize UI
-    document.addEventListener('DOMContentLoaded', () => {
-      const dayCards = Array.from(document.querySelectorAll('.day-card'));
-      const validDates = new Set();
-
-      // Extract valid dates from the pacing.csv file
-      dayCards.forEach(card => {
-        const date = card.getAttribute('data-date');
-        if (date) {
-          validDates.add(date);
-        }
-      });
-
-      // Ensure only valid dates are displayed
-      dayCards.forEach(card => {
-        const date = card.getAttribute('data-date');
-        if (!validDates.has(date)) {
-          card.style.display = 'none'; // Hide cards for invalid dates
-        }
-      });
-
-      // Handle navigation buttons
-      const dayButtons = Array.from(document.querySelectorAll('.day-btn'));
-      dayButtons.forEach(button => {
-        const date = button.getAttribute('data-date');
-        if (!validDates.has(date)) {
-          button.style.display = 'none'; // Hide buttons for invalid dates
-        }
-      });
-
-      fetchPacingCsv();
-    });
-  </script>
-</body>
-</html>
+      if
