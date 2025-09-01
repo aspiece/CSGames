@@ -78,6 +78,28 @@
       border: 1px dashed #2b3342;
     }
 
+    /* Link pill styling for Video/Slide deck */
+    .link-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 4px;
+      list-style: none;
+      padding: 0;
+    }
+    a.pill {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: #1f2530;
+      border: 1px solid #2c3443;
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+    a.pill:hover { background: #263043; }
+
     @media (max-width: 860px) {
       .layout { grid-template-columns: 1fr; }
       #day-nav { position: static; height: auto; overflow: visible; }
@@ -245,9 +267,8 @@
           const val = item[h] || '';
           if (!val) return;
 
-          // Apply sentence-to-newline formatting for normal text fields
-          const isLinky = /video|slide/i.test(h);
-          const body = isLinky ? escapeHtml(val) : sentencesToLines(val);
+          // Render Video/Slide deck as pill links; others as sentences on new lines
+          const body = renderField(h, val);
 
           inner += `
             <div class="section">
@@ -259,6 +280,54 @@
         card.innerHTML = inner;
         main.appendChild(card);
       });
+    }
+
+    // Render field content: make Video/Slide deck nice, others as sentences per line
+    function renderField(header, value) {
+      const lower = String(header).toLowerCase();
+      const isVideo = lower.includes('video');
+      const isSlide = lower.includes('slide');
+
+      if (isVideo || isSlide) {
+        const urls = extractUrls(value);
+        if (urls.length) {
+          const many = urls.length > 1;
+          const baseLabel = isVideo ? 'Watch video' : 'View slide deck';
+          const links = urls
+            .map((u, i) => {
+              const safe = sanitizeUrl(u);
+              if (!safe) return '';
+              const label = many ? `${baseLabel} ${i + 1}` : baseLabel;
+              return `<a class="pill" href="${safe}" target="_blank" rel="noopener noreferrer">${label}</a>`;
+            })
+            .filter(Boolean)
+            .join('');
+          return `<div class="link-list">${links}</div>`;
+        }
+        // No URLs detected; fall back to sentence formatting
+        return sentencesToLines(value);
+      }
+
+      // Default (escaped with sentence -> newline conversion)
+      return sentencesToLines(value);
+    }
+
+    // Extract URLs from a cell (supports multiple separated by space/comma/semicolon/newline)
+    function extractUrls(text) {
+      if (!text) return [];
+      const matches = String(text).match(/https?:\/\/[^\s,;]+/g);
+      return matches ? matches.map(s => s.trim()) : [];
+    }
+
+    // Allow only http/https links
+    function sanitizeUrl(url) {
+      try {
+        const u = new URL(url);
+        if (u.protocol === 'http:' || u.protocol === 'https:') return u.toString();
+        return null;
+      } catch {
+        return null;
+      }
     }
 
     function openDay(key) {
