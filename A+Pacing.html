@@ -356,7 +356,7 @@
         card.setAttribute('data-day', id);
         card.setAttribute('data-date', iso);
         let inner = '<div class="card-inner">';
-        CSV_HEADERS.forEach header => {
+        CSV_HEADERS.forEach(header => {
           const raw = getField(item, header) || '';
           const keyNorm = (header || '').toLowerCase();
           const url = extractFirstUrl(raw);
@@ -433,20 +433,29 @@
       if (!cards.length) return;
       let target = null;
       const val = String(dayValue || '');
-      // try data-date then data-day then numeric index
+      
+      // Try to find the target card by data-date or data-day
       target = cards.find(c => (c.getAttribute('data-date') || '') === val) ||
                cards.find(c => c.getAttribute('data-day') === val);
+      
       if (!target) {
         const idx = parseInt(val, 10);
-        if (!Number.isNaN(idx) && idx >= 1 && idx <= cards.length) target = cards[idx-1];
+        if (!Number.isNaN(idx) && idx >= 1 && idx <= cards.length) target = cards[idx - 1];
       }
+      
       if (!target) return false;
+
+      // Hide all cards and show only the target card
       cards.forEach(c => c.classList.remove('visible'));
       target.classList.add('visible');
+
+      // Update the active button in the left navigation
       document.querySelectorAll('.day-btn').forEach(b => b.classList.remove('active'));
-      const btn = Array.from(document.querySelectorAll('.day-btn')).find(b => b.dataset.day === (target.getAttribute('data-day') || b.dataset.day));
+      const btn = Array.from(document.querySelectorAll('.day-btn')).find(b => b.dataset.day === (target.getAttribute('data-day') || ''));
       if (btn) btn.classList.add('active');
-      const hash = `day-${encodeURIComponent(target.getAttribute('data-date')||target.getAttribute('data-day')||'')}`;
+
+      // Update the URL hash
+      const hash = `day-${encodeURIComponent(target.getAttribute('data-date') || target.getAttribute('data-day') || '')}`;
       if (location.hash !== `#${hash}`) location.hash = hash;
 
       // Scroll to the top of the page after making the day visible
@@ -471,4 +480,52 @@
         const todayIso = new Date().toISOString().slice(0,10);
         if (!openDay(todayIso)) {
           const next = dates.find(d => d >= todayIso) || dates[0];
-          if
+          if (next) openDay(next);
+        }
+      };
+
+      document.getElementById('clear-btn').onclick = () => {
+        const cards = Array.from(document.querySelectorAll('.day-card'));
+        cards.forEach(c => c.classList.remove('visible'));
+        document.querySelectorAll('.day-btn').forEach(b => b.classList.remove('active'));
+        location.hash = '';
+      };
+
+      // initial hash-based routing
+      applyInitialRoute();
+    }
+
+    // Apply initial routing based on URL hash or date picker
+    function applyInitialRoute() {
+      const hash = location.hash.replace(/^#day-/, '');
+      const cards = Array.from(document.querySelectorAll('.day-card'));
+      const picker = document.getElementById('date-picker');
+      const dates = cards.map(c => c.getAttribute('data-date')).filter(Boolean).sort();
+
+      let targetDate = null;
+      if (hash) {
+        // if hash is present, use it as the target day
+        targetDate = decodeURIComponent(hash);
+      } else if (dates.length) {
+        // if no hash, use the first available date as the target day
+        targetDate = dates[0];
+      }
+
+      if (targetDate) {
+        picker.value = targetDate;
+        openDay(targetDate);
+      } else {
+        // No valid target date found, reset UI
+        picker.value = '';
+        cards.forEach(c => c.classList.remove('visible'));
+        document.querySelectorAll('.day-btn').forEach(b => b.classList.remove('active'));
+      }
+    }
+
+    // Document ready: fetch CSV and initialize UI
+    document.addEventListener('DOMContentLoaded', () => {
+      fetchPacingCsv();
+    });
+  </script>
+</body>
+</html>
