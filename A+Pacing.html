@@ -527,6 +527,34 @@
 
     // Document ready: fetch CSV and initialize UI
     document.addEventListener('DOMContentLoaded', () => {
+      const dayCards = Array.from(document.querySelectorAll('.day-card'));
+      const validDates = new Set();
+
+      // Extract valid dates from the pacing.csv file
+      dayCards.forEach(card => {
+        const date = card.getAttribute('data-date');
+        if (date) {
+          validDates.add(date);
+        }
+      });
+
+      // Ensure only valid dates are displayed
+      dayCards.forEach(card => {
+        const date = card.getAttribute('data-date');
+        if (!validDates.has(date)) {
+          card.style.display = 'none'; // Hide cards for invalid dates
+        }
+      });
+
+      // Handle navigation buttons
+      const dayButtons = Array.from(document.querySelectorAll('.day-btn'));
+      dayButtons.forEach(button => {
+        const date = button.getAttribute('data-date');
+        if (!validDates.has(date)) {
+          button.style.display = 'none'; // Hide buttons for invalid dates
+        }
+      });
+
       fetchPacingCsv();
     });
   </script>
