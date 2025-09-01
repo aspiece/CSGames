@@ -249,6 +249,7 @@
         lo1: 'Learning Objectives (Lesson 1)',
         lesson2: 'Lesson 2',
         lo2: 'Learning Objectives (Lesson 2)',
+        daily: 'Daily Description', // NEW
         // boc2 intentionally omitted (removed per requirement)
         eod: 'End of Day Discussion',
         standards: 'Standards Alignment'
@@ -260,7 +261,8 @@
         [H.brain]: 'Brain Break',
         [H.lesson2]: 'Lesson 2',
         [H.eod]: 'End of Class Discussion',
-        [H.standards]: 'Standards Alignment'
+        [H.standards]: 'Standards Alignment',
+        [H.daily]: 'Daily Description' // NEW
       };
 
       const nav = document.getElementById('day-nav');
@@ -289,7 +291,12 @@
 
         let inner = '<div class="card-inner">';
 
-        // 0) Combined Learning Objectives first
+        // -1) Daily Description first (NEW)
+        if (item[H.daily]) {
+          inner += sectionHtml(LABELS[H.daily], listifyIfNeeded(item[H.daily]));
+        }
+
+        // 0) Combined Learning Objectives next
         const loCombined = [item[H.lo1], item[H.lo2]].filter(Boolean).join('; ');
         if (loCombined) {
           inner += sectionHtml('Learning Objectives (Lessons 1 & 2)', listifyIfNeeded(loCombined));
@@ -310,17 +317,17 @@
           inner += sectionHtml(LABELS[H.brain], renderField(H.brain, item[H.brain]));
         }
 
-        // 4) Lesson 2 (no nested objectives) — skip "Beginning of Class Discussion (Lesson 2)"
+        // 4) Lesson 2 (no nested objectives)
         if (item[H.lesson2]) {
           inner += sectionHtml(LABELS[H.lesson2], renderField(H.lesson2, item[H.lesson2]));
         }
 
-        // 5) End of Class Discussion (from "End of Day Discussion")
+        // 5) End of Class Discussion
         if (item[H.eod]) {
           inner += sectionHtml(LABELS[H.eod], renderField(H.eod, item[H.eod]));
         }
 
-        // (Optional) Standards Alignment at the end if present
+        // Optional: Standards
         if (item[H.standards]) {
           inner += sectionHtml(LABELS[H.standards], renderField(H.standards, item[H.standards]));
         }
