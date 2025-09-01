@@ -3,330 +3,259 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>A+ Preparation</title>
+  <title>CompTIA A+ Preparation</title>
   <style>
-    /* Removed forced landscape @page rules per request */
-    :root{--bg:#0f172a;--card:#111827;--text:#e5e7eb;--muted:#9ca3af;--accent:#22d3ee;--table:#1f2937}
-    html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Helvetica,Arial,sans-serif}
-    .wrap{max-width:1400px;margin:40px auto;padding:0 20px}
-    h1{font-size:clamp(1.6rem,3vw,2.5rem);margin:0 0 10px}
-    h2{font-size:1.25rem;margin:0 0 10px}
-    p{color:var(--muted);margin:0 0 24px;font-size:1rem}
-    .card{background:var(--card);border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,.25);overflow:hidden;padding:18px;font-size:1rem}
-    table{width:100%;border-collapse:collapse;font-size:1rem}
-    thead{background:var(--table)}
-    th,td{padding:14px 12px;vertical-align:top;font-size:1rem}
-    th{font-weight:700;text-align:left;letter-spacing:.02em}
-    tbody tr{border-bottom:1px solid rgba(255,255,255,.06)}
-    tbody tr:hover{background:rgba(34,211,238,.03)}
-    a{color:var(--accent);text-decoration:none}
-    a:hover{text-decoration:underline}
-    .small{font-size:1rem;color:var(--muted)}
-    .pill{display:inline-block;padding:2px 8px;border-radius:999px;background:rgba(34,211,238,.15);color:#a5f3fc;font-weight:600;font-size:12px;margin-left:6px}
-    .sticky{position:sticky;left:0;background:var(--card)}
-    @media (max-width:900px){
-      table{display:block;overflow:auto;white-space:nowrap}
+    :root {
+      --bg: #0f1115;
+      --card: #171a21;
+      --text: #e6e8ee;
+      --muted: #b9c0d4;
+      --accent: #6ea8fe;
     }
-    ul.agenda{margin:6px 0;padding-left:18px;font-size:13px;line-height:1.4}
+    html, body { margin:0; padding:0; background:var(--bg); color:var(--text); font: 14px/1.45 system-ui, Segoe UI, Roboto, Arial, sans-serif; }
+    .wrap { max-width: 1100px; margin: 24px auto; padding: 0 16px; }
+    h1 { margin: 0 0 6px; font-size: 1.8rem; }
+    h2 { margin: 0 0 16px; font-size: 1.05rem; color: var(--muted); }
+    .status { margin: 8px 0 16px; color: var(--muted); }
 
-    /* Collapsible UI */
-    .day-nav{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;align-items:center}
-    .day-btn{background:transparent;border:1px solid rgba(255,255,255,.06);color:var(--text);padding:8px 12px;border-radius:8px;cursor:pointer;font-weight:700;font-size:1rem}
-    .day-btn.active{background:var(--accent);color:#042023;border:none}
-    .day-row{display:none}
-    .day-row.visible{display:table-row}
-    td.day-toggle{cursor:pointer;width:48px;text-align:center;font-weight:700;border-right:1px solid rgba(255,255,255,.03)}
-    .hint{color:var(--muted);font-size:13px;margin-bottom:8px}
-    .status{color:var(--muted);margin-bottom:12px}
-    .permalink {margin-left:12px;padding:6px 10px;border-radius:8px;background:rgba(255,255,255,.04);color:var(--muted);cursor:pointer;font-size:13px}
-    .permalink.copied {background:var(--accent);color:#042023}
-
-    /* Print / PDF layout */
-    @media print {
-      /* page background and text for PDF */
-      html,body { background: #fff; color:#000; }
-      /* hide interactive controls */
-      .day-nav, #date-picker, #today-btn, #clear-btn, #copy-permalink, .hint, #status { display: none !important; }
-      .permalink { display: none !important; }
-      /* show all days in table */
-      .day-row { display: table-row !important; }
-      .day-row.visible { display: table-row !important; }
-      /* make table printable and compact */
-      table { width:100%; border-collapse:collapse; font-size:12px; color:#000; page-break-inside: auto; }
-      thead { background: none !important; color:#000; }
-      th, td { color:#000; border:1px solid #bbb; padding:8px; vertical-align:top; }
-      .sticky { position:static !important; background:transparent !important; }
-      /* avoid page break inside agenda items */
-      td { page-break-inside: avoid; }
-      /* optional: expand agenda lists readability */
-      ul.agenda { padding-left:16px; }
-
-      /* Adjust card layout for print */
-      .card-inner {
-        max-width: 100%; /* Use full width of the page */
-        padding: 20px; /* Add more padding for readability */
-        margin: 0 auto; /* Center the content */
-      }
-
-      .section {
-        margin-bottom: 16px; /* Add more spacing between sections */
-      }
-
-      .section h3 {
-        font-size: 14px; /* Slightly larger font for headers */
-        margin-bottom: 8px;
-      }
-
-      .section .section-content {
-        font-size: 13px; /* Slightly larger font for content */
-        line-height: 1.5; /* Improve readability */
-      }
-    }
-
-    /* Layout: left rail for day links, right column for vertical lesson sections */
     .layout {
       display: grid;
-      grid-template-columns: 220px 1fr;
-      gap: 18px;
+      grid-template-columns: 240px 1fr;
+      gap: 16px;
       align-items: start;
     }
 
-    /* Left rail: make it span the full height of the page */
+    /* Left nav (dates from CSV only) */
     #day-nav {
+      position: sticky;
+      top: 12px;
+      align-self: start;
       display: flex;
       flex-direction: column;
-      flex-wrap: nowrap;                       /* never wrap into new columns */
       gap: 8px;
-      height: 100%; /* Make it span the full height of the page */
-      overflow: hidden;                        /* Disable scrolling */
-      padding-right: 8px;
-      box-sizing: border-box;
-      align-items: stretch;
-      position: sticky;                        /* keep rail visible while scrolling content */
-      top: 0;
-      overflow-y: auto; /* Enable vertical scrolling */
+      height: calc(100dvh - 24px);
+      overflow: hidden; /* no scroll in left column per request */
     }
-    #day-nav .day-btn { width:100%; text-align:left; white-space:normal; }
-    #content-area { min-height:200px; }
-    .day-card { display:none; background:transparent; padding:0; margin:0 0 12px; }
-    .day-card.visible { display:block; }
-    .day-card .card-inner { background:var(--card); padding:14px; border-radius:12px; box-shadow:0 6px 18px rgba(0,0,0,.18); }
-    .section { margin-bottom:10px; }
-    .section h3 { margin:0 0 6px; font-size:1.1rem; font-weight:700; color:var(--text); }
-    .section p, .section a { margin:0; color:var(--muted); font-size:1rem; line-height:1.6; }
-    .section a { color:var(--accent); }
-    .section .section-content { margin:0; color:var(--muted); font-size:1rem; line-height:1.6; }
-    .section .section-content p { margin:6px 0; }
-    /* hide table if present (keeps backward compatibility) */
-    #pacing-table { display:none !important; }
-
-    #date-picker {
-      padding: 6px;
+    .day-btn {
+      all: unset;
+      display: block;
+      padding: 8px 10px;
+      background: #1a1f28;
+      border: 1px solid #262b36;
       border-radius: 8px;
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      background: transparent;
       color: var(--text);
+      cursor: pointer;
+    }
+    .day-btn:hover { background: #212634; }
+    .day-btn.active {
+      background: #263143;
+      border-color: #344155;
+      color: #fff;
+      box-shadow: 0 0 0 2px rgba(110,168,254,0.12) inset;
+    }
+
+    /* Content area */
+    #content-area { min-height: 200px; }
+    .day-card { display: none; margin: 0 0 14px; }
+    .day-card.visible { display: block; }
+    .card-inner {
+      background: var(--card);
+      border: 1px solid #262b36;
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 6px 18px rgba(0,0,0,.18);
+    }
+    .section { margin: 10px 0; }
+    .section h3 { margin: 0 0 6px; font-size: 1.05rem; }
+    .section .section-content { color: var(--muted); white-space: pre-wrap; }
+
+    .hint-card .hint {
+      color: var(--muted);
+      font-size: 0.95rem;
+      padding: 12px 14px;
+      border-radius: 10px;
+      background: #12141a;
+      border: 1px dashed #2b3342;
+    }
+
+    @media (max-width: 860px) {
+      .layout { grid-template-columns: 1fr; }
+      #day-nav { position: static; height: auto; overflow: visible; }
     }
   </style>
 </head>
 <body>
   <div class="wrap">
-    <h1>CompTIA A+ Preparation</h1> <!-- Updated title -->
+    <h1>CompTIA A+ Preparation</h1>
+    <h2>Genesee Career Institute</h2>
 
-    <!-- Updated subtitle -->
-    <h2 id="learning-objectives" style="margin-top:10px;font-size:1.05rem;color:var(--text);">Genesee Career Institute</h2>
-    
-    <!-- Status element for loading messages -->
     <div id="status" class="status">Loading...</div>
-    
-    <div class="card">
-      <div class="hint">This page loads its content from pacing.csv in the same directory. Click a date to reveal that day's plan. Each day gets a unique URL (hash).</div>
-      
 
-      <!-- calendar-style selection: date picker + available-dates grid -->
-      <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:12px">
-        <div class="jump-to-date">
-          <label for="date-picker" style="margin-right: 8px;">Jump to Date:</label>
-          <input id="date-picker" type="date" style="padding:6px;border-radius:8px;border:1px solid rgba(255,255,255,.06);background:transparent;color:var(--text)" />
-          <button id="jump-to-date-btn" class="permalink" style="margin-left: 8px;">Go</button>
-        </div>
-        <button id="today-btn" class="day-btn" type="button" title="Go to today">Today</button>
-        <button id="clear-btn" class="day-btn" type="button" title="Collapse all" style="background:transparent">Clear</button>
-        <div style="flex:1"></div>
-        <button id="download-pdf" class="permalink" title="Download page as PDF">Download PDF</button>
-        <button id="copy-permalink" class="permalink" title="Copy permalink for the currently open day" style="display:none">Copy link</button>
-      </div>
-
-      <div class="layout">
-        <nav id="day-nav" class="day-nav" aria-hidden="false" style="gap:6px;"></nav>
-        <main id="content-area" aria-live="polite">
-          <!-- Selected day content rendered here as vertical sections -->
-        </main>
-      </div>
+    <div class="hint-card">
+      <div class="hint">This page loads its content from pacing.csv in the same directory. The left column shows only the dates found in the CSV “Day” column.</div>
     </div>
 
-    <!-- A+ certification alignment: final heading displayed after the pacing card -->
-    <!-- <h2 id="a-plus-alignment" style="margin-top:18px;font-size:1.05rem;color:var(--text);">A+ certification Alignment</h2>
-    <div id="a-plus-alignment-content" class="card" style="margin:12px 0;padding:12px;">
-      <p class="small" style="margin:0;">Use this section to summarize which CompTIA A+ objectives each lesson maps to (CSV header suggestion: "A+ Alignment"). If present in the CSV, the page will render that content under this heading.</p>
-    </div> -->
-
-    <p class="small" style="margin-top:24px;">Guide by <b>aspiece</b>. For feedback or updates, contact the author.</p>
+    <div class="layout" style="margin-top:16px;">
+      <nav id="day-nav" aria-label="Lesson dates"></nav>
+      <main id="content-area" role="main"></main>
+    </div>
   </div>
 
-  <div id="status" class="status">Loading...</div>
-
   <script>
-    // store the CSV header order so renderRows can display columns dynamically
-    // ensure CSV_HEADERS only contains non-empty header labels
+    const CSV_URL = 'pacing.csv';
     let CSV_HEADERS = [];
 
-    // extract first http/https url from a string (returns empty string if none)
-    function extractFirstUrl(s) {
-      if (!s) return '';
-      // match http/https links, allow typical URL characters, stop at whitespace or pipe or quote
-      const m = String(s).match(/https?:\/\/[^\s\|"')<>]+/i);
-      if (!m) return '';
-      // trim common trailing punctuation
-      return m[0].replace(/[.,)\]]+$/, '');
-    }
+    document.addEventListener('DOMContentLoaded', () => {
+      loadCsvAndRender();
+    });
 
-    // CSV parser (handles quoted fields and newlines)
-    function parseCSV(text) {
-      const rows = [];
-      let cur = '';
-      let row = [];
-      let inQuotes = false;
-      for (let i = 0; i < text.length; i++) {
-        const ch = text[i];
-        const next = text[i+1];
-        if (ch === '"') {
-          if (inQuotes && next === '"') { cur += '"'; i++; } // escaped quote
-          else inQuotes = !inQuotes;
-          continue;
-        }
-        if (ch === ',' && !inQuotes) {
-          row.push(cur); cur = ''; continue;
-        }
-        if ((ch === '\n' || ch === '\r') && !inQuotes) {
-          if (ch === '\r' && next === '\n') { /* skip paired */ }
-          if (cur !== '' || row.length) { row.push(cur); cur = ''; rows.push(row); row = []; }
-          continue;
-        }
-        cur += ch;
-      }
-      if (cur !== '' || row.length) { row.push(cur); rows.push(row); }
-      return rows;
-    }
+    async function loadCsvAndRender() {
+      const statusEl = document.getElementById('status');
+      try {
+        statusEl.textContent = 'Loading pacing.csv...';
+        const resp = await fetch(CSV_URL, { cache: 'no-store' });
+        if (!resp.ok) throw new Error('HTTP ' + resp.status);
+        const text = await resp.text();
 
-    function validateCsvHeaders(headers) {
-      console.log('CSV Headers:', headers); // Debug log
-      const requiredHeaders = ['Day', 'Lesson', 'Topics'];
-      const missingHeaders = requiredHeaders.filter(header => !headers.includes(header));
-      if (missingHeaders.length > 0) {
-        throw new Error(`Missing required headers: ${missingHeaders.join(', ')}`);
-      }
-    }
-
-    function csvToObjects(text) {
-      const rows = parseCSV(text).filter(r => r.length > 0);
-      if (rows.length < 1) return [];
-
-      let headerRowIndex = 0;
-      const firstCell = String(rows[0][0] || '').trim();
-      if (firstCell.startsWith('//') || /filepath:/i.test(firstCell)) {
-        if (rows.length < 2) return [];
-        headerRowIndex = 1;
-      }
-
-      const rawHeaders = rows[headerRowIndex].map(h => (h || '').trim());
-      validateCsvHeaders(rawHeaders); // Validate headers
-      CSV_HEADERS = rawHeaders.slice();
-
-      const dataRows = rows.slice(headerRowIndex + 1);
-      return dataRows.map((r, rowIndex) => {
-        const obj = {};
-        rawHeaders.forEach((h, i) => {
-          obj[h] = (r[i] || '').trim();
-        });
-        return obj;
-      });
-    }
-
-    // Parse various date formats and normalize to ISO (yyyy-mm-dd).
-    function parseDateString(s) {
-      if (!s) return null;
-      s = s.trim();
-      if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
-
-      const m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
-      if (m) {
-        const mm = m[1].padStart(2, '0');
-        const dd = m[2].padStart(2, '0');
-        const yy = m[3];
-        return `${yy}-${mm}-${dd}`;
-      }
-
-      console.warn(`Invalid date format: ${s}`);
-      return null;
-    }
-
-    function formatDisplayDate(isoDate) {
-      const options = { year: 'numeric', month: 'short', day: 'numeric' };
-      const date = new Date(isoDate);
-      return date.toLocaleDateString(undefined, options);
-    }
-
-    // Render rows dynamically from CSV. Accepts arbitrary number of days.
-    function renderRows(data) {
-      console.log('Rendering Data:', data); // Debug log
-      const dayNav = document.getElementById('day-nav');
-      const content = document.getElementById('content-area');
-      dayNav.innerHTML = '';
-      content.innerHTML = '';
-
-      data.forEach(item => {
-        const day = item.Day;
-        const iso = parseDateString(day);
-
-        if (!iso) {
-          console.warn(`Skipping row with invalid date: ${day}`);
+        const rows = csvToObjects(text);
+        if (!rows.length) {
+          statusEl.textContent = 'No days found in pacing.csv.';
+          renderEmpty();
           return;
         }
+        renderFromCsv(rows);
+        statusEl.textContent = `Loaded ${rows.length} day${rows.length === 1 ? '' : 's'} from pacing.csv.`;
+        applyInitialRoute();
+      } catch (err) {
+        console.error('Failed to load CSV:', err);
+        document.getElementById('status').textContent = 'Error loading pacing.csv. Ensure the file exists and is reachable.';
+        renderEmpty();
+      }
+    }
 
-        // Create navigation button
+    function renderEmpty() {
+      document.getElementById('day-nav').innerHTML = '';
+      document.getElementById('content-area').innerHTML = '';
+    }
+
+    // Parse CSV to array of objects; first row is headers.
+    function csvToObjects(text) {
+      const rows = parseCSV(text).filter(r => r.length && r.some(c => (c || '').trim() !== ''));
+      if (!rows.length) return [];
+      const headers = rows[0].map(h => (h || '').trim());
+      CSV_HEADERS = headers.slice();
+      // Minimal required: Day
+      if (!headers.includes('Day')) return [];
+      const dataRows = rows.slice(1);
+      const objects = dataRows.map(r => {
+        const obj = {};
+        headers.forEach((h, i) => obj[h] = (r[i] || '').trim());
+        return obj;
+      }).filter(o => (o.Day || '').trim().length > 0);
+      return objects;
+    }
+
+    // Robust-ish CSV parser for quotes and commas
+    function parseCSV(text) {
+      const out = [];
+      let row = [], cell = '', inQ = false;
+      for (let i = 0; i < text.length; i++) {
+        const ch = text[i];
+        if (inQ) {
+          if (ch === '"') {
+            if (text[i + 1] === '"') { cell += '"'; i++; }
+            else { inQ = false; }
+          } else {
+            cell += ch;
+          }
+        } else {
+          if (ch === '"') inQ = true;
+          else if (ch === ',') { row.push(cell); cell = ''; }
+          else if (ch === '\n') { row.push(cell); out.push(row); row = []; cell = ''; }
+          else if (ch === '\r') { /* ignore */ }
+          else { cell += ch; }
+        }
+      }
+      if (cell.length > 0 || row.length > 0) { row.push(cell); out.push(row); }
+      return out;
+    }
+
+    // Build UI strictly from CSV rows (no sequential dates)
+    function renderFromCsv(rows) {
+      const nav = document.getElementById('day-nav');
+      const main = document.getElementById('content-area');
+      nav.innerHTML = '';
+      main.innerHTML = '';
+
+      rows.forEach((item, idx) => {
+        const dayLabel = (item.Day || '').trim(); // use exactly what’s in CSV
+        if (!dayLabel) return;
+
+        // Nav button (shows the CSV Day string verbatim)
         const btn = document.createElement('button');
         btn.className = 'day-btn';
         btn.type = 'button';
-        btn.textContent = formatDisplayDate(iso);
-        btn.dataset.day = day;
-        btn.dataset.date = iso;
-        btn.addEventListener('click', () => openDay(day));
-        dayNav.appendChild(btn);
+        btn.textContent = dayLabel;
+        btn.dataset.key = dayLabel;
+        btn.setAttribute('aria-label', `Open ${dayLabel}`);
+        btn.addEventListener('click', () => openDay(dayLabel));
+        nav.appendChild(btn);
 
-        // Create content card
+        // Content card
         const card = document.createElement('article');
         card.className = 'day-card';
-        card.setAttribute('data-day', day);
-        card.setAttribute('data-date', iso);
+        card.setAttribute('data-key', dayLabel);
+
         let inner = '<div class="card-inner">';
-        CSV_HEADERS.forEach(header => {
-          const value = item[header] || '';
-          if (value) {
-            inner += `
-              <div class="section">
-                <h3>${escapeHtml(header)}</h3>
-                <div class="section-content">${escapeHtml(value)}</div>
-              </div>
-            `;
-          }
+        CSV_HEADERS.forEach(h => {
+          if (h === 'Day') return;
+          const val = item[h] || '';
+          if (!val) return;
+          inner += `
+            <div class="section">
+              <h3>${escapeHtml(h)}</h3>
+              <div class="section-content">${escapeHtml(val)}</div>
+            </div>`;
         });
         inner += '</div>';
         card.innerHTML = inner;
-        content.appendChild(card);
+        main.appendChild(card);
       });
+    }
 
-      initCollapsibleUI();
+    function openDay(key) {
+      const cards = Array.from(document.querySelectorAll('.day-card'));
+      const target = cards.find(c => c.getAttribute('data-key') === key);
+      if (!target) {
+        console.warn('No card found for day:', key);
+        return false;
+      }
+      cards.forEach(c => c.classList.remove('visible'));
+      target.classList.add('visible');
+
+      const btns = Array.from(document.querySelectorAll('.day-btn'));
+      btns.forEach(b => b.classList.remove('active'));
+      const active = btns.find(b => b.dataset.key === key);
+      if (active) active.classList.add('active');
+
+      // Update URL hash to the exact CSV Day label
+      const enc = encodeURIComponent(key);
+      if (location.hash !== `#${enc}`) history.replaceState(null, '', `#${enc}`);
+
+      // Scroll to top like a normal page load
+      window.scrollTo({ top: 0, behavior: 'auto' });
+      return true;
+    }
+
+    function applyInitialRoute() {
+      const btns = Array.from(document.querySelectorAll('.day-btn'));
+      if (!btns.length) return;
+      const hash = decodeURIComponent(location.hash.replace(/^#/, ''));
+      if (hash) {
+        if (openDay(hash)) return;
+      }
+      // Fallback to first CSV day
+      openDay(btns[0].dataset.key);
     }
 
     function escapeHtml(s) {
@@ -335,120 +264,8 @@
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
+        .replace(/'/g, '&#39;');
     }
-
-    // escape for attribute values (minimal)
-    function escapeAttr(s) {
-      return String(s).replace(/"/g, '%22').replace(/'/g, '%27');
-    }
-
-    // split raw text into sentences, preserving punctuation
-    function splitSentences(text) {
-      if (!text) return [];
-      // match sequences ending with . ! ? or end of string
-      const parts = text.match(/[^.!?]+[.!?]*/g);
-      return parts ? parts.map(p => p.trim()).filter(Boolean) : [text.trim()];
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-      fetchPacingCsv();
-    });
-
-    function fetchPacingCsv() {
-      const statusEl = document.getElementById('status');
-      statusEl.textContent = 'Loading...';
-      return fetch('pacing.csv', { cache: 'no-store' })
-        .then(resp => {
-          if (!resp.ok) throw new Error('pacing.csv not found (HTTP ' + resp.status + ')');
-          return resp.text();
-        })
-        .then(text => {
-          console.log('CSV File Content:', text); // Debug log
-          const objs = csvToObjects(text);
-          console.log('Parsed CSV Data:', objs); // Debug log
-          if (!objs.length) throw new Error('pacing.csv is empty or malformed');
-          renderRows(objs);
-          statusEl.textContent = `Loaded pacing.csv (${objs.length} day${objs.length === 1 ? '' : 's'})`;
-          setTimeout(() => applyInitialRoute(), 20);
-        })
-        .catch(err => {
-          console.error(err);
-          document.getElementById('status').textContent = 'Error loading pacing.csv — see console for details.';
-          alert('Could not load pacing.csv from the same directory. Ensure pacing.csv exists and uses expected headers.');
-        });
-    }
-
-    function openDay(dayValue) {
-      console.log('Opening Day:', dayValue); // Debug log
-      const cards = Array.from(document.querySelectorAll('.day-card'));
-      if (!cards.length) return;
-
-      const target = cards.find(card => card.getAttribute('data-day') === dayValue);
-      if (!target) {
-        console.warn(`No card found for day: ${dayValue}`);
-        return false;
-      }
-
-      cards.forEach(card => card.classList.remove('visible'));
-      target.classList.add('visible');
-
-      document.querySelectorAll('.day-btn').forEach(btn => btn.classList.remove('active'));
-      const activeBtn = document.querySelector(`.day-btn[data-day="${dayValue}"]`);
-      if (activeBtn) activeBtn.classList.add('active');
-
-      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      return true;
-    }
-
-    // apply the initial route based on URL hash or default to first day
-    function applyInitialRoute() {
-      const hash = window.location.hash.replace(/^#/, '');
-      const validDays = Array.from(document.querySelectorAll('.day-card')).map(card => card.getAttribute('data-day'));
-
-      if (hash && validDays.includes(hash)) {
-        openDay(hash);
-      } else if (validDays.length > 0) {
-        openDay(validDays[0]); // Open the first valid day from the CSV
-      } else {
-        console.warn('No valid days found in the CSV.');
-      }
-    }
-
-    // Collapsible UI for agenda items
-    function initCollapsibleUI() {
-      const toggles = document.querySelectorAll('.day-card .section h3');
-      toggles.forEach(toggle => {
-        toggle.addEventListener('click', () => {
-          const content = toggle.nextElementSibling;
-          if (content) {
-            const isOpen = content.style.display !== 'none';
-            content.style.display = isOpen ? 'none' : 'block';
-            toggle.classList.toggle('open', !isOpen);
-          }
-        });
-      });
-    }
-
-    // download current page as PDF
-    document.getElementById('download-pdf').addEventListener('click', () => {
-      const originalTitle = document.title;
-      document.title = 'CompTIA A+ Preparation - Print View';
-      window.print();
-      document.title = originalTitle;
-    });
-
-    // copy permalink to clipboard
-    document.getElementById('copy-permalink').addEventListener('click', function() {
-      const dayValue = document.querySelector('.day-card.visible')?.getAttribute('data-day');
-      if (!dayValue) return;
-      const url = new URL(window.location);
-      url.hash = dayValue;
-      navigator.clipboard.writeText(url.toString()).then(() => {
-        this.classList.add('copied');
-        setTimeout(() => this.classList.remove('copied'), 2000);
-      });
-    });
   </script>
 </body>
 </html>
