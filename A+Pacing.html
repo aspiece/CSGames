@@ -84,25 +84,26 @@
     }
 
     /* Layout: left rail for day links, right column for vertical lesson sections */
-    .layout { display:grid; grid-template-columns:220px 1fr; gap:18px; align-items:start; }
-    /* Left rail: always a single vertical column that grows to show all days.
-       Use a fixed viewport-based height and vertical scrolling so the list
-       continues down the left side for the entire CSV. */
+    .layout {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 18px;
+      align-items: start;
+    }
+
+    /* Left rail: make it span the full height of the page */
     #day-nav {
       display: flex;
       flex-direction: column;
       flex-wrap: nowrap;                       /* never wrap into new columns */
       gap: 8px;
-      /* Use viewport height minus header/controls area so the rail fills page */
-      height: calc(100vh - 200px);
-      max-height: calc(100vh - 120px);
-      overflow-y: auto;                        /* vertical scroll for long lists */
-      overflow-x: hidden;
+      height: 100%; /* Make it span the full height of the page */
+      overflow: hidden;                        /* Disable scrolling */
       padding-right: 8px;
       box-sizing: border-box;
       align-items: stretch;
       position: sticky;                        /* keep rail visible while scrolling content */
-      top: 20px;
+      top: 0;
     }
     #day-nav .day-btn { width:100%; text-align:left; white-space:normal; }
     #content-area { min-height:200px; }
