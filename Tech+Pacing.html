@@ -172,14 +172,23 @@
       const main=document.getElementById('content-area');
       nav.innerHTML=''; main.innerHTML='';
 
+      const days=[]; // NEW: keep a list of day strings
+
       rows.forEach(item=>{
         const day=(item[H.day]||'').trim(); if(!day) return;
+        days.push(day); // NEW
 
-        // Make nav
-        const btn=document.createElement('button');
-        btn.className='day-btn'; btn.type='button'; btn.textContent=day; btn.dataset.key=day;
-        btn.addEventListener('click',()=>openDay(day));
-        nav.appendChild(btn);
+        // Make nav link (deep link)
+        const a=document.createElement('a');           // CHANGED: button -> anchor
+        a.className='day-btn';
+        a.href=makeDayHref(day);                       // NEW: shareable link
+        a.textContent=day;
+        a.dataset.key=day;
+        a.addEventListener('click', (e)=>{             // NEW: client-side routing
+          e.preventDefault();
+          openDay(day, {updateUrl:true});
+        });
+        nav.appendChild(a);
 
         // Compute minutes
         const minutes={
@@ -233,8 +242,12 @@
         main.appendChild(card);
       });
 
-      // Activate first day
-      const firstBtn = nav.querySelector('.day-btn'); if(firstBtn){firstBtn.classList.add('active'); openDay(firstBtn.dataset.key);}
+      // Select initial day: URL > today > first
+      const urlDay = getURLDay();
+      const today = formatTodayForCsv();
+      const initial = (urlDay && days.includes(urlDay)) ? urlDay
+                     : (days.includes(today) ? today : days[0]);
+      if(initial){ openDay(initial, {updateUrl:!urlDay, replace:true}); }
 
       function toMin(v){
         const n = Number(String(v||'').trim());
@@ -242,10 +255,44 @@
       }
     }
 
-    function openDay(key){
-      document.querySelectorAll('.day-btn').forEach(b=>b.classList.toggle('active', b.dataset.key===key));
-      document.querySelectorAll('.day-card').forEach(c=>c.classList.toggle('visible', c.dataset.key===key));
+    // NEW: Helpers for deep-linking
+    function makeDayHref(day){
+      const u = new URL(window.location.href);
+      u.searchParams.set('day', day);
+      return u.pathname + u.search; // keep same doc
     }
+    function getURLDay(){
+      const sp = new URLSearchParams(window.location.search);
+      const d = sp.get('day');
+      return d ? d.trim() : '';
+    }
+    function setURLDay(day, {replace}={}){
+      const url = makeDayHref(day);
+      if(replace){ history.replaceState({day}, '', url); }
+      else { history.pushState({day}, '', url); }
+    }
+    function formatTodayForCsv(){
+      const d=new Date();
+      const mm=String(d.getMonth()+1).padStart(2,'0');
+      const dd=String(d.getDate()).padStart(2,'0');
+      const yyyy=d.getFullYear();
+      return `${mm}/${dd}/${yyyy}`;
+    }
+
+    // CHANGED: openDay now manages URL and active state
+    function openDay(key, {updateUrl=false, replace=false}={}){
+      document.querySelectorAll('.day-btn')
+        .forEach(b=>b.classList.toggle('active', b.dataset.key===key));
+      document.querySelectorAll('.day-card')
+        .forEach(c=>c.classList.toggle('visible', c.dataset.key===key));
+      if(updateUrl){ setURLDay(key, {replace}); }
+    }
+
+    // NEW: handle back/forward
+    window.addEventListener('popstate', ()=>{
+      const d = getURLDay();
+      if(d){ openDay(d, {updateUrl:false}); }
+    });
 
     async function init(){
       try{
