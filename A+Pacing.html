@@ -216,6 +216,7 @@
     }
 
     function validateCsvHeaders(headers) {
+      console.log('CSV Headers:', headers); // Debug log
       const requiredHeaders = ['Day', 'Lesson', 'Topics'];
       const missingHeaders = requiredHeaders.filter(header => !headers.includes(header));
       if (missingHeaders.length > 0) {
@@ -368,7 +369,9 @@
           return resp.text();
         })
         .then(text => {
+          console.log('CSV File Content:', text); // Debug log
           const objs = csvToObjects(text);
+          console.log('Parsed CSV Data:', objs); // Debug log
           if (!objs.length) throw new Error('pacing.csv is empty or malformed');
           renderRows(objs);
           statusEl.textContent = `Loaded pacing.csv (${objs.length} day${objs.length === 1 ? '' : 's'})`;
@@ -382,34 +385,28 @@
     }
 
     function openDay(dayValue) {
+      console.log('Opening Day:', dayValue); // Debug log
       const cards = Array.from(document.querySelectorAll('.day-card'));
       if (!cards.length) return;
       let target = null;
       const val = String(dayValue || '');
       
-      // Try to find the target card by data-date or data-day
       target = cards.find(c => (c.getAttribute('data-date') || '') === val) ||
                cards.find(c => c.getAttribute('data-day') === val);
       
       if (!target) {
-        const idx = parseInt(val, 10);
-        if (!Number.isNaN(idx) && idx >= 1 && idx <= cards.length) target = cards[idx - 1];
+        console.warn(`No card found for day: ${dayValue}`);
+        return false;
       }
-      
-      if (!target) return false;
 
-      // Hide all cards and show only the target card
       cards.forEach(c => c.classList.remove('visible'));
       target.classList.add('visible');
 
-      // Update the active button in the left navigation
       document.querySelectorAll('.day-btn').forEach(b => b.classList.remove('active'));
       const btn = Array.from(document.querySelectorAll('.day-btn')).find(b => b.dataset.day === (target.getAttribute('data-day') || ''));
       if (btn) btn.classList.add('active');
 
-      // Scroll to the top of the target card smoothly
       target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-
       return true;
     }
 
