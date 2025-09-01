@@ -285,9 +285,8 @@
       dayNav.innerHTML = '';
       content.innerHTML = '';
 
-      // Iterate over each row in the CSV data
-      data.forEach((item) => {
-        const day = item.Day; // Use the "Day" column from the CSV file
+      data.forEach(item => {
+        const day = item.Day;
         const iso = parseDateString(day);
 
         if (!iso) {
@@ -295,19 +294,17 @@
           return;
         }
 
-        // Create navigation button for the day
+        // Create navigation button
         const btn = document.createElement('button');
         btn.className = 'day-btn';
         btn.type = 'button';
-        btn.textContent = formatDisplayDate(iso); // Display the formatted date
-        btn.title = day;
+        btn.textContent = formatDisplayDate(iso);
         btn.dataset.day = day;
         btn.dataset.date = iso;
-        btn.setAttribute('aria-label', `Jump to ${day}`);
         btn.addEventListener('click', () => openDay(day));
         dayNav.appendChild(btn);
 
-        // Create content card for the day
+        // Create content card
         const card = document.createElement('article');
         card.className = 'day-card';
         card.setAttribute('data-day', day);
@@ -386,23 +383,19 @@
       console.log('Opening Day:', dayValue); // Debug log
       const cards = Array.from(document.querySelectorAll('.day-card'));
       if (!cards.length) return;
-      let target = null;
-      const val = String(dayValue || '');
-      
-      target = cards.find(c => (c.getAttribute('data-date') || '') === val) ||
-               cards.find(c => c.getAttribute('data-day') === val);
-      
+
+      const target = cards.find(card => card.getAttribute('data-day') === dayValue);
       if (!target) {
         console.warn(`No card found for day: ${dayValue}`);
         return false;
       }
 
-      cards.forEach(c => c.classList.remove('visible'));
+      cards.forEach(card => card.classList.remove('visible'));
       target.classList.add('visible');
 
-      document.querySelectorAll('.day-btn').forEach(b => b.classList.remove('active'));
-      const btn = Array.from(document.querySelectorAll('.day-btn')).find(b => b.dataset.day === (target.getAttribute('data-day') || ''));
-      if (btn) btn.classList.add('active');
+      document.querySelectorAll('.day-btn').forEach(btn => btn.classList.remove('active'));
+      const activeBtn = document.querySelector(`.day-btn[data-day="${dayValue}"]`);
+      if (activeBtn) activeBtn.classList.add('active');
 
       target.scrollIntoView({ behavior: 'smooth', block: 'start' });
       return true;
@@ -411,10 +404,14 @@
     // apply the initial route based on URL hash or default to first day
     function applyInitialRoute() {
       const hash = window.location.hash.replace(/^#/, '');
-      if (hash) {
-        openDay(hash) || openDay(1); // try hash, then fallback to day 1
+      const validDays = Array.from(document.querySelectorAll('.day-card')).map(card => card.getAttribute('data-day'));
+
+      if (hash && validDays.includes(hash)) {
+        openDay(hash);
+      } else if (validDays.length > 0) {
+        openDay(validDays[0]); // Open the first valid day from the CSV
       } else {
-        openDay(1);
+        console.warn('No valid days found in the CSV.');
       }
     }
 
