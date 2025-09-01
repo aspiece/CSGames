@@ -5,655 +5,279 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>CompTIA Tech+ Preparation</title>
   <style>
-    :root {
-      --bg: #ffffff;
-      --fg: #111;
-      --muted: #333;
-      --btn-bg: #0d6efd;
-      --btn-fg: #fff;
-      --btn-bg-alt: #495057;
+    :root{
+      --bg:#0f1115;--card:#171a21;--text:#e6e8ee;--muted:#b9c0d4;--accent:#6ea8fe;--border:#2c3443;
+      --ok:#2fbf71;--warn:#f7b500;--err:#ff5d5d;
+      --btn:#0d6efd;--btn-alt:#495057;
     }
-    html, body {
-      margin: 0;
-      padding: 0;
-      background: var(--bg);
-      color: var(--fg);
-    }
-    /* Base typography */
-    body {
-      font-family: system-ui, Segoe UI, Roboto, Arial, sans-serif;
-      font-size: 16px;
-      line-height: 1.6;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-    }
-    h1 { font-size: 1.8rem; line-height: 1.2; margin: 0 0 8px; }
-    h2 { font-size: 1.35rem; line-height: 1.3; margin: 0 0 8px; }
-    h3 { font-size: 1.12rem; line-height: 1.35; margin: 14px 0 6px; }
-    .wrap { max-width: 1100px; margin: 24px auto; padding: 0 16px; }
-
-    /* Projector mode: larger text + more spacing */
-    body.projector {
-      font-size: 22px;           /* adjust if you want bigger/smaller */
-      line-height: 1.7;
-    }
-    body.projector h1 { font-size: 2.2rem; }
-    body.projector h2 { font-size: 1.7rem; }
-    body.projector h3 { font-size: 1.35rem; }
-    body.projector .wrap { max-width: 1200px; }
-
-    /* Toggle button */
-    .projector-toggle {
-      position: fixed;
-      top: 12px;
-      right: 12px;
-      z-index: 1000;
-      border: 0;
-      border-radius: 999px;
-      padding: 10px 14px;
-      background: var(--btn-bg);
-      color: var(--btn-fg);
-      font-weight: 600;
-      font-size: 0.95rem;
-      box-shadow: 0 6px 18px rgba(0,0,0,.15);
-      cursor: pointer;
-    }
-    .projector-toggle[aria-pressed="true"] {
-      background: var(--btn-bg-alt);
-    }
-    .projector-hint {
-      position: fixed;
-      top: 56px;
-      right: 16px;
-      z-index: 999;
-      color: var(--muted);
-      font-size: 0.85rem;
-      user-select: none;
-    }
-
-    :root {
-      --bg: #0f1115;
-      --card: #171a21;
-      --text: #e6e8ee;
-      --muted: #b9c0d4;
-      --accent: #6ea8fe;
-      --border: #2c3443;
-    }
-    html, body { margin:0; padding:0; background:var(--bg); color:var(--text); font: 14px/1.5 system-ui, Segoe UI, Roboto, Arial, sans-serif; }
-    .wrap { max-width: 1100px; margin: 24px auto; padding: 0 16px; }
-    h1 { margin: 0 0 6px; font-size: 1.8rem; }
-    h2 { margin: 0 0 16px; font-size: 1.05rem; color: var(--muted); }
-    .status { margin: 8px 0 16px; color: var(--muted); }
-
-    .layout {
-      display: grid;
-      grid-template-columns: 260px 1fr;
-      gap: 16px;
-      align-items: start;
-    }
-
-    /* Left nav (dates from CSV only) */
-    #day-nav {
-      position: sticky;
-      top: 12px;
-      align-self: start;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      max-height: calc(100dvh - 24px);
-      overflow-y: auto;
-      padding-right: 4px;
-    }
-    .day-btn {
-      all: unset;
-      display: block;
-      padding: 8px 10px;
-      background: #1a1f28;
-      border: 1px solid #262b36;
-      border-radius: 8px;
-      color: var(--text);
-      cursor: pointer;
-    }
-    .day-btn:hover { background: #212634; }
-    .day-btn.active {
-      background: #263143;
-      border-color: #344155;
-      color: #fff;
-      box-shadow: 0 0 0 2px rgba(110,168,254,0.12) inset;
-    }
-
-    /* Content area */
-    #content-area { min-height: 200px; }
-    .day-card { display: none; margin: 0 0 14px; }
-    .day-card.visible { display: block; }
-    .card-inner {
-      background: var(--card);
-      border: 1px solid #262b36;
-      border-radius: 12px;
-      padding: 16px;
-      box-shadow: 0 6px 18px rgba(0,0,0,.18);
-    }
-    .section { margin: 12px 0; }
-    .section h3 { margin: 0 0 6px; font-size: 1.05rem; }
-    .section .section-content { color: var(--muted); white-space: pre-wrap; }
-
-    /* Slide deck link pills */
-    .link-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 6px;
-      padding: 0;
-      list-style: none;
-    }
-    a.pill {
-      display: inline-block;
-      padding: 6px 10px;
-      border-radius: 999px;
-      background: #1f2530;
-      border: 1px solid var(--border);
-      color: var(--accent);
-      text-decoration: none;
-      font-weight: 600;
-      font-size: 0.95rem;
-    }
-    a.pill:hover { background: #263043; }
-
-    /* Video embeds */
-    .video-list {
-      display: grid;
-      gap: 12px;
-      margin-top: 6px;
-    }
-    .video-embed {
-      position: relative;
-      width: 100%;
-      max-width: 900px;
-      aspect-ratio: 16 / 9;
-      background: #000;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      overflow: hidden;
-    }
-    .video-embed iframe,
-    .video-embed video {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-    }
-
-    /* NEW: list styling for semicolon-separated items */
-    .line-list { margin: 6px 0 0; padding-left: 18px; }
-    .line-list li { margin: 4px 0; }
-
-    @media (max-width: 860px) {
-      .layout { grid-template-columns: 1fr; }
-      #day-nav { position: static; max-height: none; }
-    }
+    html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font:14px/1.55 system-ui,Segoe UI,Roboto,Arial,sans-serif}
+    .wrap{max-width:1100px;margin:24px auto;padding:0 16px}
+    h1{margin:0 0 6px;font-size:1.8rem}
+    .layout{display:grid;grid-template-columns:260px 1fr;gap:16px;align-items:start}
+    #day-nav{position:sticky;top:12px;display:flex;flex-direction:column;gap:8px;max-height:calc(100dvh - 24px);overflow:auto;padding-right:4px}
+    .day-btn{all:unset;display:block;padding:8px 10px;background:#1a1f28;border:1px solid #262b36;border-radius:8px;color:var(--text);cursor:pointer}
+    .day-btn:hover{background:#212634}
+    .day-btn.active{background:#263143;border-color:#344155;color:#fff;box-shadow:0 0 0 2px rgba(110,168,254,.12) inset}
+    #content-area{min-height:200px}
+    .day-card{display:none}
+    .day-card.visible{display:block}
+    .card-inner{background:var(--card);border:1px solid #262b36;border-radius:12px;padding:16px;box-shadow:0 6px 18px rgba(0,0,0,.18)}
+    .topline{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:0 0 8px}
+    .time-total{font-weight:700}
+    .time-total.ok{color:var(--ok)}
+    .time-total.warn{color:var(--warn)}
+    .time-total.err{color:var(--err)}
+    .section{margin:12px 0}
+    .section h3{margin:0 0 6px;font-size:1.05rem}
+    .section .meta{color:var(--muted);font-size:.95rem;margin-left:8px}
+    .section .section-content{color:var(--muted);white-space:pre-wrap}
+    .line-list{margin:6px 0 0;padding-left:18px}
+    .line-list li{margin:4px 0}
+    /* Slide links and videos (kept minimal for now) */
+    .link-list{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;padding:0;list-style:none}
+    a.pill{display:inline-block;padding:6px 10px;border-radius:999px;background:#1f2530;border:1px solid var(--border);color:var(--accent);text-decoration:none;font-weight:600;font-size:.95rem}
+    a.pill:hover{background:#263043}
+    .video-list{display:grid;gap:12px;margin-top:6px}
+    .video-embed{position:relative;width:100%;max-width:900px;aspect-ratio:16/9;background:#000;border:1px solid var(--border);border-radius:10px;overflow:hidden}
+    .video-embed iframe,.video-embed video{position:absolute;inset:0;width:100%;height:100%}
+    /* Projector Mode */
+    .projector-toggle{position:fixed;top:12px;right:12px;z-index:1000;border:0;border-radius:999px;padding:10px 14px;background:var(--btn);color:#fff;font-weight:600;font-size:.95rem;box-shadow:0 6px 18px rgba(0,0,0,.15);cursor:pointer}
+    .projector-toggle[aria-pressed="true"]{background:var(--btn-alt)}
+    .projector-hint{position:fixed;top:56px;right:16px;z-index:999;color:var(--muted);font-size:.85rem;user-select:none}
+    body.projector{font-size:20px;line-height:1.7}
+    body.projector h1{font-size:2.1rem}
+    body.projector .section h3{font-size:1.25rem}
+    @media (max-width:860px){.layout{grid-template-columns:1fr}#day-nav{position:static;max-height:none}}
   </style>
 </head>
 <body>
-  <!-- Projector Mode toggle -->
-  <button id="projectorToggle" class="projector-toggle" type="button" aria-pressed="false" title="Toggle projector mode (Shift+P)">
-    Projector Mode
-  </button>
+  <button id="projectorToggle" class="projector-toggle" type="button" aria-pressed="false" title="Toggle projector mode (Shift+P)">Projector Mode</button>
   <div class="projector-hint" id="projectorHint">Shortcut: Shift+P</div>
 
   <div class="wrap">
-    <h1>CompTIA Tech+ Preparation</h1>
-    <h2>Genesee Career Institute</h2>
+    <header style="margin-bottom:10px">
+      <h1>CompTIA Tech+ Preparation</h1>
+      <div id="status" style="color:var(--muted)"></div>
+    </header>
 
-    <div id="status" class="status">Loading...</div>
-
-    <div class="layout" style="margin-top:16px;">
-      <nav id="day-nav" aria-label="Lesson dates"></nav>
-      <main id="content-area" role="main"></main>
+    <div class="layout">
+      <nav id="day-nav" aria-label="Days"></nav>
+      <main id="content-area" aria-live="polite"></main>
     </div>
   </div>
 
   <script>
-    const CSV_URL = 'tech+pacing.csv';
-    let CSV_HEADERS = [];
-
-    document.addEventListener('DOMContentLoaded', () => {
-      loadCsvAndRender();
-    });
-
-    async function loadCsvAndRender() {
-      const statusEl = document.getElementById('status');
-      try {
-        statusEl.textContent = 'Loading pacing.csv...';
-        const resp = await fetch(CSV_URL, { cache: 'no-store' });
-        if (!resp.ok) throw new Error('HTTP ' + resp.status);
-        const text = await resp.text();
-
-        const rows = csvToObjects(text);
-        if (!rows.length) {
-          statusEl.textContent = 'No days found in pacing.csv.';
-          renderEmpty();
-          return;
-        }
-        renderFromCsv(rows);
-        statusEl.textContent = `Loaded ${rows.length} day${rows.length === 1 ? '' : 's'} from pacing.csv.`;
-        applyInitialRoute();
-      } catch (err) {
-        console.error('Failed to load CSV:', err);
-        statusEl.textContent = 'Error loading pacing.csv. Ensure the file exists and is reachable.';
-        renderEmpty();
+    // Basic CSV parsing (handles quotes and commas)
+    function parseCSV(text){
+      const rows=[];let row=[],cell='',q=false;
+      for(let i=0;i<text.length;i++){
+        const c=text[i],n=text[i+1];
+        if(c==='\"'){
+          if(q && n==='\"'){cell+='\"';i++;} else {q=!q;}
+        } else if(c===',' && !q){row.push(cell);cell='';}
+        else if((c==='\n' || c==='\r') && !q){
+          if(c==='\r' && n==='\n'){i++;}
+          row.push(cell);rows.push(row);row=[];cell='';
+        } else {cell+=c;}
       }
+      if(cell.length||row.length) {row.push(cell);rows.push(row);}
+      // Drop comment or empty header lines
+      return rows.filter(r=>r.some(v=>String(v).trim().length));
     }
-
-    function renderEmpty() {
-      document.getElementById('day-nav').innerHTML = '';
-      document.getElementById('content-area').innerHTML = '';
-    }
-
-    // Parse CSV text into array of objects
-    function csvToObjects(text) {
-      const rows = parseCSV(text).filter(r => r.length && r.some(c => (c || '').trim() !== ''));
-      if (!rows.length) return [];
-
-      // Find header row (skip BOM/comment/filepath lines)
-      let headerRowIndex = 0;
-      while (headerRowIndex < rows.length) {
-        const row = rows[headerRowIndex].map(c => (c || '').trim());
-        const first = row[0] || '';
-        const cleaned = row.map(h => h.replace(/^\uFEFF/, '')); // strip BOM
-        if (first.startsWith('//') || first.startsWith('#') || /filepath:/i.test(first)) {
-          headerRowIndex++;
-          continue;
-        }
-        rows[headerRowIndex] = cleaned;
-        break;
-      }
-
-      const headers = rows[headerRowIndex].map(h => (h || '').trim());
-      CSV_HEADERS = headers.slice();
-
-      // Require 'Day'
-      if (!headers.includes('Day')) {
-        console.warn('CSV header row missing "Day". Headers:', headers);
-        return [];
-      }
-
-      const dataRows = rows.slice(headerRowIndex + 1);
-      const objects = dataRows.map(r => {
-        const obj = {};
-        headers.forEach((h, i) => obj[h] = (r[i] || '').trim());
-        return obj;
-      }).filter(o => (o.Day || '').trim().length > 0);
-
-      return objects;
-    }
-
-    // Robust CSV parser with quotes
-    function parseCSV(text) {
-      const out = [];
-      let row = [], cell = '', inQ = false;
-      for (let i = 0; i < text.length; i++) {
-        const ch = text[i];
-        if (inQ) {
-          if (ch === '"') {
-            if (text[i + 1] === '"') { cell += '"'; i++; }
-            else { inQ = false; }
-          } else {
-            cell += ch;
-          }
-        } else {
-          if (ch === '"') inQ = true;
-          else if (ch === ',') { row.push(cell); cell = ''; }
-          else if (ch === '\n') { row.push(cell); out.push(row); row = []; cell = ''; }
-          else if (ch === '\r') { /* ignore */ }
-          else { cell += ch; }
-        }
-      }
-      if (cell.length > 0 || row.length > 0) { row.push(cell); out.push(row); }
-      return out;
-    }
-
-    // Build UI strictly from CSV rows (custom order per requirements)
-    function renderFromCsv(rows) {
-      const H = {
-        boc1: 'Beginning of Class Discussion (Lesson 1)',
-        brain: 'Brain Break (5-10 min)',
-        lesson1: 'Lesson 1',
-        lo1: 'Learning Objectives (Lesson 1)',
-        lesson2: 'Lesson 2',
-        lo2: 'Learning Objectives (Lesson 2)',
-        daily: 'Daily Description', // NEW
-        // boc2 intentionally omitted (removed per requirement)
-        eod: 'End of Day Discussion',
-        standards: 'Standards Alignment'
-      };
-
-      const LABELS = {
-        [H.boc1]: 'Beginning of Class Discussion',
-        [H.lesson1]: 'Lesson 1',
-        [H.brain]: 'Brain Break',
-        [H.lesson2]: 'Lesson 2',
-        [H.eod]: 'End of Class Discussion',
-        [H.standards]: 'Standards Alignment',
-        [H.daily]: 'Daily Description' // NEW
-      };
-
-      const nav = document.getElementById('day-nav');
-      const main = document.getElementById('content-area');
-      nav.innerHTML = '';
-      main.innerHTML = '';
-
-      rows.forEach(item => {
-        const dayLabel = (item.Day || '').trim();
-        if (!dayLabel) return;
-
-        // Nav button
-        const btn = document.createElement('button');
-        btn.className = 'day-btn';
-        btn.type = 'button';
-        btn.textContent = dayLabel;
-        btn.dataset.key = dayLabel;
-        btn.setAttribute('aria-label', `Open ${dayLabel}`);
-        btn.addEventListener('click', () => openDay(dayLabel));
-        nav.appendChild(btn);
-
-        // Content card
-        const card = document.createElement('article');
-        card.className = 'day-card';
-        card.setAttribute('data-key', dayLabel);
-
-        let inner = '<div class="card-inner">';
-
-        // -1) Daily Description first (NEW)
-        if (item[H.daily]) {
-          inner += sectionHtml(LABELS[H.daily], listifyIfNeeded(item[H.daily]));
-        }
-
-        // 0) Combined Learning Objectives next
-        const loCombined = [item[H.lo1], item[H.lo2]].filter(Boolean).join('; ');
-        if (loCombined) {
-          inner += sectionHtml('Learning Objectives (Lessons 1 & 2)', listifyIfNeeded(loCombined));
-        }
-
-        // 1) Beginning of Class Discussion (Lesson 1)
-        if (item[H.boc1]) {
-          inner += sectionHtml(LABELS[H.boc1], renderField(H.boc1, item[H.boc1]));
-        }
-
-        // 2) Lesson 1 (no nested objectives)
-        if (item[H.lesson1]) {
-          inner += sectionHtml(LABELS[H.lesson1], renderField(H.lesson1, item[H.lesson1]));
-        }
-
-        // 3) Brain Break
-        if (item[H.brain]) {
-          inner += sectionHtml(LABELS[H.brain], renderField(H.brain, item[H.brain]));
-        }
-
-        // 4) Lesson 2 (no nested objectives)
-        if (item[H.lesson2]) {
-          inner += sectionHtml(LABELS[H.lesson2], renderField(H.lesson2, item[H.lesson2]));
-        }
-
-        // 5) End of Class Discussion
-        if (item[H.eod]) {
-          inner += sectionHtml(LABELS[H.eod], renderField(H.eod, item[H.eod]));
-        }
-
-        // Optional: Standards
-        if (item[H.standards]) {
-          inner += sectionHtml(LABELS[H.standards], renderField(H.standards, item[H.standards]));
-        }
-
-        inner += '</div>';
-        card.innerHTML = inner;
-        main.appendChild(card);
+    function rowsToObjects(rows){
+      const header=rows[0].map(h=>h.trim());
+      return rows.slice(1).map(r=>{
+        const o={};
+        header.forEach((h,i)=>o[h]=r[i]??'');
+        return o;
       });
-
-      function sectionHtml(title, contentHtml) {
-        return `
-          <div class="section">
-            <h3>${escapeHtml(title)}</h3>
-            <div class="section-content">${contentHtml}</div>
-          </div>`;
-      }
+    }
+    function escapeHtml(s){return String(s??'').replace(/[&<>"']/g,m=>({ '&':'&nbsp;&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]||m)).replace('&nbsp;&amp;','&amp;')}
+    function sentencesToLines(s){
+      const escaped=escapeHtml(s);
+      return escaped.replace(/;(\s+)?/g,'\n').replace(/([.!?])\s+/g,'$1\n');
+    }
+    function listifyIfNeeded(text){
+      if(!text) return '';
+      const items=String(text).split(';').map(t=>t.trim()).filter(Boolean);
+      if(items.length>=2){return `<ul class="line-list">${items.map(it=>`<li>${escapeHtml(it)}</li>`).join('')}</ul>`;}
+      return sentencesToLines(text);
+    }
+    function extractUrls(text){if(!text) return []; const m=String(text).match(/\bhttps?:\/\/[^\s)]+/g); return m||[];}
+    function sanitizeUrl(u){try{const url=new URL(u);return url.protocol==='http:'||url.protocol==='https:'?url.href:'';}catch{return ''}}
+    function makeVideoEmbed(u){
+      const safe=sanitizeUrl(u); if(!safe) return '';
+      // YouTube
+      const yt = safe.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]{11})/);
+      if(yt){return `<div class="video-embed"><iframe src="https://www.youtube.com/embed/${yt[1]}" frameborder="0" allowfullscreen></iframe></div>`;}
+      return `<div class="video-embed"><iframe src="${safe}" frameborder="0"></iframe></div>`;
     }
 
-    // Render fields: Video embeds, Slide deck pills, others sentence/semicolon formatting
-    function renderField(header, value) {
-      const lower = String(header).toLowerCase();
-      const isVideo = lower.includes('video');
-      const isSlide = lower.includes('slide');
-
-      if (isVideo) {
-        const urls = extractUrls(value);
-        if (urls.length) {
-          const embeds = urls.map(u => makeVideoEmbed(u)).filter(Boolean).join('');
-          if (embeds) return `<div class="video-list">${embeds}</div>`;
+    function renderField(header,value){
+      const lower=String(header).toLowerCase();
+      if(lower.includes('video')){
+        const urls=extractUrls(value);
+        if(urls.length){
+          const embeds=urls.map(u=>makeVideoEmbed(u)).filter(Boolean).join('');
+          if(embeds) return `<div class="video-list">${embeds}</div>`;
         }
         return listifyIfNeeded(value);
       }
-
-      if (isSlide) {
-        const urls = extractUrls(value);
-        if (urls.length) {
-          const many = urls.length > 1;
-          const baseLabel = 'View slide deck';
-          const links = urls.map((u, i) => {
-            const safe = sanitizeUrl(u);
-            if (!safe) return '';
-            const label = many ? `${baseLabel} ${i + 1}` : baseLabel;
+      if(lower.includes('slide')){
+        const urls=extractUrls(value);
+        if(urls.length){
+          const many=urls.length>1;
+          const base='View slide deck';
+          const links=urls.map((u,i)=>{
+            const safe=sanitizeUrl(u); if(!safe) return '';
+            const label=many?`${base} ${i+1}`:base;
             return `<a class="pill" href="${safe}" target="_blank" rel="noopener noreferrer">${label}</a>`;
           }).filter(Boolean).join('');
           return `<div class="link-list">${links}</div>`;
         }
         return listifyIfNeeded(value);
       }
-
       return listifyIfNeeded(value);
     }
 
-    // Extract URLs (space/comma/semicolon/newline separated)
-    function extractUrls(text) {
-      if (!text) return [];
-      const matches = String(text).match(/https?:\/\/[^\s,;]+/g);
-      return matches ? matches.map(s => s.trim()) : [];
+    function sectionHtml(title, minutes, contentHtml){
+      const timeTag = Number.isFinite(minutes) && minutes>0 ? `<span class="meta">(${minutes} min)</span>` : '';
+      return `
+        <div class="section">
+          <h3>${escapeHtml(title)} ${timeTag}</h3>
+          <div class="section-content">${contentHtml||''}</div>
+        </div>`;
     }
 
-    // Allow only http/https links
-    function sanitizeUrl(url) {
-      try {
-        const u = new URL(url);
-        if (u.protocol === 'http:' || u.protocol === 'https:') return u.toString();
-        return null;
-      } catch {
-        return null;
+    function renderFromCsv(rows){
+      const H={
+        day:'Day',
+        lesson1:'Lesson 1',
+        lo1:'Learning Objectives (Lesson 1)',
+        boc1:'Beginning of Class Discussion (Lesson 1)',
+        brain:'Brain Break (5-10 min)',
+        lesson2:'Lesson 2',
+        lo2:'Learning Objectives (Lesson 2)',
+        eod:'End of Day Discussion',
+        standards:'Standards Alignment',
+        daily:'Daily Description',
+        mBeg:'Minutes: Beginning Discussion',
+        mL1:'Minutes: Lesson 1',
+        mBreak:'Minutes: Brain Break',
+        mL2:'Minutes: Lesson 2',
+        mEnd:'Minutes: End Discussion'
+      };
+
+      const nav=document.getElementById('day-nav');
+      const main=document.getElementById('content-area');
+      nav.innerHTML=''; main.innerHTML='';
+
+      rows.forEach(item=>{
+        const day=(item[H.day]||'').trim(); if(!day) return;
+
+        // Make nav
+        const btn=document.createElement('button');
+        btn.className='day-btn'; btn.type='button'; btn.textContent=day; btn.dataset.key=day;
+        btn.addEventListener('click',()=>openDay(day));
+        nav.appendChild(btn);
+
+        // Compute minutes
+        const minutes={
+          beg: toMin(item[H.mBeg]),
+          l1: toMin(item[H.mL1]),
+          brk: toMin(item[H.mBreak]),
+          l2: toMin(item[H.mL2]),
+          end: toMin(item[H.mEnd]),
+        };
+        const total = (minutes.beg+minutes.l1+minutes.brk+minutes.l2+minutes.end);
+        const goal = 90;
+        const statusClass = total===goal ? 'ok' : (total>0 && Math.abs(total-goal)<=5 ? 'warn' : total>goal ? 'err' : 'warn');
+        const statusText = total===goal ? 'on target' : total>goal ? 'over' : 'under';
+
+        const card=document.createElement('article');
+        card.className='day-card'; card.setAttribute('data-key',day);
+
+        let inner = `<div class="card-inner">
+          <div class="topline">
+            <div class="time-total ${statusClass}">Planned Time: ${total} / ${goal} min (${statusText})</div>
+          </div>
+        `;
+
+        // 1) Daily Description first
+        if(item[H.daily]) inner += sectionHtml('Daily Description', undefined, listifyIfNeeded(item[H.daily]));
+
+        // 2) Combined Learning Objectives
+        const loCombined=[item[H.lo1], item[H.lo2]].filter(Boolean).join('; ');
+        if(loCombined) inner += sectionHtml('Learning Objectives (Lessons 1 & 2)', undefined, listifyIfNeeded(loCombined));
+
+        // 3) Beginning of Class Discussion
+        if(item[H.boc1]) inner += sectionHtml('Beginning of Class Discussion', minutes.beg, renderField(H.boc1,item[H.boc1]));
+
+        // 4) Lesson 1
+        if(item[H.lesson1]) inner += sectionHtml('Lesson 1', minutes.l1, renderField(H.lesson1,item[H.lesson1]));
+
+        // 5) Brain Break
+        if(item[H.brain]) inner += sectionHtml('Brain Break', minutes.brk, renderField(H.brain,item[H.brain]));
+
+        // 6) Lesson 2
+        if(item[H.lesson2]) inner += sectionHtml('Lesson 2', minutes.l2, renderField(H.lesson2,item[H.lesson2]));
+
+        // 7) End of Class Discussion
+        if(item[H.eod]) inner += sectionHtml('End of Class Discussion', minutes.end, renderField(H.eod,item[H.eod]));
+
+        // Optional: Standards
+        if(item[H.standards]) inner += sectionHtml('Standards Alignment', undefined, renderField(H.standards,item[H.standards]));
+
+        inner += `</div>`;
+        card.innerHTML = inner;
+        main.appendChild(card);
+      });
+
+      // Activate first day
+      const firstBtn = nav.querySelector('.day-btn'); if(firstBtn){firstBtn.classList.add('active'); openDay(firstBtn.dataset.key);}
+
+      function toMin(v){
+        const n = Number(String(v||'').trim());
+        return Number.isFinite(n) ? n : 0;
       }
     }
 
-    // Video embeds (YouTube, Vimeo, MP4/WebM)
-    function makeVideoEmbed(url) {
-      const safe = sanitizeUrl(url);
-      if (!safe) return '';
-
-      const yt = getYouTubeEmbed(safe);
-      if (yt) {
-        return `
-          <div class="video-embed">
-            <iframe
-              src="${yt}"
-              title="YouTube video"
-              frameborder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              allowfullscreen
-              referrerpolicy="strict-origin-when-cross-origin">
-            </iframe>
-          </div>`;
-      }
-
-      const vm = getVimeoEmbed(safe);
-      if (vm) {
-        return `
-          <div class="video-embed">
-            <iframe
-              src="${vm}"
-              title="Vimeo video"
-              frameborder="0"
-              allow="autoplay; fullscreen; picture-in-picture"
-              allowfullscreen
-              referrerpolicy="strict-origin-when-cross-origin">
-            </iframe>
-          </div>`;
-      }
-
-      if (/\.(mp4|webm)(\?.*)?$/i.test(safe)) {
-        return `
-          <div class="video-embed">
-            <video controls preload="metadata">
-              <source src="${safe}">
-              Your browser does not support the video tag.
-            </video>
-          </div>`;
-      }
-
-      return `<div class="link-list"><a class="pill" href="${safe}" target="_blank" rel="noopener noreferrer">Watch video</a></div>`;
+    function openDay(key){
+      document.querySelectorAll('.day-btn').forEach(b=>b.classList.toggle('active', b.dataset.key===key));
+      document.querySelectorAll('.day-card').forEach(c=>c.classList.toggle('visible', c.dataset.key===key));
     }
 
-    function getYouTubeEmbed(u) {
-      try {
-        const url = new URL(u);
-        const host = url.hostname.replace(/^www\./, '').toLowerCase();
-        let id = '';
-        let start = parseYouTubeStart(url);
-
-        if (host === 'youtu.be') {
-          id = url.pathname.slice(1);
-        } else if (host.endsWith('youtube.com')) {
-          if (url.pathname === '/watch') {
-            id = url.searchParams.get('v') || '';
-          } else if (url.pathname.startsWith('/shorts/')) {
-            id = url.pathname.split('/')[2] || '';
-          } else if (url.pathname.startsWith('/embed/')) {
-            id = url.pathname.split('/')[2] || '';
-          }
-        }
-        if (!id) return null;
-
-        const params = new URLSearchParams({ rel: '0', modestbranding: '1', playsinline: '1' });
-        if (start > 0) params.set('start', String(start));
-        return `https://www.youtube.com/embed/${encodeURIComponent(id)}?${params.toString()}`;
-      } catch {
-        return null;
+    async function init(){
+      try{
+        const res = await fetch('tech%2Bpacing.csv', {cache:'no-store'});
+        const text = await res.text();
+        const rows = parseCSV(text);
+        const objects = rowsToObjects(rows);
+        document.getElementById('status').textContent = `Loaded ${objects.length} day(s).`;
+        renderFromCsv(objects);
+      }catch(err){
+        document.getElementById('status').textContent = 'Failed to load CSV.';
+        console.error(err);
       }
     }
+    init();
 
-    function parseYouTubeStart(url) {
-      const t = url.searchParams.get('t') || url.searchParams.get('start');
-      if (!t) return 0;
-      if (/^\d+$/.test(t)) return parseInt(t, 10);
-      const m = t.match(/(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s)?/i);
-      if (!m) return 0;
-      const h = parseInt(m[1] || '0', 10);
-      const min = parseInt(m[2] || '0', 10);
-      const s = parseInt(m[3] || '0', 10);
-      return h * 3600 + min * 60 + s;
-    }
-
-    function getVimeoEmbed(u) {
-      try {
-        const url = new URL(u);
-        const host = url.hostname.replace(/^www\./, '').toLowerCase();
-        if (!host.endsWith('vimeo.com')) return null;
-        const parts = url.pathname.split('/').filter(Boolean);
-        const id = parts[0] && /^\d+$/.test(parts[0]) ? parts[0] : '';
-        if (!id) return null;
-        return `https://player.vimeo.com/video/${id}`;
-      } catch {
-        return null;
-      }
-    }
-
-    // Sentence/semicolon -> newline (fallback)
-    function sentencesToLines(s) {
-      const escaped = escapeHtml(s);
-      return escaped
-        .replace(/;(\s+)?/g, '\n')       // wrap at semicolons
-        .replace(/([.!?])\s+/g, '$1\n'); // wrap at sentence ends
-    }
-
-    // NEW: turn semicolon-separated text into a list where appropriate
-    function listifyIfNeeded(text) {
-      if (!text) return '';
-      const raw = String(text);
-      const items = raw.split(';').map(t => t.trim()).filter(Boolean);
-      if (items.length >= 2) {
-        return `<ul class="line-list">${items.map(it => `<li>${escapeHtml(it)}</li>`).join('')}</ul>`;
-      }
-      return sentencesToLines(raw);
-    }
-
-    function openDay(key) {
-      const cards = Array.from(document.querySelectorAll('.day-card'));
-      const target = cards.find(c => c.getAttribute('data-key') === key);
-      if (!target) {
-        console.warn('No card found for day:', key);
-        return false;
-      }
-      cards.forEach(c => c.classList.remove('visible'));
-      target.classList.add('visible');
-
-      const btns = Array.from(document.querySelectorAll('.day-btn'));
-      btns.forEach(b => b.classList.remove('active'));
-      const active = btns.find(b => b.dataset.key === key);
-      if (active) active.classList.add('active');
-
-      const enc = encodeURIComponent(key);
-      if (location.hash !== `#${enc}`) history.replaceState(null, '', `#${enc}`);
-
-      window.scrollTo({ top: 0, behavior: 'auto' });
-      return true;
-    }
-
-    function applyInitialRoute() {
-      const btns = Array.from(document.querySelectorAll('.day-btn'));
-      if (!btns.length) return;
-      const hash = decodeURIComponent(location.hash.replace(/^#/, ''));
-      if (hash && openDay(hash)) return;
-      openDay(btns[0].dataset.key);
-    }
-
-    function escapeHtml(s) {
-      return String(s)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
-    }
-
-    (function projectorMode() {
-      const key = 'projector-mode:v1';
-      const btn = document.getElementById('projectorToggle');
-      const hint = document.getElementById('projectorHint');
-
-      function apply(on) {
+    // Projector Mode with persistence and shortcut
+    (function projectorMode(){
+      const key='projector-mode:v1';
+      const btn=document.getElementById('projectorToggle');
+      const hint=document.getElementById('projectorHint');
+      function apply(on){
         document.body.classList.toggle('projector', !!on);
-        btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+        btn.setAttribute('aria-pressed', on?'true':'false');
         btn.textContent = on ? 'Exit Projector' : 'Projector Mode';
-        localStorage.setItem(key, on ? '1' : '0');
-        if (hint) hint.style.opacity = on ? '0.6' : '1';
+        localStorage.setItem(key, on?'1':'0');
+        if(hint) hint.style.opacity = on ? '0.6' : '1';
       }
-
-      const initial = localStorage.getItem(key) === '1';
-      apply(initial);
-
-      btn.addEventListener('click', () => apply(btn.getAttribute('aria-pressed') !== 'true'));
-
-      // Keyboard shortcut: Shift+P
-      window.addEventListener('keydown', (e) => {
-        if (e.shiftKey && (e.key === 'P' || e.key === 'p')) {
-          e.preventDefault();
-          apply(btn.getAttribute('aria-pressed') !== 'true');
-        }
+      const initial = localStorage.getItem(key)==='1'; apply(initial);
+      btn.addEventListener('click',()=>apply(btn.getAttribute('aria-pressed')!=='true'));
+      window.addEventListener('keydown',e=>{
+        if(e.shiftKey && (e.key==='P'||e.key==='p')){ e.preventDefault(); apply(btn.getAttribute('aria-pressed')!=='true'); }
       });
     })();
   </script>
