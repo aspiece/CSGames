@@ -106,33 +106,36 @@
     let CSV_HEADERS = [];
 
     document.addEventListener('DOMContentLoaded', () => {
-      const dayCards = Array.from(document.querySelectorAll('.day-card'));
-      const validDates = new Set();
+      // Load CSV and render on page load
+      loadCsvAndRender();
+    });
 
-      // Extract valid dates from the pacing.csv file
-      dayCards.forEach(card => {
-        const date = card.getAttribute('data-date');
-        if (date) {
-          validDates.add(date);
-        }
-      });
+    const dayCards = Array.from(document.querySelectorAll('.day-card'));
+    const validDates = new Set();
 
-      // Ensure only valid dates are displayed
-      dayCards.forEach(card => {
-        const date = card.getAttribute('data-date');
-        if (!validDates.has(date)) {
-          card.style.display = 'none'; // Hide cards for invalid dates
-        }
-      });
+    // Extract valid dates from the pacing.csv file
+    dayCards.forEach(card => {
+      const date = card.getAttribute('data-date');
+      if (date) {
+        validDates.add(date);
+      }
+    });
 
-      // Handle navigation buttons
-      const dayButtons = Array.from(document.querySelectorAll('.day-btn'));
-      dayButtons.forEach(button => {
-        const date = button.getAttribute('data-date');
-        if (!validDates.has(date)) {
-          button.style.display = 'none'; // Hide buttons for invalid dates
-        }
-      });
+    // Ensure only valid dates are displayed
+    dayCards.forEach(card => {
+      const date = card.getAttribute('data-date');
+      if (!validDates.has(date)) {
+        card.style.display = 'none'; // Hide cards for invalid dates
+      }
+    });
+
+    // Handle navigation buttons
+    const dayButtons = Array.from(document.querySelectorAll('.day-btn'));
+    dayButtons.forEach(button => {
+      const date = button.getAttribute('data-date');
+      if (!validDates.has(date)) {
+        button.style.display = 'none'; // Hide buttons for invalid dates
+      }
     });
 
     async function loadCsvAndRender() {
@@ -169,6 +172,10 @@
       const rows = parseCSV(text).filter(r => r.length && r.some(c => (c || '').trim() !== ''));
       if (!rows.length) return [];
       const headers = rows[0].map(h => (h || '').trim());
+
+      // Strip UTF-8 BOM from first header if present (common from Excel)
+      if (headers.length) headers[0] = headers[0].replace(/^\uFEFF/, '');
+
       CSV_HEADERS = headers.slice();
       // Minimal required: Day
       if (!headers.includes('Day')) return [];
