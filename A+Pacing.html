@@ -106,7 +106,33 @@
     let CSV_HEADERS = [];
 
     document.addEventListener('DOMContentLoaded', () => {
-      loadCsvAndRender();
+      const dayCards = Array.from(document.querySelectorAll('.day-card'));
+      const validDates = new Set();
+
+      // Extract valid dates from the pacing.csv file
+      dayCards.forEach(card => {
+        const date = card.getAttribute('data-date');
+        if (date) {
+          validDates.add(date);
+        }
+      });
+
+      // Ensure only valid dates are displayed
+      dayCards.forEach(card => {
+        const date = card.getAttribute('data-date');
+        if (!validDates.has(date)) {
+          card.style.display = 'none'; // Hide cards for invalid dates
+        }
+      });
+
+      // Handle navigation buttons
+      const dayButtons = Array.from(document.querySelectorAll('.day-btn'));
+      dayButtons.forEach(button => {
+        const date = button.getAttribute('data-date');
+        if (!validDates.has(date)) {
+          button.style.display = 'none'; // Hide buttons for invalid dates
+        }
+      });
     });
 
     async function loadCsvAndRender() {
@@ -211,10 +237,15 @@
           if (h === 'Day') return;
           const val = item[h] || '';
           if (!val) return;
+
+          // Apply sentence-to-newline formatting for normal text fields
+          const isLinky = /video|slide/i.test(h);
+          const body = isLinky ? escapeHtml(val) : sentencesToLines(val);
+
           inner += `
             <div class="section">
               <h3>${escapeHtml(h)}</h3>
-              <div class="section-content">${escapeHtml(val)}</div>
+              <div class="section-content">${body}</div>
             </div>`;
         });
         inner += '</div>';
@@ -265,6 +296,16 @@
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#39;');
+    }
+
+    // Convert sentences to new lines, preserving URLs by running after escaping.
+    function sentencesToLines(s) {
+      const escaped = escapeHtml(s);
+      // Replace one or more spaces after a period with a newline.
+      // Avoid double-breaking if a newline already follows.
+      return escaped
+        .replace(/\. +/g, '.\n')
+        .replace(/\.(?=$)/g, '.'); // keep trailing period as-is
     }
   </script>
 </body>
