@@ -240,15 +240,36 @@
       return out;
     }
 
-    // Build UI strictly from CSV rows
+    // Build UI strictly from CSV rows (custom order per requirements)
     function renderFromCsv(rows) {
+      const H = {
+        boc1: 'Beginning of Class Discussion (Lesson 1)',
+        brain: 'Brain Break (5-10 min)',
+        lesson1: 'Lesson 1',
+        lo1: 'Learning Objectives (Lesson 1)',
+        lesson2: 'Lesson 2',
+        lo2: 'Learning Objectives (Lesson 2)',
+        // boc2 intentionally omitted (removed per requirement)
+        eod: 'End of Day Discussion',
+        standards: 'Standards Alignment'
+      };
+
+      const LABELS = {
+        [H.boc1]: 'Beginning of Class Discussion',
+        [H.lesson1]: 'Lesson 1',
+        [H.brain]: 'Brain Break',
+        [H.lesson2]: 'Lesson 2',
+        [H.eod]: 'End of Class Discussion',
+        [H.standards]: 'Standards Alignment'
+      };
+
       const nav = document.getElementById('day-nav');
       const main = document.getElementById('content-area');
       nav.innerHTML = '';
       main.innerHTML = '';
 
       rows.forEach(item => {
-        const dayLabel = (item.Day || '').trim(); // exact CSV value
+        const dayLabel = (item.Day || '').trim();
         if (!dayLabel) return;
 
         // Nav button
@@ -267,23 +288,65 @@
         card.setAttribute('data-key', dayLabel);
 
         let inner = '<div class="card-inner">';
-        CSV_HEADERS.forEach(h => {
-          if (h === 'Day') return;
-          const val = (item[h] || '').trim();
-          if (!val) return;
 
-          const body = renderField(h, val);
+        // 1) Beginning of Class Discussion (Lesson 1)
+        if (item[H.boc1]) {
+          inner += sectionHtml(LABELS[H.boc1], renderField(H.boc1, item[H.boc1]));
+        }
 
-          inner += `
-            <div class="section">
-              <h3>${escapeHtml(h)}</h3>
-              <div class="section-content">${body}</div>
-            </div>`;
-        });
+        // 2) Lesson 1 (with Learning Objectives nested)
+        if (item[H.lesson1]) {
+          let body = renderField(H.lesson1, item[H.lesson1]);
+          if (item[H.lo1]) {
+            body += `
+              <div class="section" style="margin-top:10px;">
+                <h4 style="margin:0 0 4px;">Learning Objectives</h4>
+                <div class="section-content">${listifyIfNeeded(item[H.lo1])}</div>
+              </div>`;
+          }
+          inner += sectionHtml(LABELS[H.lesson1], body);
+        }
+
+        // 3) Brain Break
+        if (item[H.brain]) {
+          inner += sectionHtml(LABELS[H.brain], renderField(H.brain, item[H.brain]));
+        }
+
+        // 4) Lesson 2 (with Learning Objectives nested) — skip "Beginning of Class Discussion (Lesson 2)"
+        if (item[H.lesson2]) {
+          let body = renderField(H.lesson2, item[H.lesson2]);
+          if (item[H.lo2]) {
+            body += `
+              <div class="section" style="margin-top:10px;">
+                <h4 style="margin:0 0 4px;">Learning Objectives</h4>
+                <div class="section-content">${listifyIfNeeded(item[H.lo2])}</div>
+              </div>`;
+          }
+          inner += sectionHtml(LABELS[H.lesson2], body);
+        }
+
+        // 5) End of Class Discussion (from "End of Day Discussion")
+        if (item[H.eod]) {
+          inner += sectionHtml(LABELS[H.eod], renderField(H.eod, item[H.eod]));
+        }
+
+        // (Optional) Standards Alignment at the end if present
+        if (item[H.standards]) {
+          inner += sectionHtml(LABELS[H.standards], renderField(H.standards, item[H.standards]));
+        }
+
         inner += '</div>';
         card.innerHTML = inner;
         main.appendChild(card);
       });
+
+      function sectionHtml(title, contentHtml) {
+        return `
+          <div class="section">
+            <h3>${escapeHtml(title)}</h3>
+            <div class="section-content">${contentHtml}</div>
+          </div>`;
+      }
     }
 
     // Render fields: Video embeds, Slide deck pills, others sentence/semicolon formatting
