@@ -500,6 +500,9 @@
           const num = dayFromHash.match(/\d+/);
           if (num) openDay(num[0]);
         }
+      } else {
+        // Ensure the page loads at the top
+        window.scrollTo(0, 0);
       }
     }
 
