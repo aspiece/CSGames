@@ -11,8 +11,9 @@
       --text: #e6e8ee;
       --muted: #b9c0d4;
       --accent: #6ea8fe;
+      --border: #2c3443;
     }
-    html, body { margin:0; padding:0; background:var(--bg); color:var(--text); font: 14px/1.45 system-ui, Segoe UI, Roboto, Arial, sans-serif; }
+    html, body { margin:0; padding:0; background:var(--bg); color:var(--text); font: 14px/1.5 system-ui, Segoe UI, Roboto, Arial, sans-serif; }
     .wrap { max-width: 1100px; margin: 24px auto; padding: 0 16px; }
     h1 { margin: 0 0 6px; font-size: 1.8rem; }
     h2 { margin: 0 0 16px; font-size: 1.05rem; color: var(--muted); }
@@ -20,7 +21,7 @@
 
     .layout {
       display: grid;
-      grid-template-columns: 240px 1fr;
+      grid-template-columns: 260px 1fr;
       gap: 16px;
       align-items: start;
     }
@@ -33,8 +34,9 @@
       display: flex;
       flex-direction: column;
       gap: 8px;
-      height: calc(100dvh - 24px);
-      overflow: hidden; /* no scroll in left column per request */
+      max-height: calc(100dvh - 24px);
+      overflow-y: auto;
+      padding-right: 4px;
     }
     .day-btn {
       all: unset;
@@ -65,34 +67,25 @@
       padding: 16px;
       box-shadow: 0 6px 18px rgba(0,0,0,.18);
     }
-    .section { margin: 10px 0; }
+    .section { margin: 12px 0; }
     .section h3 { margin: 0 0 6px; font-size: 1.05rem; }
     .section .section-content { color: var(--muted); white-space: pre-wrap; }
 
-    .hint-card .hint {
-      color: var(--muted);
-      font-size: 0.95rem;
-      padding: 12px 14px;
-      border-radius: 10px;
-      background: #12141a;
-      border: 1px dashed #2b3342;
-    }
-
-    /* Link pill styling for Video/Slide deck */
+    /* Slide deck link pills */
     .link-list {
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
-      margin-top: 4px;
-      list-style: none;
+      margin-top: 6px;
       padding: 0;
+      list-style: none;
     }
     a.pill {
       display: inline-block;
       padding: 6px 10px;
       border-radius: 999px;
       background: #1f2530;
-      border: 1px solid #2c3443;
+      border: 1px solid var(--border);
       color: var(--accent);
       text-decoration: none;
       font-weight: 600;
@@ -100,7 +93,7 @@
     }
     a.pill:hover { background: #263043; }
 
-    /* Video embed layout */
+    /* Video embeds */
     .video-list {
       display: grid;
       gap: 12px;
@@ -112,7 +105,7 @@
       max-width: 900px;
       aspect-ratio: 16 / 9;
       background: #000;
-      border: 1px solid #2c3443;
+      border: 1px solid var(--border);
       border-radius: 10px;
       overflow: hidden;
     }
@@ -126,7 +119,7 @@
 
     @media (max-width: 860px) {
       .layout { grid-template-columns: 1fr; }
-      #day-nav { position: static; height: auto; overflow: visible; }
+      #day-nav { position: static; max-height: none; }
     }
   </style>
 </head>
@@ -136,10 +129,6 @@
     <h2>Genesee Career Institute</h2>
 
     <div id="status" class="status">Loading...</div>
-
-    <div class="hint-card">
-      <div class="hint">This page loads its content from pacing.csv in the same directory. The left column shows only the dates found in the CSV “Day” column.</div>
-    </div>
 
     <div class="layout" style="margin-top:16px;">
       <nav id="day-nav" aria-label="Lesson dates"></nav>
@@ -174,7 +163,7 @@
         applyInitialRoute();
       } catch (err) {
         console.error('Failed to load CSV:', err);
-        document.getElementById('status').textContent = 'Error loading pacing.csv. Ensure the file exists and is reachable.';
+        statusEl.textContent = 'Error loading pacing.csv. Ensure the file exists and is reachable.';
         renderEmpty();
       }
     }
@@ -184,30 +173,21 @@
       document.getElementById('content-area').innerHTML = '';
     }
 
-    // Parse CSV to array of objects; first row is headers.
+    // Parse CSV text into array of objects
     function csvToObjects(text) {
       const rows = parseCSV(text).filter(r => r.length && r.some(c => (c || '').trim() !== ''));
       if (!rows.length) return [];
 
-      // Find the header row, skipping comments/BOM lines
+      // Find header row (skip BOM/comment/filepath lines)
       let headerRowIndex = 0;
       while (headerRowIndex < rows.length) {
         const row = rows[headerRowIndex].map(c => (c || '').trim());
-        const firstCell = row[0] || '';
+        const first = row[0] || '';
         const cleaned = row.map(h => h.replace(/^\uFEFF/, '')); // strip BOM
-        const hasDay = cleaned.includes('Day');
-
-        // Skip comment-ish rows or VS Code filepath line
-        if (firstCell.startsWith('//') || firstCell.startsWith('#') || /filepath:/i.test(firstCell)) {
+        if (first.startsWith('//') || first.startsWith('#') || /filepath:/i.test(first)) {
           headerRowIndex++;
           continue;
         }
-        // If this row contains 'Day', treat it as headers
-        if (hasDay) {
-          rows[headerRowIndex] = cleaned;
-          break;
-        }
-        // Otherwise assume this is the header row
         rows[headerRowIndex] = cleaned;
         break;
       }
@@ -217,7 +197,7 @@
 
       // Require 'Day'
       if (!headers.includes('Day')) {
-        console.warn('CSV header row not found or missing "Day".');
+        console.warn('CSV header row missing "Day". Headers:', headers);
         return [];
       }
 
@@ -231,7 +211,7 @@
       return objects;
     }
 
-    // Robust-ish CSV parser for quotes and commas
+    // Robust CSV parser with quotes
     function parseCSV(text) {
       const out = [];
       let row = [], cell = '', inQ = false;
@@ -256,18 +236,18 @@
       return out;
     }
 
-    // Build UI strictly from CSV rows (no sequential dates)
+    // Build UI strictly from CSV rows
     function renderFromCsv(rows) {
       const nav = document.getElementById('day-nav');
       const main = document.getElementById('content-area');
       nav.innerHTML = '';
       main.innerHTML = '';
 
-      rows.forEach((item, idx) => {
-        const dayLabel = (item.Day || '').trim(); // use exactly what’s in CSV
+      rows.forEach(item => {
+        const dayLabel = (item.Day || '').trim(); // exact CSV value
         if (!dayLabel) return;
 
-        // Nav button (shows the CSV Day string verbatim)
+        // Nav button
         const btn = document.createElement('button');
         btn.className = 'day-btn';
         btn.type = 'button';
@@ -285,10 +265,9 @@
         let inner = '<div class="card-inner">';
         CSV_HEADERS.forEach(h => {
           if (h === 'Day') return;
-          const val = item[h] || '';
+          const val = (item[h] || '').trim();
           if (!val) return;
 
-          // Render Video/Slide deck as pill links; others as sentences on new lines
           const body = renderField(h, val);
 
           inner += `
@@ -303,7 +282,7 @@
       });
     }
 
-    // Render field content: make Video embedded, Slide deck as pill links; others as sentences per line
+    // Render fields: Video embeds, Slide deck pills, others sentence-per-line
     function renderField(header, value) {
       const lower = String(header).toLowerCase();
       const isVideo = lower.includes('video');
@@ -312,13 +291,9 @@
       if (isVideo) {
         const urls = extractUrls(value);
         if (urls.length) {
-          const embeds = urls
-            .map(u => makeVideoEmbed(u))
-            .filter(Boolean)
-            .join('');
+          const embeds = urls.map(u => makeVideoEmbed(u)).filter(Boolean).join('');
           if (embeds) return `<div class="video-list">${embeds}</div>`;
         }
-        // Fallback to text if no recognizable URL
         return sentencesToLines(value);
       }
 
@@ -327,30 +302,43 @@
         if (urls.length) {
           const many = urls.length > 1;
           const baseLabel = 'View slide deck';
-          const links = urls
-            .map((u, i) => {
-              const safe = sanitizeUrl(u);
-              if (!safe) return '';
-              const label = many ? `${baseLabel} ${i + 1}` : baseLabel;
-              return `<a class="pill" href="${safe}" target="_blank" rel="noopener noreferrer">${label}</a>`;
-            })
-            .filter(Boolean)
-            .join('');
+          const links = urls.map((u, i) => {
+            const safe = sanitizeUrl(u);
+            if (!safe) return '';
+            const label = many ? `${baseLabel} ${i + 1}` : baseLabel;
+            return `<a class="pill" href="${safe}" target="_blank" rel="noopener noreferrer">${label}</a>`;
+          }).filter(Boolean).join('');
           return `<div class="link-list">${links}</div>`;
         }
         return sentencesToLines(value);
       }
 
-      // Default (escaped with sentence -> newline conversion)
       return sentencesToLines(value);
     }
 
-    // Create an embed for YouTube, Vimeo, or direct video files
+    // Extract URLs (space/comma/semicolon/newline separated)
+    function extractUrls(text) {
+      if (!text) return [];
+      const matches = String(text).match(/https?:\/\/[^\s,;]+/g);
+      return matches ? matches.map(s => s.trim()) : [];
+    }
+
+    // Allow only http/https links
+    function sanitizeUrl(url) {
+      try {
+        const u = new URL(url);
+        if (u.protocol === 'http:' || u.protocol === 'https:') return u.toString();
+        return null;
+      } catch {
+        return null;
+      }
+    }
+
+    // Video embeds (YouTube, Vimeo, MP4/WebM)
     function makeVideoEmbed(url) {
       const safe = sanitizeUrl(url);
       if (!safe) return '';
 
-      // YouTube
       const yt = getYouTubeEmbed(safe);
       if (yt) {
         return `
@@ -366,7 +354,6 @@
           </div>`;
       }
 
-      // Vimeo
       const vm = getVimeoEmbed(safe);
       if (vm) {
         return `
@@ -382,7 +369,6 @@
           </div>`;
       }
 
-      // Direct video files (mp4/webm)
       if (/\.(mp4|webm)(\?.*)?$/i.test(safe)) {
         return `
           <div class="video-embed">
@@ -393,7 +379,6 @@
           </div>`;
       }
 
-      // Unknown provider: fall back to a link
       return `<div class="link-list"><a class="pill" href="${safe}" target="_blank" rel="noopener noreferrer">Watch video</a></div>`;
     }
 
@@ -402,30 +387,22 @@
         const url = new URL(u);
         const host = url.hostname.replace(/^www\./, '').toLowerCase();
         let id = '';
-        let start = 0;
+        let start = parseYouTubeStart(url);
 
         if (host === 'youtu.be') {
           id = url.pathname.slice(1);
-          start = parseYouTubeStart(url);
         } else if (host.endsWith('youtube.com')) {
           if (url.pathname === '/watch') {
             id = url.searchParams.get('v') || '';
-            start = parseYouTubeStart(url);
           } else if (url.pathname.startsWith('/shorts/')) {
             id = url.pathname.split('/')[2] || '';
-            start = parseYouTubeStart(url);
           } else if (url.pathname.startsWith('/embed/')) {
             id = url.pathname.split('/')[2] || '';
-            start = parseYouTubeStart(url);
           }
         }
         if (!id) return null;
 
-        const params = new URLSearchParams({
-          rel: '0',
-          modestbranding: '1',
-          playsinline: '1'
-        });
+        const params = new URLSearchParams({ rel: '0', modestbranding: '1', playsinline: '1' });
         if (start > 0) params.set('start', String(start));
         return `https://www.youtube.com/embed/${encodeURIComponent(id)}?${params.toString()}`;
       } catch {
@@ -434,7 +411,6 @@
     }
 
     function parseYouTubeStart(url) {
-      // Support t=1h2m3s, t=90, start=90
       const t = url.searchParams.get('t') || url.searchParams.get('start');
       if (!t) return 0;
       if (/^\d+$/.test(t)) return parseInt(t, 10);
@@ -452,13 +428,18 @@
         const host = url.hostname.replace(/^www\./, '').toLowerCase();
         if (!host.endsWith('vimeo.com')) return null;
         const parts = url.pathname.split('/').filter(Boolean);
-        // Basic vimeo.com/{id}
         const id = parts[0] && /^\d+$/.test(parts[0]) ? parts[0] : '';
         if (!id) return null;
         return `https://player.vimeo.com/video/${id}`;
       } catch {
         return null;
       }
+    }
+
+    // Sentence -> newline for readability (non-video/slide fields)
+    function sentencesToLines(s) {
+      const escaped = escapeHtml(s);
+      return escaped.replace(/\. +/g, '.\n');
     }
 
     function openDay(key) {
@@ -476,11 +457,9 @@
       const active = btns.find(b => b.dataset.key === key);
       if (active) active.classList.add('active');
 
-      // Update URL hash to the exact CSV Day label
       const enc = encodeURIComponent(key);
       if (location.hash !== `#${enc}`) history.replaceState(null, '', `#${enc}`);
 
-      // Scroll to top like a normal page load
       window.scrollTo({ top: 0, behavior: 'auto' });
       return true;
     }
@@ -489,10 +468,7 @@
       const btns = Array.from(document.querySelectorAll('.day-btn'));
       if (!btns.length) return;
       const hash = decodeURIComponent(location.hash.replace(/^#/, ''));
-      if (hash) {
-        if (openDay(hash)) return;
-      }
-      // Fallback to first CSV day
+      if (hash && openDay(hash)) return;
       openDay(btns[0].dataset.key);
     }
 
@@ -503,16 +479,6 @@
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#39;');
-    }
-
-    // Convert sentences to new lines, preserving URLs by running after escaping.
-    function sentencesToLines(s) {
-      const escaped = escapeHtml(s);
-      // Replace one or more spaces after a period with a newline.
-      // Avoid double-breaking if a newline already follows.
-      return escaped
-        .replace(/\. +/g, '.\n')
-        .replace(/\.(?=$)/g, '.'); // keep trailing period as-is
     }
   </script>
 </body>
