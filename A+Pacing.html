@@ -152,36 +152,7 @@
     let CSV_HEADERS = [];
 
     document.addEventListener('DOMContentLoaded', () => {
-      // Load CSV and render on page load
       loadCsvAndRender();
-    });
-
-    const dayCards = Array.from(document.querySelectorAll('.day-card'));
-    const validDates = new Set();
-
-    // Extract valid dates from the pacing.csv file
-    dayCards.forEach(card => {
-      const date = card.getAttribute('data-date');
-      if (date) {
-        validDates.add(date);
-      }
-    });
-
-    // Ensure only valid dates are displayed
-    dayCards.forEach(card => {
-      const date = card.getAttribute('data-date');
-      if (!validDates.has(date)) {
-        card.style.display = 'none'; // Hide cards for invalid dates
-      }
-    });
-
-    // Handle navigation buttons
-    const dayButtons = Array.from(document.querySelectorAll('.day-btn'));
-    dayButtons.forEach(button => {
-      const date = button.getAttribute('data-date');
-      if (!validDates.has(date)) {
-        button.style.display = 'none'; // Hide buttons for invalid dates
-      }
     });
 
     async function loadCsvAndRender() {
@@ -217,20 +188,46 @@
     function csvToObjects(text) {
       const rows = parseCSV(text).filter(r => r.length && r.some(c => (c || '').trim() !== ''));
       if (!rows.length) return [];
-      const headers = rows[0].map(h => (h || '').trim());
 
-      // Strip UTF-8 BOM from first header if present (common from Excel)
-      if (headers.length) headers[0] = headers[0].replace(/^\uFEFF/, '');
+      // Find the header row, skipping comments/BOM lines
+      let headerRowIndex = 0;
+      while (headerRowIndex < rows.length) {
+        const row = rows[headerRowIndex].map(c => (c || '').trim());
+        const firstCell = row[0] || '';
+        const cleaned = row.map(h => h.replace(/^\uFEFF/, '')); // strip BOM
+        const hasDay = cleaned.includes('Day');
 
+        // Skip comment-ish rows or VS Code filepath line
+        if (firstCell.startsWith('//') || firstCell.startsWith('#') || /filepath:/i.test(firstCell)) {
+          headerRowIndex++;
+          continue;
+        }
+        // If this row contains 'Day', treat it as headers
+        if (hasDay) {
+          rows[headerRowIndex] = cleaned;
+          break;
+        }
+        // Otherwise assume this is the header row
+        rows[headerRowIndex] = cleaned;
+        break;
+      }
+
+      const headers = rows[headerRowIndex].map(h => (h || '').trim());
       CSV_HEADERS = headers.slice();
-      // Minimal required: Day
-      if (!headers.includes('Day')) return [];
-      const dataRows = rows.slice(1);
+
+      // Require 'Day'
+      if (!headers.includes('Day')) {
+        console.warn('CSV header row not found or missing "Day".');
+        return [];
+      }
+
+      const dataRows = rows.slice(headerRowIndex + 1);
       const objects = dataRows.map(r => {
         const obj = {};
         headers.forEach((h, i) => obj[h] = (r[i] || '').trim());
         return obj;
       }).filter(o => (o.Day || '').trim().length > 0);
+
       return objects;
     }
 
