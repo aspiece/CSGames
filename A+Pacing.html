@@ -134,8 +134,11 @@
 
       <!-- calendar-style selection: date picker + available-dates grid -->
       <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:12px">
-        <label class="small" for="date-picker" style="margin:0">Jump to date:</label>
-        <input id="date-picker" type="date" style="padding:6px;border-radius:8px;border:1px solid rgba(255,255,255,.06);background:transparent;color:var(--text)" />
+        <div class="jump-to-date">
+          <label for="date-picker" style="margin-right: 8px;">Jump to Date:</label>
+          <input id="date-picker" type="date" style="padding:6px;border-radius:8px;border:1px solid rgba(255,255,255,.06);background:transparent;color:var(--text)" />
+          <button id="jump-to-date-btn" class="permalink" style="margin-left: 8px;">Go</button>
+        </div>
         <button id="today-btn" class="day-btn" type="button" title="Go to today">Today</button>
         <button id="clear-btn" class="day-btn" type="button" title="Collapse all" style="background:transparent">Clear</button>
         <div style="flex:1"></div>
