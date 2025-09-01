@@ -100,6 +100,30 @@
     }
     a.pill:hover { background: #263043; }
 
+    /* Video embed layout */
+    .video-list {
+      display: grid;
+      gap: 12px;
+      margin-top: 6px;
+    }
+    .video-embed {
+      position: relative;
+      width: 100%;
+      max-width: 900px;
+      aspect-ratio: 16 / 9;
+      background: #000;
+      border: 1px solid #2c3443;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .video-embed iframe,
+    .video-embed video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+
     @media (max-width: 860px) {
       .layout { grid-template-columns: 1fr; }
       #day-nav { position: static; height: auto; overflow: visible; }
@@ -282,17 +306,30 @@
       });
     }
 
-    // Render field content: make Video/Slide deck nice, others as sentences per line
+    // Render field content: make Video embedded, Slide deck as pill links; others as sentences per line
     function renderField(header, value) {
       const lower = String(header).toLowerCase();
       const isVideo = lower.includes('video');
       const isSlide = lower.includes('slide');
 
-      if (isVideo || isSlide) {
+      if (isVideo) {
+        const urls = extractUrls(value);
+        if (urls.length) {
+          const embeds = urls
+            .map(u => makeVideoEmbed(u))
+            .filter(Boolean)
+            .join('');
+          if (embeds) return `<div class="video-list">${embeds}</div>`;
+        }
+        // Fallback to text if no recognizable URL
+        return sentencesToLines(value);
+      }
+
+      if (isSlide) {
         const urls = extractUrls(value);
         if (urls.length) {
           const many = urls.length > 1;
-          const baseLabel = isVideo ? 'Watch video' : 'View slide deck';
+          const baseLabel = 'View slide deck';
           const links = urls
             .map((u, i) => {
               const safe = sanitizeUrl(u);
@@ -304,7 +341,6 @@
             .join('');
           return `<div class="link-list">${links}</div>`;
         }
-        // No URLs detected; fall back to sentence formatting
         return sentencesToLines(value);
       }
 
@@ -312,19 +348,117 @@
       return sentencesToLines(value);
     }
 
-    // Extract URLs from a cell (supports multiple separated by space/comma/semicolon/newline)
-    function extractUrls(text) {
-      if (!text) return [];
-      const matches = String(text).match(/https?:\/\/[^\s,;]+/g);
-      return matches ? matches.map(s => s.trim()) : [];
+    // Create an embed for YouTube, Vimeo, or direct video files
+    function makeVideoEmbed(url) {
+      const safe = sanitizeUrl(url);
+      if (!safe) return '';
+
+      // YouTube
+      const yt = getYouTubeEmbed(safe);
+      if (yt) {
+        return `
+          <div class="video-embed">
+            <iframe
+              src="${yt}"
+              title="YouTube video"
+              frameborder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowfullscreen
+              referrerpolicy="strict-origin-when-cross-origin">
+            </iframe>
+          </div>`;
+      }
+
+      // Vimeo
+      const vm = getVimeoEmbed(safe);
+      if (vm) {
+        return `
+          <div class="video-embed">
+            <iframe
+              src="${vm}"
+              title="Vimeo video"
+              frameborder="0"
+              allow="autoplay; fullscreen; picture-in-picture"
+              allowfullscreen
+              referrerpolicy="strict-origin-when-cross-origin">
+            </iframe>
+          </div>`;
+      }
+
+      // Direct video files (mp4/webm)
+      if (/\.(mp4|webm)(\?.*)?$/i.test(safe)) {
+        return `
+          <div class="video-embed">
+            <video controls preload="metadata">
+              <source src="${safe}">
+              Your browser does not support the video tag.
+            </video>
+          </div>`;
+      }
+
+      // Unknown provider: fall back to a link
+      return `<div class="link-list"><a class="pill" href="${safe}" target="_blank" rel="noopener noreferrer">Watch video</a></div>`;
     }
 
-    // Allow only http/https links
-    function sanitizeUrl(url) {
+    function getYouTubeEmbed(u) {
       try {
-        const u = new URL(url);
-        if (u.protocol === 'http:' || u.protocol === 'https:') return u.toString();
+        const url = new URL(u);
+        const host = url.hostname.replace(/^www\./, '').toLowerCase();
+        let id = '';
+        let start = 0;
+
+        if (host === 'youtu.be') {
+          id = url.pathname.slice(1);
+          start = parseYouTubeStart(url);
+        } else if (host.endsWith('youtube.com')) {
+          if (url.pathname === '/watch') {
+            id = url.searchParams.get('v') || '';
+            start = parseYouTubeStart(url);
+          } else if (url.pathname.startsWith('/shorts/')) {
+            id = url.pathname.split('/')[2] || '';
+            start = parseYouTubeStart(url);
+          } else if (url.pathname.startsWith('/embed/')) {
+            id = url.pathname.split('/')[2] || '';
+            start = parseYouTubeStart(url);
+          }
+        }
+        if (!id) return null;
+
+        const params = new URLSearchParams({
+          rel: '0',
+          modestbranding: '1',
+          playsinline: '1'
+        });
+        if (start > 0) params.set('start', String(start));
+        return `https://www.youtube.com/embed/${encodeURIComponent(id)}?${params.toString()}`;
+      } catch {
         return null;
+      }
+    }
+
+    function parseYouTubeStart(url) {
+      // Support t=1h2m3s, t=90, start=90
+      const t = url.searchParams.get('t') || url.searchParams.get('start');
+      if (!t) return 0;
+      if (/^\d+$/.test(t)) return parseInt(t, 10);
+      const m = t.match(/(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s)?/i);
+      if (!m) return 0;
+      const h = parseInt(m[1] || '0', 10);
+      const min = parseInt(m[2] || '0', 10);
+      const s = parseInt(m[3] || '0', 10);
+      return h * 3600 + min * 60 + s;
+    }
+
+    function getVimeoEmbed(u) {
+      try {
+        const url = new URL(u);
+        const host = url.hostname.replace(/^www\./, '').toLowerCase();
+        if (!host.endsWith('vimeo.com')) return null;
+        const parts = url.pathname.split('/').filter(Boolean);
+        // Basic vimeo.com/{id}
+        const id = parts[0] && /^\d+$/.test(parts[0]) ? parts[0] : '';
+        if (!id) return null;
+        return `https://player.vimeo.com/video/${id}`;
       } catch {
         return null;
       }
