@@ -295,8 +295,8 @@
       dayNav.innerHTML = '';
       content.innerHTML = '';
 
-      data.forEach((item, idx) => {
-        const id = item.Day || `Day ${idx + 1}`;
+      data.forEach((item) => {
+        const id = item.Day; // Use the "Day" column from the CSV file
         const iso = parseDateString(item.Day);
 
         if (!iso) {
@@ -304,10 +304,11 @@
           return;
         }
 
+        // Create navigation button for the day
         const btn = document.createElement('button');
         btn.className = 'day-btn';
         btn.type = 'button';
-        btn.textContent = formatDisplayDate(iso);
+        btn.textContent = formatDisplayDate(iso); // Display the formatted date
         btn.title = id;
         btn.dataset.day = id;
         btn.dataset.date = iso;
@@ -315,6 +316,7 @@
         btn.addEventListener('click', () => openDay(id));
         dayNav.appendChild(btn);
 
+        // Create content card for the day
         const card = document.createElement('article');
         card.className = 'day-card';
         card.setAttribute('data-day', id);
