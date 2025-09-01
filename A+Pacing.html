@@ -104,6 +104,7 @@
       align-items: stretch;
       position: sticky;                        /* keep rail visible while scrolling content */
       top: 0;
+      overflow-y: auto; /* Enable vertical scrolling */
     }
     #day-nav .day-btn { width:100%; text-align:left; white-space:normal; }
     #content-area { min-height:200px; }
@@ -118,6 +119,14 @@
     .section .section-content p { margin:6px 0; }
     /* hide table if present (keeps backward compatibility) */
     #pacing-table { display:none !important; }
+
+    #date-picker {
+      padding: 6px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      background: transparent;
+      color: var(--text);
+    }
   </style>
 </head>
 <body>
@@ -206,61 +215,35 @@
       return rows;
     }
 
+    function validateCsvHeaders(headers) {
+      const requiredHeaders = ['Day', 'Lesson', 'Topics'];
+      const missingHeaders = requiredHeaders.filter(header => !headers.includes(header));
+      if (missingHeaders.length > 0) {
+        throw new Error(`Missing required headers: ${missingHeaders.join(', ')}`);
+      }
+    }
+
     function csvToObjects(text) {
       const rows = parseCSV(text).filter(r => r.length > 0);
       if (rows.length < 1) return [];
 
-      // If the file contains an initial comment/filepath line (e.g. "// filepath: ..."),
-      // skip it so the real CSV header is used.
       let headerRowIndex = 0;
       const firstCell = String(rows[0][0] || '').trim();
       if (firstCell.startsWith('//') || /filepath:/i.test(firstCell)) {
-        if (rows.length < 2) return []; // nothing after the comment
+        if (rows.length < 2) return [];
         headerRowIndex = 1;
       }
 
-      // preserve original header labels, but filter-out any completely-empty headers
-      const rawHeadersAll = rows[headerRowIndex].map(h => (h||'').trim());
-      const rawHeaders = rawHeadersAll.map((h,i)=> h || `Column ${i+1}`);
-      CSV_HEADERS = rawHeaders.slice(); // keep header order and labels
-
-      // normalized keys for convenient lookup
-      const normalizedHeaders = rawHeaders.map(h => h.toLowerCase().replace(/[^a-z0-9]+/g, ''));
-
-      // detect video/slides columns if present (by normalized name)
-      const videoNames = ['video','videos','videolink','videolinks'];
-      const slideNames = ['slide','slides','slidedeck','slidelink','slidedecklink','deck','presentation'];
-      let videoIndex = normalizedHeaders.findIndex(h => videoNames.includes(h));
-      let slideIndex = normalizedHeaders.findIndex(h => slideNames.includes(h));
-
-      // if no explicit video/slides headers and there are extra columns, guess at the end columns
-      const expectedBaseCount = 8;
-      if (videoIndex === -1 && slideIndex === -1) {
-        if (rawHeaders.length === expectedBaseCount + 1) videoIndex = expectedBaseCount;
-        else if (rawHeaders.length === expectedBaseCount + 2) { videoIndex = expectedBaseCount; slideIndex = expectedBaseCount + 1; }
-      }
+      const rawHeaders = rows[headerRowIndex].map(h => (h || '').trim());
+      validateCsvHeaders(rawHeaders); // Validate headers
+      CSV_HEADERS = rawHeaders.slice();
 
       const dataRows = rows.slice(headerRowIndex + 1);
       return dataRows.map((r, rowIndex) => {
         const obj = {};
-        // attach raw header-labeled fields and normalized keys
         rawHeaders.forEach((h, i) => {
-          const value = (r[i] || '').trim();
-          obj[h] = value;                                   // exact header label
-          obj[normalizedHeaders[i]] = value;                // normalized key
+          obj[h] = (r[i] || '').trim();
         });
-
-        // convenient canonical aliases for older code paths
-        obj.Day = obj.Day || obj.day || obj[normalizedHeaders[0]] || obj[rawHeaders[0]] || String(rowIndex+1);
-        obj.Lesson = obj.Lesson || obj.lesson || obj[normalizedHeaders[1]] || obj[rawHeaders[1]] || '';
-        obj.Topics = obj.Topics || obj.topics || obj[normalizedHeaders[2]] || obj[rawHeaders[2]] || '';
-
-        // extract video / slides urls (first URL found)
-        const rawVideo = (typeof videoIndex === 'number' && videoIndex >= 0) ? (r[videoIndex]||'').trim() : (obj.video||obj.Video||'');
-        const rawSlides = (typeof slideIndex === 'number' && slideIndex >= 0) ? (r[slideIndex]||'').trim() : (obj.slides||obj.Slides||'');
-        obj.Video = extractFirstUrl(rawVideo || obj.video || obj.Video || '');
-        obj.Slides = extractFirstUrl(rawSlides || obj.slides || obj.Slides || '');
-
         return obj;
       });
     }
@@ -269,25 +252,25 @@
     function parseDateString(s) {
       if (!s) return null;
       s = s.trim();
-      // if the value is a simple integer (day number like "1", "16"), treat as NOT a date
       if (/^\d+$/.test(s)) return null;
-      // If already ISO-like yyyy-mm-dd
       if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
-      // Try common US format mm/dd/yyyy or m/d/yyyy
+
       const m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/);
       if (m) {
-        let mm = m[1].padStart(2,'0'), dd = m[2].padStart(2,'0'), yy = m[3];
+        let mm = m[1].padStart(2, '0'), dd = m[2].padStart(2, '0'), yy = m[3];
         if (yy.length === 2) yy = '20' + yy;
         return `${yy}-${mm}-${dd}`;
       }
-      // Try Date.parse fallback (may accept formats like "Aug 29 2025")
+
       const d = new Date(s);
       if (!isNaN(d.getTime())) {
         const y = d.getFullYear();
-        const mm = String(d.getMonth()+1).padStart(2,'0');
-        const dd = String(d.getDate()).padStart(2,'0');
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const dd = String(d.getDate()).padStart(2, '0');
         return `${y}-${mm}-${dd}`;
       }
+
+      console.warn(`Invalid date format: ${s}`);
       return null;
     }
 
@@ -310,18 +293,22 @@
         const id = item.Day || `Day ${idx + 1}`;
         const iso = parseDateString(item.Day);
 
-        // Create navigation button for the day
+        if (!iso) {
+          console.warn(`Skipping row with invalid date: ${item.Day}`);
+          return;
+        }
+
         const btn = document.createElement('button');
         btn.className = 'day-btn';
         btn.type = 'button';
-        btn.textContent = iso ? formatDisplayDate(iso) : id;
+        btn.textContent = formatDisplayDate(iso);
         btn.title = id;
         btn.dataset.day = id;
         btn.dataset.date = iso;
+        btn.setAttribute('aria-label', `Jump to ${id}`);
         btn.addEventListener('click', () => openDay(id));
         dayNav.appendChild(btn);
 
-        // Create content card for the day
         const card = document.createElement('article');
         card.className = 'day-card';
         card.setAttribute('data-day', id);
@@ -374,6 +361,7 @@
 
     function fetchPacingCsv() {
       const statusEl = document.getElementById('status');
+      statusEl.textContent = 'Loading...';
       return fetch('pacing.csv', { cache: 'no-store' })
         .then(resp => {
           if (!resp.ok) throw new Error('pacing.csv not found (HTTP ' + resp.status + ')');
@@ -419,15 +407,56 @@
       const btn = Array.from(document.querySelectorAll('.day-btn')).find(b => b.dataset.day === (target.getAttribute('data-day') || ''));
       if (btn) btn.classList.add('active');
 
-      // Update the URL hash
-      const hash = `day-${encodeURIComponent(dayValue)}`;
-      if (location.hash !== `#${hash}`) location.hash = hash;
-
-      // Scroll to the top of the page
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      // Scroll to the top of the target card smoothly
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
       return true;
     }
+
+    // apply the initial route based on URL hash or default to first day
+    function applyInitialRoute() {
+      const hash = window.location.hash.replace(/^#/, '');
+      if (hash) {
+        openDay(hash) || openDay(1); // try hash, then fallback to day 1
+      } else {
+        openDay(1);
+      }
+    }
+
+    // Collapsible UI for agenda items
+    function initCollapsibleUI() {
+      const toggles = document.querySelectorAll('.day-card .section h3');
+      toggles.forEach(toggle => {
+        toggle.addEventListener('click', () => {
+          const content = toggle.nextElementSibling;
+          if (content) {
+            const isOpen = content.style.display !== 'none';
+            content.style.display = isOpen ? 'none' : 'block';
+            toggle.classList.toggle('open', !isOpen);
+          }
+        });
+      });
+    }
+
+    // download current page as PDF
+    document.getElementById('download-pdf').addEventListener('click', () => {
+      const originalTitle = document.title;
+      document.title = 'CompTIA A+ Preparation - Print View';
+      window.print();
+      document.title = originalTitle;
+    });
+
+    // copy permalink to clipboard
+    document.getElementById('copy-permalink').addEventListener('click', function() {
+      const dayValue = document.querySelector('.day-card.visible')?.getAttribute('data-day');
+      if (!dayValue) return;
+      const url = new URL(window.location);
+      url.hash = dayValue;
+      navigator.clipboard.writeText(url.toString()).then(() => {
+        this.classList.add('copied');
+        setTimeout(() => this.classList.remove('copied'), 2000);
+      });
+    });
   </script>
 </body>
 </html>
