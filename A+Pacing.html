@@ -125,7 +125,7 @@
 </head>
 <body>
   <div class="wrap">
-    <h1>Comptia Tech + preparation</h1>
+    <h1>Comptia A+ preparation</h1>
     <h2>Genesee Career Institute</h2>
 
     <div id="status" class="status">Loading...</div>
@@ -464,11 +464,59 @@
       return true;
     }
 
+    // Helpers for matching today's date to CSV day values
+    function formatTodayMMDDYYYY() {
+      const d = new Date();
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const dd = String(d.getDate()).padStart(2, '0');
+      const yyyy = d.getFullYear();
+      return `${mm}/${dd}/${yyyy}`;
+    }
+    function normalizeDayKey(s) {
+      const m = String(s || '').trim().match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+      if (!m) return '';
+      const mm = m[1].padStart(2, '0');
+      const dd = m[2].padStart(2, '0');
+      const yyyy = m[3];
+      return `${mm}/${dd}/${yyyy}`;
+    }
+    function parseDay(s) {
+      const m = String(s || '').trim().match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+      if (!m) return null;
+      const mm = parseInt(m[1], 10) - 1;
+      const dd = parseInt(m[2], 10);
+      const yyyy = parseInt(m[3], 10);
+      const d = new Date(yyyy, mm, dd);
+      return isNaN(d.getTime()) ? null : new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    }
+
     function applyInitialRoute() {
       const btns = Array.from(document.querySelectorAll('.day-btn'));
       if (!btns.length) return;
+
+      // 1) If URL hash matches a day, honor it
       const hash = decodeURIComponent(location.hash.replace(/^#/, ''));
       if (hash && openDay(hash)) return;
+
+      // 2) Try to open today's date (normalized match)
+      const todayNorm = formatTodayMMDDYYYY();
+      const todayBtn = btns.find(b => normalizeDayKey(b.dataset.key) === todayNorm);
+      if (todayBtn) { openDay(todayBtn.dataset.key); return; }
+
+      // 3) Otherwise open the next upcoming date, else the most recent past date, else the first
+      const now = new Date(); now.setHours(0,0,0,0);
+      const dated = btns
+        .map(b => ({ key: b.dataset.key, date: parseDay(b.dataset.key) }))
+        .filter(x => x.date)
+        .sort((a, b) => a.date - b.date);
+
+      const upcoming = dated.find(x => x.date >= now);
+      if (upcoming) { openDay(upcoming.key); return; }
+
+      const lastPast = dated[dated.length - 1];
+      if (lastPast) { openDay(lastPast.key); return; }
+
+      // 4) Fallback
       openDay(btns[0].dataset.key);
     }
 
