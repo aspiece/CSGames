@@ -368,7 +368,10 @@
       return parts ? parts.map(p => p.trim()).filter(Boolean) : [text.trim()];
     }
 
-    // Fetch pacing.csv from same directory and render it
+    document.addEventListener('DOMContentLoaded', () => {
+      fetchPacingCsv();
+    });
+
     function fetchPacingCsv() {
       const statusEl = document.getElementById('status');
       return fetch('pacing.csv', { cache: 'no-store' })
@@ -390,7 +393,6 @@
         });
     }
 
-    // Open a day by its Day value (exact match), ISO date (yyyy-mm-dd), or numeric index (1-based)
     function openDay(dayValue) {
       const cards = Array.from(document.querySelectorAll('.day-card'));
       if (!cards.length) return;
@@ -415,4 +417,17 @@
       // Update the active button in the left navigation
       document.querySelectorAll('.day-btn').forEach(b => b.classList.remove('active'));
       const btn = Array.from(document.querySelectorAll('.day-btn')).find(b => b.dataset.day === (target.getAttribute('data-day') || ''));
-      if
+      if (btn) btn.classList.add('active');
+
+      // Update the URL hash
+      const hash = `day-${encodeURIComponent(dayValue)}`;
+      if (location.hash !== `#${hash}`) location.hash = hash;
+
+      // Scroll to the top of the page
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      return true;
+    }
+  </script>
+</body>
+</html>
