@@ -289,22 +289,20 @@
 
         let inner = '<div class="card-inner">';
 
+        // 0) Combined Learning Objectives first
+        const loCombined = [item[H.lo1], item[H.lo2]].filter(Boolean).join('; ');
+        if (loCombined) {
+          inner += sectionHtml('Learning Objectives (Lessons 1 & 2)', listifyIfNeeded(loCombined));
+        }
+
         // 1) Beginning of Class Discussion (Lesson 1)
         if (item[H.boc1]) {
           inner += sectionHtml(LABELS[H.boc1], renderField(H.boc1, item[H.boc1]));
         }
 
-        // 2) Lesson 1 (with Learning Objectives nested)
+        // 2) Lesson 1 (no nested objectives)
         if (item[H.lesson1]) {
-          let body = renderField(H.lesson1, item[H.lesson1]);
-          if (item[H.lo1]) {
-            body += `
-              <div class="section" style="margin-top:10px;">
-                <h4 style="margin:0 0 4px;">Learning Objectives</h4>
-                <div class="section-content">${listifyIfNeeded(item[H.lo1])}</div>
-              </div>`;
-          }
-          inner += sectionHtml(LABELS[H.lesson1], body);
+          inner += sectionHtml(LABELS[H.lesson1], renderField(H.lesson1, item[H.lesson1]));
         }
 
         // 3) Brain Break
@@ -312,17 +310,9 @@
           inner += sectionHtml(LABELS[H.brain], renderField(H.brain, item[H.brain]));
         }
 
-        // 4) Lesson 2 (with Learning Objectives nested) — skip "Beginning of Class Discussion (Lesson 2)"
+        // 4) Lesson 2 (no nested objectives) — skip "Beginning of Class Discussion (Lesson 2)"
         if (item[H.lesson2]) {
-          let body = renderField(H.lesson2, item[H.lesson2]);
-          if (item[H.lo2]) {
-            body += `
-              <div class="section" style="margin-top:10px;">
-                <h4 style="margin:0 0 4px;">Learning Objectives</h4>
-                <div class="section-content">${listifyIfNeeded(item[H.lo2])}</div>
-              </div>`;
-          }
-          inner += sectionHtml(LABELS[H.lesson2], body);
+          inner += sectionHtml(LABELS[H.lesson2], renderField(H.lesson2, item[H.lesson2]));
         }
 
         // 5) End of Class Discussion (from "End of Day Discussion")
