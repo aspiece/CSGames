@@ -285,6 +285,7 @@
 
     // Render rows dynamically from CSV. Accepts arbitrary number of days.
     function renderRows(data) {
+      console.log('Rendering Data:', data); // Debug log
       const dayNav = document.getElementById('day-nav');
       const content = document.getElementById('content-area');
       dayNav.innerHTML = '';
