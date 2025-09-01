@@ -257,34 +257,24 @@
     function parseDateString(s) {
       if (!s) return null;
       s = s.trim();
-      if (/^\d+$/.test(s)) return null;
       if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
 
-      const m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/);
+      const m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
       if (m) {
-        let mm = m[1].padStart(2, '0'), dd = m[2].padStart(2, '0'), yy = m[3];
-        if (yy.length === 2) yy = '20' + yy;
+        const mm = m[1].padStart(2, '0');
+        const dd = m[2].padStart(2, '0');
+        const yy = m[3];
         return `${yy}-${mm}-${dd}`;
-      }
-
-      const d = new Date(s);
-      if (!isNaN(d.getTime())) {
-        const y = d.getFullYear();
-        const mm = String(d.getMonth() + 1).padStart(2, '0');
-        const dd = String(d.getDate()).padStart(2, '0');
-        return `${y}-${mm}-${dd}`;
       }
 
       console.warn(`Invalid date format: ${s}`);
       return null;
     }
 
-    function formatDisplayDate(iso) {
-      if (!iso) return '';
-      const d = new Date(iso);
-      if (isNaN(d.getTime())) return iso;
-      const opts = {month:'short', day:'numeric'};
-      return d.toLocaleDateString(undefined, opts);
+    function formatDisplayDate(isoDate) {
+      const options = { year: 'numeric', month: 'short', day: 'numeric' };
+      const date = new Date(isoDate);
+      return date.toLocaleDateString(undefined, options);
     }
 
     // Render rows dynamically from CSV. Accepts arbitrary number of days.
@@ -295,12 +285,13 @@
       dayNav.innerHTML = '';
       content.innerHTML = '';
 
+      // Iterate over each row in the CSV data
       data.forEach((item) => {
-        const id = item.Day; // Use the "Day" column from the CSV file
-        const iso = parseDateString(item.Day);
+        const day = item.Day; // Use the "Day" column from the CSV file
+        const iso = parseDateString(day);
 
         if (!iso) {
-          console.warn(`Skipping row with invalid date: ${item.Day}`);
+          console.warn(`Skipping row with invalid date: ${day}`);
           return;
         }
 
@@ -309,17 +300,17 @@
         btn.className = 'day-btn';
         btn.type = 'button';
         btn.textContent = formatDisplayDate(iso); // Display the formatted date
-        btn.title = id;
-        btn.dataset.day = id;
+        btn.title = day;
+        btn.dataset.day = day;
         btn.dataset.date = iso;
-        btn.setAttribute('aria-label', `Jump to ${id}`);
-        btn.addEventListener('click', () => openDay(id));
+        btn.setAttribute('aria-label', `Jump to ${day}`);
+        btn.addEventListener('click', () => openDay(day));
         dayNav.appendChild(btn);
 
         // Create content card for the day
         const card = document.createElement('article');
         card.className = 'day-card';
-        card.setAttribute('data-day', id);
+        card.setAttribute('data-day', day);
         card.setAttribute('data-date', iso);
         let inner = '<div class="card-inner">';
         CSV_HEADERS.forEach(header => {
