@@ -67,6 +67,16 @@
       margin-left: 8px;
       vertical-align: middle;
     }
+    .graded-panel{border:1px solid #e0e0e0;background:#fffbe6;padding:10px 12px;border-radius:8px;margin-top:10px}
+    .graded-panel h4{margin:0 0 6px 0;font-size:1rem;color:#8e44ad}
+    .graded-list{margin:0;padding-left:18px}
+    .graded-list li{margin:4px 0}
+    .pill{display:inline-block;padding:2px 6px;border-radius:999px;font-size:.8em;margin-left:6px;border:1px solid}
+    .pill.assessment{color:#fff;background:#e74c3c;border-color:#e74c3c}
+    .pill.assignment{color:#fff;background:#27ae60;border-color:#27ae60}
+    .pill.survey{color:#fff;background:#8e44ad;border-color:#8e44ad}
+    .pill.key{color:#fff;background:#3498db;border-color:#3498db}
+    .pill.rubric{color:#fff;background:#2c3e50;border-color:#2c3e50}
   </style>
 </head>
 <body>
@@ -378,5 +388,105 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
   </script>
+  <script>
+/* Inject a "Graded this week" panel into each week based on a week->items map */
+document.addEventListener('DOMContentLoaded', function(){
+  const gradedByWeek = {
+    1: [
+      {name:"Getting Started in Java Quiz", type:"Assessment", key:"Key-LMS"},
+      {name:"Eclipse Quiz", type:"Assessment", key:"Key-LMS"},
+      {name:"Print Statements Quiz", type:"Assessment", key:"Key-LMS"}
+    ],
+    2: [
+      {name:"Primitive Data Types Quiz", type:"Assessment", key:"Key-LMS"},
+      {name:"Short, Int and Long Quiz", type:"Assessment", key:"Key-LMS"},
+      {name:"Float, Double, Char & Boolean Quiz", type:"Assessment", key:"Key-LMS"}
+    ],
+    3: [
+      {name:"User Input Quiz", type:"Assessment", key:"Key-LMS"}
+    ],
+    4: [
+      {name:"Module 2 Mad Lib Assignment", type:"Assignment", key:"Rubric"}
+    ],
+    5: [
+      {name:"Global Variables Quiz", type:"Assessment", key:"Key-LMS"},
+      {name:"RockPaperScissors Quiz", type:"Assessment", key:"Key-LMS"}
+    ],
+    6: [
+      {name:"Module 2 FizzBuzz Assignment", type:"Assignment", key:"Rubric"}
+    ],
+    7: [
+      {name:"Methods Quiz", type:"Assessment", key:"Key-LMS"},
+      {name:"Do While Quiz", type:"Assessment", key:"Key-LMS"}
+    ],
+    8: [
+      {name:"Module 3 Stick Game Assignment", type:"Assignment", key:"Rubric"}
+    ],
+    9: [
+      {name:"Computers Turn Quiz", type:"Assessment", key:"Key-LMS"},
+      {name:"Stick Game Quiz", type:"Assessment", key:"Key-LMS"},
+      {name:"Module 3 Guess My Number Assignment", type:"Assignment", key:"Rubric"}
+    ],
+    10: [
+      {name:"Card Shuffler Quiz", type:"Assessment", key:"Key-LMS"}
+    ],
+    11: [
+      {name:"Shuffle and Deal Quiz", type:"Assessment", key:"Key-LMS"}
+    ],
+    12: [
+      {name:"Battleship Quiz", type:"Assessment", key:"Key-LMS"},
+      {name:"Module 4 BattleShip Assignment", type:"Assignment", key:"Rubric"}
+    ],
+    14: [
+      {name:"TicTacToe Quiz", type:"Assessment", key:"Key-LMS"}
+    ],
+    15: [
+      {name:"X & O Quiz", type:"Assessment", key:"Key-LMS"},
+      {name:"Module 5 TicTacToe Assignment", type:"Assignment", key:"Rubric"}
+    ],
+    16: [
+      {name:"Action Quiz", type:"Assessment", key:"Key-LMS"}
+    ],
+    17: [
+      {name:"Picture Puzzle Quiz", type:"Assessment", key:"Key-LMS"}
+    ],
+    18: [
+      {name:"Switching Pieces Quiz", type:"Assessment", key:"Key-LMS"},
+      {name:"Module 6 PicturePuzzler Assignment", type:"Assignment", key:"Rubric"}
+    ],
+    21: [
+      {name:"Semester Exam", type:"Assessment", key:"Key-LMS"},
+      {name:"End of Course Survey", type:"Survey", key:"Rubric"},
+      {name:"Participation", type:"Assignment", key:"Rubric"}
+    ]
+  };
+
+  function pill(type){ return `<span class="pill ${type.toLowerCase()}">${type}</span>`; }
+  function keyPill(k){
+    if(!k) return '';
+    const cls = k.toLowerCase().includes('rubric') ? 'rubric' : 'key';
+    return `<span class="pill ${cls}">${k}</span>`;
+    }
+
+  document.querySelectorAll('.container details').forEach(det=>{
+    const sum = det.querySelector('summary'); if(!sum) return;
+    const m = sum.textContent.match(/^Week\s+(\d+)/i); if(!m) return;
+    const week = parseInt(m[1],10);
+    const items = gradedByWeek[week]; if(!items || !items.length) return;
+
+    const panel = document.createElement('div');
+    panel.className = 'graded-panel';
+    panel.innerHTML = `
+      <h4>Graded this week</h4>
+      <ul class="graded-list">
+        ${items.map(it=>`<li>${it.name} ${pill(it.type)} ${keyPill(it.key)}</li>`).join('')}
+      </ul>
+    `;
+
+    const topics = det.querySelector('.topics') || det;
+    topics.appendChild(panel);
+  });
+});
+</script>
 </body>
 </html>
