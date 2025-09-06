@@ -372,7 +372,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   document.querySelectorAll('.topics li').forEach(li => {
     const txt = li.textContent.trim().toLowerCase();
-    if (gradedItems.some(name => txt === name || txt.startsWith(name + ":") || txt.startsWith("project: " + name))) {
+    if (gradedItems.some(name => txt.includes(name))) {
       li.innerHTML += ' <span class="graded-badge">Graded</span>';
     }
   });
