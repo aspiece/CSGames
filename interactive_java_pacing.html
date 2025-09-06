@@ -355,31 +355,28 @@
         c.el.scrollIntoView({behavior:'smooth', block:'start'});
       });
     })();
-    (function(){
-      // List of graded assignments/quizzes (case-insensitive match)
-      const gradedItems = [
-        "Eclipse Quiz","Print Statements Quiz","Primitive Data Types Quiz","Short, Int and Long Quiz",
-        "Float, Double, Char & Boolean Quiz","Getting Started in Java Quiz","User Input Quiz",
-        "Module 2 Mad Lib Assignment","Global Variables Quiz","RockPaperScissors Quiz",
-        "Module 2 FizzBuzz Assignment","Methods Quiz","Do While Quiz","Module 3 Guess My Number Assignment",
-        "Stick Game Quiz","Computers Turn Quiz","Module 3 Stick Game Assignment","Card Shuffler Quiz",
-        "Shuffle and Deal Quiz","Battleship Quiz","Module 4 BattleShip Assignment","TicTacToe Quiz",
-        "X & O Quiz","Action Quiz","Module 5 TicTacToe Assignment","Picture Puzzle Quiz",
-        "Switching Pieces Quiz","Module 6 PicturePuzzler Assignment","Semester Exam",
-        "End of Course Survey","Participation"
-      ].map(s => s.toLowerCase());
+  </script>
+  <script>
+document.addEventListener('DOMContentLoaded', function() {
+  const gradedItems = [
+    "Eclipse Quiz","Print Statements Quiz","Primitive Data Types Quiz","Short, Int and Long Quiz",
+    "Float, Double, Char & Boolean Quiz","Getting Started in Java Quiz","User Input Quiz",
+    "Module 2 Mad Lib Assignment","Global Variables Quiz","RockPaperScissors Quiz",
+    "Module 2 FizzBuzz Assignment","Methods Quiz","Do While Quiz","Module 3 Guess My Number Assignment",
+    "Stick Game Quiz","Computers Turn Quiz","Module 3 Stick Game Assignment","Card Shuffler Quiz",
+    "Shuffle and Deal Quiz","Battleship Quiz","Module 4 BattleShip Assignment","TicTacToe Quiz",
+    "X & O Quiz","Action Quiz","Module 5 TicTacToe Assignment","Picture Puzzle Quiz",
+    "Switching Pieces Quiz","Module 6 PicturePuzzler Assignment","Semester Exam",
+    "End of Course Survey","Participation"
+  ].map(s => s.toLowerCase());
 
-      // Add "Graded" badge to matching items
-      document.querySelectorAll('.topics li').forEach(li => {
-        const txt = li.textContent.trim().toLowerCase();
-        for (const graded of gradedItems) {
-          if (txt.includes(graded)) {
-            li.innerHTML += ' <span class="graded-badge">Graded</span>';
-            break;
-          }
-        }
-      });
-    })();
+  document.querySelectorAll('.topics li').forEach(li => {
+    const txt = li.textContent.trim().toLowerCase();
+    if (gradedItems.some(name => txt === name || txt.startsWith(name + ":") || txt.startsWith("project: " + name))) {
+      li.innerHTML += ' <span class="graded-badge">Graded</span>';
+    }
+  });
+});
   </script>
 </body>
 </html>
