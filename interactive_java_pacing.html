@@ -56,6 +56,17 @@
     .toolbar { display:flex; gap:8px; justify-content:space-between; align-items:center; margin: 0 0 12px 0; }
     .toolbar .btn { cursor:pointer; border:1px solid #ddd; padding:8px 12px; border-radius:8px; background:#fff; }
     .toolbar .btn:hover { border-color:#1abc9c; }
+    .graded-badge {
+      display: inline-block;
+      background: #e74c3c;
+      color: #fff;
+      font-size: 0.85em;
+      font-weight: bold;
+      border-radius: 6px;
+      padding: 2px 8px;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
   </style>
 </head>
 <body>
@@ -342,6 +353,31 @@
         details.forEach(d => { if (d!==c.el) d.removeAttribute('open'); });
         c.el.classList.add('current');
         c.el.scrollIntoView({behavior:'smooth', block:'start'});
+      });
+    })();
+    (function(){
+      // List of graded assignments/quizzes (case-insensitive match)
+      const gradedItems = [
+        "Eclipse Quiz","Print Statements Quiz","Primitive Data Types Quiz","Short, Int and Long Quiz",
+        "Float, Double, Char & Boolean Quiz","Getting Started in Java Quiz","User Input Quiz",
+        "Module 2 Mad Lib Assignment","Global Variables Quiz","RockPaperScissors Quiz",
+        "Module 2 FizzBuzz Assignment","Methods Quiz","Do While Quiz","Module 3 Guess My Number Assignment",
+        "Stick Game Quiz","Computers Turn Quiz","Module 3 Stick Game Assignment","Card Shuffler Quiz",
+        "Shuffle and Deal Quiz","Battleship Quiz","Module 4 BattleShip Assignment","TicTacToe Quiz",
+        "X & O Quiz","Action Quiz","Module 5 TicTacToe Assignment","Picture Puzzle Quiz",
+        "Switching Pieces Quiz","Module 6 PicturePuzzler Assignment","Semester Exam",
+        "End of Course Survey","Participation"
+      ].map(s => s.toLowerCase());
+
+      // Add "Graded" badge to matching items
+      document.querySelectorAll('.topics li').forEach(li => {
+        const txt = li.textContent.trim().toLowerCase();
+        for (const graded of gradedItems) {
+          if (txt.includes(graded)) {
+            li.innerHTML += ' <span class="graded-badge">Graded</span>';
+            break;
+          }
+        }
       });
     })();
   </script>
