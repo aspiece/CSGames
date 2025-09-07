@@ -287,9 +287,19 @@
       nav.innerHTML = '';
       main.innerHTML = '';
 
-      rows.forEach(item => {
-        const dayLabel = (item.Day || '').trim(); // exact CSV value
-        if (!dayLabel) return;
+      // NEW: sort by Day descending so newest dates appear first
+      const sorted = rows.slice().sort((a, b) => {
+        const da = parseDay(a.Day);
+        const db = parseDay(b.Day);
+        if (da && db) return db - da;            // newer first
+        if (da && !db) return -1;                // dated rows before undated
+        if (!da && db) return 1;
+        // fallback to string compare if not parseable
+        return String(b.Day || '').localeCompare(String(a.Day || ''));
+      });
+
+      sorted.forEach(item => {
+        const dayLabel = (item.Day || '').trim(); if (!dayLabel) return;
 
         // Nav button
         const btn = document.createElement('button');
@@ -311,9 +321,7 @@
           if (h === 'Day') return;
           const val = (item[h] || '').trim();
           if (!val) return;
-
           const body = renderField(h, val);
-
           inner += `
             <div class="section">
               <h3>${escapeHtml(h)}</h3>
