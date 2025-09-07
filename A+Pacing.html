@@ -137,12 +137,56 @@
   </div>
 
   <script>
-    const CSV_URL = 'pacing.csv';
+    // REMOTE: Google Sheets CSV (primary) + LOCAL fallback
+    const REMOTE_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRaERVAD_R03bqKKhlHKEnbZ2fByQZOAGHE19M3eBln86ngA0BIkIYGax83w2AeinvQsd6tQW4aCpCT/pub?gid=1299414535&single=true&output=csv';
+    const LOCAL_CSV_URL = 'pacing.csv';
     let CSV_HEADERS = [];
 
     document.addEventListener('DOMContentLoaded', () => {
-      loadCsvAndRender();
+      initAutoRefresh();
     });
+
+    async function refreshData() {
+      const statusEl = document.getElementById('status');
+      const sources = [REMOTE_CSV_URL, LOCAL_CSV_URL];
+      let lastErr = null;
+      for (const baseUrl of sources) {
+        // Cache-bust to ensure updates are fetched
+        const url = baseUrl + (baseUrl.includes('?') ? '&' : '?') + 't=' + Date.now();
+        try {
+          statusEl.textContent = `Loading ${baseUrl.includes('docs.google.com') ? 'Google Sheets' : 'local CSV'}...`;
+          const resp = await fetch(url, { cache: 'no-store' });
+          if (!resp.ok) throw new Error('HTTP ' + resp.status);
+          const text = await resp.text();
+          const rows = csvToObjects(text);
+          if (!rows.length) {
+            lastErr = new Error('No rows parsed');
+            continue;
+          }
+          renderFromCsv(rows);
+          const src = baseUrl.includes('docs.google.com') ? 'Google Sheets' : 'local CSV';
+          const now = new Date();
+          const hh = String(now.getHours()).padStart(2, '0');
+          const mm = String(now.getMinutes()).padStart(2, '0');
+          const ss = String(now.getSeconds()).padStart(2, '0');
+          statusEl.textContent = `Loaded ${rows.length} day${rows.length === 1 ? '' : 's'} from ${src}. Last update ${hh}:${mm}:${ss}.`;
+          // Re-open current hash/today after re-render
+          applyInitialRoute();
+          return;
+        } catch (e) {
+          lastErr = e;
+        }
+      }
+      console.error('Failed to load CSV from all sources:', lastErr);
+      statusEl.textContent = 'Error loading pacing data. Ensure the Google Sheet is published and pacing.csv exists.';
+      renderEmpty();
+    }
+
+    function initAutoRefresh() {
+      refreshData();
+      // Auto-refresh every 10 seconds
+      setInterval(refreshData, 10 * 1000);
+    }
 
     async function loadCsvAndRender() {
       const statusEl = document.getElementById('status');
