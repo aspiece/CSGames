@@ -172,21 +172,38 @@
       const main=document.getElementById('content-area');
       nav.innerHTML=''; main.innerHTML='';
 
-      const days=[]; // NEW: keep a list of day strings
+      // NEW: sort by Day descending (newest at top)
+      function parseDayStr(s){
+        const m=String(s||'').trim().match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+        if(!m) return null;
+        const d=new Date(parseInt(m[3],10), parseInt(m[1],10)-1, parseInt(m[2],10));
+        return isNaN(d.getTime()) ? null : d;
+      }
+      const sorted = rows.slice().sort((a,b)=>{
+        const da = parseDayStr(a[H.day]);
+        const db = parseDayStr(b[H.day]);
+        if(da && db) return db - da;      // newer first
+        if(da && !db) return -1;          // dated rows before undated
+        if(!da && db) return 1;
+        return String(b[H.day]||'').localeCompare(String(a[H.day]||'')); // fallback
+      });
 
-      rows.forEach(item=>{
+      const days=[]; // keep a list of day strings
+
+      // CHANGED: iterate sorted rows
+      sorted.forEach(item=>{
         const day=(item[H.day]||'').trim(); if(!day) return;
-        days.push(day); // NEW
+        days.push(day);
 
         // Make nav link (deep link)
-        const a=document.createElement('a');           // CHANGED: button -> anchor
+        const a=document.createElement('a');
         a.className='day-btn';
-        a.href=makeDayHref(day);                       // NEW: shareable link
+        a.href=makeDayHref(day);
         a.textContent=day;
         a.dataset.key=day;
-        a.addEventListener('click', (e)=>{             // NEW: client-side routing
+        a.addEventListener('click',(e)=>{
           e.preventDefault();
-          openDay(day, {updateUrl:true});
+          openDay(day,{updateUrl:true});
         });
         nav.appendChild(a);
 
@@ -212,29 +229,14 @@
           </div>
         `;
 
-        // 1) Daily Description first
         if(item[H.daily]) inner += sectionHtml('Daily Description', undefined, listifyIfNeeded(item[H.daily]));
-
-        // 2) Combined Learning Objectives
         const loCombined=[item[H.lo1], item[H.lo2]].filter(Boolean).join('; ');
         if(loCombined) inner += sectionHtml('Learning Objectives (Lessons 1 & 2)', undefined, listifyIfNeeded(loCombined));
-
-        // 3) Beginning of Class Discussion
         if(item[H.boc1]) inner += sectionHtml('Beginning of Class Discussion', minutes.beg, renderField(H.boc1,item[H.boc1]));
-
-        // 4) Lesson 1
         if(item[H.lesson1]) inner += sectionHtml('Lesson 1', minutes.l1, renderField(H.lesson1,item[H.lesson1]));
-
-        // 5) Brain Break
         if(item[H.brain]) inner += sectionHtml('Brain Break', minutes.brk, renderField(H.brain,item[H.brain]));
-
-        // 6) Lesson 2
         if(item[H.lesson2]) inner += sectionHtml('Lesson 2', minutes.l2, renderField(H.lesson2,item[H.lesson2]));
-
-        // 7) End of Class Discussion
         if(item[H.eod]) inner += sectionHtml('End of Class Discussion', minutes.end, renderField(H.eod,item[H.eod]));
-
-        // Optional: Standards
         if(item[H.standards]) inner += sectionHtml('Standards Alignment', undefined, renderField(H.standards,item[H.standards]));
 
         inner += `</div>`;
@@ -242,11 +244,26 @@
         main.appendChild(card);
       });
 
-      // Select initial day: URL > today > first
+      // Initial selection: URL > today (exact) > next upcoming >= today > most recent past > first
       const urlDay = getURLDay();
-      const today = formatTodayForCsv();
-      const initial = (urlDay && days.includes(urlDay)) ? urlDay
-                     : (days.includes(today) ? today : days[0]);
+      const todayStr = formatTodayForCsv();
+      const parsedDays = days
+        .map(d => ({ key: d, date: parseDayStr(d) }))
+        .filter(x => x.date)
+        .sort((a,b) => a.date - b.date);
+
+      let initial = '';
+      if (urlDay && days.includes(urlDay)) {
+        initial = urlDay;
+      } else if (days.includes(todayStr)) {
+        initial = todayStr;
+      } else {
+        const today = new Date(); today.setHours(0,0,0,0);
+        const upcoming = parsedDays.find(x => x.date >= today);
+        if (upcoming) initial = upcoming.key;
+        else if (parsedDays.length) initial = parsedDays[parsedDays.length - 1].key;
+        else initial = days[0];
+      }
       if(initial){ openDay(initial, {updateUrl:!urlDay, replace:true}); }
 
       function toMin(v){
