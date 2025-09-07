@@ -113,7 +113,30 @@
       return `<div class="video-embed"><iframe src="${safe}" frameborder="0"></iframe></div>`;
     }
 
+    // Render helpers
+    function isUrlOnlyCell(value){
+      const text = String(value||'').trim();
+      if(!text) return false;
+      const urls = extractUrls(text);
+      if(!urls.length) return false;
+      // remove all URLs and trailing separators; if nothing else remains, it's url-only
+      const stripped = text.replace(/\bhttps?:\/\/[^\s)]+/g,'').replace(/[\s,;|-]+/g,' ').trim();
+      return stripped.length === 0;
+    }
+
+    function renderPillLinks(value){
+      const urls = (extractUrls(value)||[]).map(sanitizeUrl).filter(Boolean);
+      if(!urls.length) return escapeHtml(value||'');
+      const many = urls.length>1;
+      const items = urls.map((u,i)=>`<a class="pill" href="${u}" target="_blank" rel="noopener noreferrer">${many?`Link ${i+1}`:'Open link'}</a>`);
+      return `<div class="link-list">${items.join('')}</div>`;
+    }
+
     function renderField(header,value){
+      // If the cell only contains one or more URL(s), render as pill link(s)
+      if(isUrlOnlyCell(value)){
+        return renderPillLinks(value);
+      }
       const lower=String(header).toLowerCase();
       if(lower.includes('video')){
         const urls=extractUrls(value);
@@ -126,53 +149,21 @@
       if(lower.includes('slide')){
         const urls=extractUrls(value);
         if(urls.length){
-          const many=urls.length>1;
-          const base='View slide deck';
-          const links=urls.map((u,i)=>{
-            const safe=sanitizeUrl(u); if(!safe) return '';
-            const label=many?`${base} ${i+1}`:base;
-            return `<a class="pill" href="${safe}" target="_blank" rel="noopener noreferrer">${label}</a>`;
-          }).filter(Boolean).join('');
-          return `<div class="link-list">${links}</div>`;
+          // Even for slides, if there is other text, keep as pill links
+          return renderPillLinks(value);
         }
         return listifyIfNeeded(value);
       }
       return listifyIfNeeded(value);
     }
 
-    function sectionHtml(title, minutes, contentHtml){
-      const timeTag = Number.isFinite(minutes) && minutes>0 ? `<span class="meta">(${minutes} min)</span>` : '';
-      return `
-        <div class="section">
-          <h3>${escapeHtml(title)} ${timeTag}</h3>
-          <div class="section-content">${contentHtml||''}</div>
-        </div>`;
-    }
-
-    function renderFromCsv(rows){
-      const H={
-        day:'Day',
-        lesson1:'Lesson 1',
-        lo1:'Learning Objectives (Lesson 1)',
-        boc1:'Beginning of Class Discussion (Lesson 1)',
-        brain:'Brain Break (5-10 min)',
-        lesson2:'Lesson 2',
-        lo2:'Learning Objectives (Lesson 2)',
-        eod:'End of Day Discussion',
-        standards:'Standards Alignment',
-        daily:'Daily Description',
-        mBeg:'Minutes: Beginning Discussion',
-        mL1:'Minutes: Lesson 1',
-        mBreak:'Minutes: Brain Break',
-        mL2:'Minutes: Lesson 2',
-        mEnd:'Minutes: End Discussion'
-      };
-
+    // Render from CSV honoring header order (left-to-right)
+    function renderFromCsv(rows, headers){
       const nav=document.getElementById('day-nav');
       const main=document.getElementById('content-area');
       nav.innerHTML=''; main.innerHTML='';
 
-      // Date helpers (normalize and parse to midnight)
+      // Date helpers
       function parseDayStr(s){
         const m=String(s||'').trim().match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
         if(!m) return null;
@@ -194,41 +185,43 @@
         return '';
       }
 
-      // Newest-first (descending)
+      // Newest-first (descending by Day)
       const sorted = rows.slice().sort((a,b)=>{
-        const da=parseDayStr(a[H.day]); const db=parseDayStr(b[H.day]);
+        const da=parseDayStr(a['Day']); const db=parseDayStr(b['Day']);
         if(da && db) return db - da;
         if(da && !db) return -1;
         if(!da && db) return 1;
-        return String(b[H.day]||'').localeCompare(String(a[H.day]||''));
+        return String(b['Day']||'').localeCompare(String(a['Day']||''));
       });
 
       const days=[];
 
       sorted.forEach(item=>{
-        const day=(item[H.day]||'').trim(); if(!day) return;
+        const day=(item['Day']||'').trim(); if(!day) return;
         days.push(day);
 
+        // Nav
         const a=document.createElement('a');
         a.className='day-btn';
         a.href=makeDayHref(day);
         a.textContent=day;
         a.dataset.key=day;
-        a.addEventListener('click', (e)=>{ e.preventDefault(); openDay(day,{updateUrl:true}); });
+        a.addEventListener('click',(e)=>{ e.preventDefault(); openDay(day,{updateUrl:true}); });
         nav.appendChild(a);
 
-        const minutes={
-          beg:+(item[H.mBeg]||0)||0,
-          l1:+(item[H.mL1]||0)||0,
-          brk:+(item[H.mBreak]||0)||0,
-          l2:+(item[H.mL2]||0)||0,
-          end:+(item[H.mEnd]||0)||0,
-        };
-        const total=minutes.beg+minutes.l1+minutes.brk+minutes.l2+minutes.end;
+        // Minutes total from any "Minutes:" columns
+        let total=0;
+        headers.forEach(h=>{
+          if(/^Minutes:\s*/i.test(h)){
+            const n = Number(String(item[h]||'').trim());
+            if(Number.isFinite(n)) total += n;
+          }
+        });
         const goal=90;
         const statusClass = total===goal ? 'ok' : (total>0 && Math.abs(total-goal)<=5 ? 'warn' : total>goal ? 'err' : 'warn');
         const statusText = total===goal ? 'on target' : total>goal ? 'over' : 'under';
 
+        // Card
         const card=document.createElement('article');
         card.className='day-card'; card.setAttribute('data-key',day);
         let inner = `<div class="card-inner">
@@ -236,15 +229,20 @@
             <div class="time-total ${statusClass}">Planned Time: ${total} / ${goal} min (${statusText})</div>
           </div>
         `;
-        if(item[H.daily]) inner += sectionHtml('Daily Description', undefined, listifyIfNeeded(item[H.daily]));
-        const loCombined=[item[H.lo1], item[H.lo2]].filter(Boolean).join('; ');
-        if(loCombined) inner += sectionHtml('Learning Objectives (Lessons 1 & 2)', undefined, listifyIfNeeded(loCombined));
-        if(item[H.boc1]) inner += sectionHtml('Beginning of Class Discussion', minutes.beg, renderField(H.boc1,item[H.boc1]));
-        if(item[H.lesson1]) inner += sectionHtml('Lesson 1', minutes.l1, renderField(H.lesson1,item[H.lesson1]));
-        if(item[H.brain]) inner += sectionHtml('Brain Break', minutes.brk, renderField(H.brain,item[H.brain]));
-        if(item[H.lesson2]) inner += sectionHtml('Lesson 2', minutes.l2, renderField(H.lesson2,item[H.lesson2]));
-        if(item[H.eod]) inner += sectionHtml('End of Class Discussion', minutes.end, renderField(H.eod,item[H.eod]));
-        if(item[H.standards]) inner += sectionHtml('Standards Alignment', undefined, renderField(H.standards,item[H.standards]));
+
+        // Sections in CSV header order (left-to-right), skipping Day and Minutes columns
+        headers.forEach(h=>{
+          if(h==='Day') return;
+          if(/^Minutes:\s*/i.test(h)) return;
+          const val = item[h];
+          if(!val || String(val).trim()==='') return;
+          inner += `
+            <div class="section">
+              <h3>${escapeHtml(h)}</h3>
+              <div class="section-content">${renderField(h,val)}</div>
+            </div>`;
+        });
+
         inner += `</div>`;
         card.innerHTML=inner;
         main.appendChild(card);
@@ -268,9 +266,9 @@
         initial = todayKey;
       } else {
         const today = new Date(); today.setHours(0,0,0,0);
-        const upcoming = parsedDays.find(x => x.date >= today); // next class day
+        const upcoming = parsedDays.find(x => x.date >= today);
         if (upcoming) initial = upcoming.key;
-        else if (parsedDays.length) initial = parsedDays[parsedDays.length-1].key; // most recent past
+        else if (parsedDays.length) initial = parsedDays[parsedDays.length-1].key;
         else if (days.length) initial = days[0];
       }
       if(initial){ openDay(initial,{updateUrl:!urlDayRaw, replace:true}); }
@@ -328,14 +326,16 @@
           const res = await fetch(url, {cache:'no-store'});
           if(!res.ok) throw new Error(`${res.status} ${res.statusText}`);
           const text = await res.text();
-          const rows = parseCSV(text);
-          const objects = rowsToObjects(rows);
-          renderFromCsv(objects);
+          const raw = parseCSV(text);
+          const headers = (raw[0]||[]).map(h=>String(h||'').trim());
+          const objects = rowsToObjects(raw);
+          renderFromCsv(objects, headers);
           const from = url.includes('docs.google.com') ? 'Google Sheets' : 'local CSV';
           const now = new Date();
           const hh = String(now.getHours()).padStart(2,'0');
           const mm = String(now.getMinutes()).padStart(2,'0');
-          statusEl.textContent = `Loaded ${objects.length} day(s) from ${from}. Last update ${hh}:${mm}.`;
+          const ss = String(now.getSeconds()).padStart(2,'0');
+          statusEl.textContent = `Loaded ${objects.length} day(s) from ${from}. Last update ${hh}:${mm}:${ss}.`;
           return;
         }catch(e){
           lastErr = e;
@@ -348,8 +348,8 @@
     async function init(){
       try{
         await refreshData();
-        // Auto-refresh every 5 minutes
-        setInterval(refreshData, 5 * 60 * 1000);
+        // Auto-refresh every 10 seconds
+        setInterval(refreshData, 10 * 1000);
       }catch(err){
         document.getElementById('status').textContent = 'Failed to load CSV.';
         console.error(err);
