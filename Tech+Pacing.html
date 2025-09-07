@@ -294,14 +294,41 @@
       if(d){ openDay(d, {updateUrl:false}); }
     });
 
+    // Remote CSV (Google Sheets) + local fallback
+    const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT5Cl-zJhR2pasXp3Pim4JEGmEL9tkZEySkdh4UEekBn8dX1mQ8_P6eZ-6wz5TmeHEHTg97ccLT4PaR/pub?gid=2017374015&single=true&output=csv';
+
+    // NEW: refresh function that tries Google Sheets then local fallback
+    async function refreshData(){
+      const statusEl = document.getElementById('status');
+      const sources = [CSV_URL, 'tech%2Bpacing.csv'];
+      let lastErr = null;
+      for(const url of sources){
+        try{
+          const res = await fetch(url, {cache:'no-store'});
+          if(!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+          const text = await res.text();
+          const rows = parseCSV(text);
+          const objects = rowsToObjects(rows);
+          renderFromCsv(objects);
+          const from = url.includes('docs.google.com') ? 'Google Sheets' : 'local CSV';
+          const now = new Date();
+          const hh = String(now.getHours()).padStart(2,'0');
+          const mm = String(now.getMinutes()).padStart(2,'0');
+          statusEl.textContent = `Loaded ${objects.length} day(s) from ${from}. Last update ${hh}:${mm}.`;
+          return;
+        }catch(e){
+          lastErr = e;
+        }
+      }
+      console.error('CSV load failed:', lastErr);
+      statusEl.textContent = 'Failed to load CSV.';
+    }
+
     async function init(){
       try{
-        const res = await fetch('tech%2Bpacing.csv', {cache:'no-store'});
-        const text = await res.text();
-        const rows = parseCSV(text);
-        const objects = rowsToObjects(rows);
-        document.getElementById('status').textContent = `Loaded ${objects.length} day(s).`;
-        renderFromCsv(objects);
+        await refreshData();
+        // Auto-refresh every 5 minutes
+        setInterval(refreshData, 5 * 60 * 1000);
       }catch(err){
         document.getElementById('status').textContent = 'Failed to load CSV.';
         console.error(err);
