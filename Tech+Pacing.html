@@ -172,63 +172,70 @@
       const main=document.getElementById('content-area');
       nav.innerHTML=''; main.innerHTML='';
 
-      // NEW: sort by Day descending (newest at top)
+      // Date helpers (normalize and parse to midnight)
       function parseDayStr(s){
         const m=String(s||'').trim().match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
         if(!m) return null;
         const d=new Date(parseInt(m[3],10), parseInt(m[1],10)-1, parseInt(m[2],10));
-        return isNaN(d.getTime()) ? null : d;
+        if(isNaN(d.getTime())) return null;
+        d.setHours(0,0,0,0);
+        return d;
       }
+      function normalizeDayStr(s){
+        const m=String(s||'').trim().match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+        if(!m) return '';
+        const mm=m[1].padStart(2,'0'), dd=m[2].padStart(2,'0');
+        return `${mm}/${dd}/${m[3]}`;
+      }
+      function findKeyByNormalized(target, keys){
+        const norm = normalizeDayStr(target);
+        if(!norm) return '';
+        for(const k of keys){ if(normalizeDayStr(k)===norm) return k; }
+        return '';
+      }
+
+      // Newest-first (descending)
       const sorted = rows.slice().sort((a,b)=>{
-        const da = parseDayStr(a[H.day]);
-        const db = parseDayStr(b[H.day]);
-        if(da && db) return db - da;      // newer first
-        if(da && !db) return -1;          // dated rows before undated
+        const da=parseDayStr(a[H.day]); const db=parseDayStr(b[H.day]);
+        if(da && db) return db - da;
+        if(da && !db) return -1;
         if(!da && db) return 1;
-        return String(b[H.day]||'').localeCompare(String(a[H.day]||'')); // fallback
+        return String(b[H.day]||'').localeCompare(String(a[H.day]||''));
       });
 
-      const days=[]; // keep a list of day strings
+      const days=[];
 
-      // CHANGED: iterate sorted rows
       sorted.forEach(item=>{
         const day=(item[H.day]||'').trim(); if(!day) return;
         days.push(day);
 
-        // Make nav link (deep link)
         const a=document.createElement('a');
         a.className='day-btn';
         a.href=makeDayHref(day);
         a.textContent=day;
         a.dataset.key=day;
-        a.addEventListener('click',(e)=>{
-          e.preventDefault();
-          openDay(day,{updateUrl:true});
-        });
+        a.addEventListener('click', (e)=>{ e.preventDefault(); openDay(day,{updateUrl:true}); });
         nav.appendChild(a);
 
-        // Compute minutes
         const minutes={
-          beg: toMin(item[H.mBeg]),
-          l1: toMin(item[H.mL1]),
-          brk: toMin(item[H.mBreak]),
-          l2: toMin(item[H.mL2]),
-          end: toMin(item[H.mEnd]),
+          beg:+(item[H.mBeg]||0)||0,
+          l1:+(item[H.mL1]||0)||0,
+          brk:+(item[H.mBreak]||0)||0,
+          l2:+(item[H.mL2]||0)||0,
+          end:+(item[H.mEnd]||0)||0,
         };
-        const total = (minutes.beg+minutes.l1+minutes.brk+minutes.l2+minutes.end);
-        const goal = 90;
+        const total=minutes.beg+minutes.l1+minutes.brk+minutes.l2+minutes.end;
+        const goal=90;
         const statusClass = total===goal ? 'ok' : (total>0 && Math.abs(total-goal)<=5 ? 'warn' : total>goal ? 'err' : 'warn');
         const statusText = total===goal ? 'on target' : total>goal ? 'over' : 'under';
 
         const card=document.createElement('article');
         card.className='day-card'; card.setAttribute('data-key',day);
-
         let inner = `<div class="card-inner">
           <div class="topline">
             <div class="time-total ${statusClass}">Planned Time: ${total} / ${goal} min (${statusText})</div>
           </div>
         `;
-
         if(item[H.daily]) inner += sectionHtml('Daily Description', undefined, listifyIfNeeded(item[H.daily]));
         const loCombined=[item[H.lo1], item[H.lo2]].filter(Boolean).join('; ');
         if(loCombined) inner += sectionHtml('Learning Objectives (Lessons 1 & 2)', undefined, listifyIfNeeded(loCombined));
@@ -238,38 +245,35 @@
         if(item[H.lesson2]) inner += sectionHtml('Lesson 2', minutes.l2, renderField(H.lesson2,item[H.lesson2]));
         if(item[H.eod]) inner += sectionHtml('End of Class Discussion', minutes.end, renderField(H.eod,item[H.eod]));
         if(item[H.standards]) inner += sectionHtml('Standards Alignment', undefined, renderField(H.standards,item[H.standards]));
-
         inner += `</div>`;
-        card.innerHTML = inner;
+        card.innerHTML=inner;
         main.appendChild(card);
       });
 
-      // Initial selection: URL > today (exact) > next upcoming >= today > most recent past > first
-      const urlDay = getURLDay();
+      // Initial selection: ?day (normalized) > today (normalized) > next upcoming (>= today) > most recent past > first
+      const urlDayRaw = getURLDay();
+      const urlKey = findKeyByNormalized(urlDayRaw, days);
       const todayStr = formatTodayForCsv();
+      const todayKey = findKeyByNormalized(todayStr, days);
+
       const parsedDays = days
-        .map(d => ({ key: d, date: parseDayStr(d) }))
-        .filter(x => x.date)
-        .sort((a,b) => a.date - b.date);
+        .map(d => ({ key:d, date:parseDayStr(d) }))
+        .filter(x=>x.date)
+        .sort((a,b)=>a.date - b.date);
 
       let initial = '';
-      if (urlDay && days.includes(urlDay)) {
-        initial = urlDay;
-      } else if (days.includes(todayStr)) {
-        initial = todayStr;
+      if (urlKey) {
+        initial = urlKey;
+      } else if (todayKey) {
+        initial = todayKey;
       } else {
         const today = new Date(); today.setHours(0,0,0,0);
-        const upcoming = parsedDays.find(x => x.date >= today);
+        const upcoming = parsedDays.find(x => x.date >= today); // next class day
         if (upcoming) initial = upcoming.key;
-        else if (parsedDays.length) initial = parsedDays[parsedDays.length - 1].key;
-        else initial = days[0];
+        else if (parsedDays.length) initial = parsedDays[parsedDays.length-1].key; // most recent past
+        else if (days.length) initial = days[0];
       }
-      if(initial){ openDay(initial, {updateUrl:!urlDay, replace:true}); }
-
-      function toMin(v){
-        const n = Number(String(v||'').trim());
-        return Number.isFinite(n) ? n : 0;
-      }
+      if(initial){ openDay(initial,{updateUrl:!urlDayRaw, replace:true}); }
     }
 
     // NEW: Helpers for deep-linking
