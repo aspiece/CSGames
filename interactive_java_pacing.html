@@ -320,8 +320,10 @@
       const monthMap = {January:0, February:1, March:2, April:3, May:4, June:5, July:6, August:7, September:8, October:9, November:10, December:11,
                         Jan:0, Feb:1, Mar:2, Apr:3, May:4, Jun:5, Jul:6, Aug:7, Sep:8, Sept:8, Oct:9, Nov:10, Dec:11};
       const acadStartYear = 2025;
+
+      // collect details and attempt to parse original dates to find original final end
       const details = Array.from(document.querySelectorAll('.container details'));
-      const spans = [];
+      const origSpans = [];
       for (const d of details) {
         const sum = d.querySelector('summary');
         if (!sum) continue;
@@ -338,9 +340,53 @@
         let eYear = (eMonthIdx < sMonthIdx) ? sYear + 1 : sYear;
         const start = new Date(sYear, sMonthIdx, sd);
         const end = new Date(eYear, eMonthIdx, ed, 23, 59, 59, 999);
-        spans.push({el:d, start, end});
+        origSpans.push({el:d, start, end});
       }
+
+      // Determine original schedule final end date (if parse succeeded)
+      const lastEnd = origSpans.length ? origSpans.reduce((a,b)=>a.end>b.end?a:b).end : null;
+
+      // Compute the Monday of the current week (treat current week as the week to start)
       const now = new Date();
+      const today = new Date(now);
+      today.setHours(0,0,0,0);
+      const dow = today.getDay(); // 0 Sun .. 1 Mon .. 6 Sat
+      const daysSinceMonday = (dow + 6) % 7; // 0 -> Monday
+      const newStartWeek = new Date(today);
+      newStartWeek.setDate(today.getDate() - daysSinceMonday);
+      newStartWeek.setHours(0,0,0,0);
+
+      // If we have a valid original final end and the new start is before it, redistribute the date ranges
+      let spans = [];
+      if (lastEnd && newStartWeek < lastEnd) {
+        const n = details.length;
+        const totalMs = lastEnd.getTime() - newStartWeek.getTime();
+        const perWeekMs = totalMs / n;
+        const monthsShort = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+        for (let i = 0; i < n; i++) {
+          const s = new Date(newStartWeek.getTime() + perWeekMs * i);
+          const e = new Date(newStartWeek.getTime() + perWeekMs * (i + 1) - 1);
+
+          const sFmt = `${monthsShort[s.getMonth()]} ${s.getDate()}`;
+          const eFmt = `${monthsShort[e.getMonth()]} ${e.getDate()}`;
+
+          const det = details[i];
+          const sum = det.querySelector('summary');
+          if (sum) {
+            // Preserve the title text after the em-dash if present
+            const parts = sum.textContent.split('—');
+            const title = (parts[1] || '').trim();
+            sum.textContent = `Week ${i+1}: ${sFmt} – ${eFmt} — ${title}`;
+          }
+
+          spans.push({el: det, start: s, end: e});
+        }
+      } else {
+        // fallback: use original parsed spans
+        spans = origSpans;
+      }
+
       function pickCurrentSpan() {
         let current = spans.find(s => now >= s.start && now <= s.end);
         if (current) return current;
@@ -349,12 +395,14 @@
         const past = spans.filter(s => s.end < now).sort((a,b)=>b.end-a.end);
         return past[0] || null;
       }
+
       const current = pickCurrentSpan();
       if (current) {
         current.el.setAttribute('open','');
         current.el.classList.add('current');
         setTimeout(()=>{ current.el.scrollIntoView({behavior:'smooth', block:'start'}); }, 50);
       }
+
       const btn = document.getElementById('jumpCurrent');
       if (btn) btn.addEventListener('click', () => {
         const c = pickCurrentSpan();
