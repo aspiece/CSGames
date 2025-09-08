@@ -324,12 +324,22 @@
       // collect details and attempt to parse original dates to find original final end
       const details = Array.from(document.querySelectorAll('.container details'));
       const origSpans = [];
+      // Also keep original order map for notes that don't include explicit dates
+      const detIndexMap = new Map();
+      details.forEach((d,i)=>detIndexMap.set(d, i));
+
+      // collect notes that need to be preserved/moved (note/holiday)
+      const originalNotes = [];
       for (const d of details) {
         const sum = d.querySelector('summary');
         if (!sum) continue;
         const text = sum.textContent;
         const m = text.match(/([A-Za-z]{3,9})\s*(\d{1,2})\s*[–-]\s*([A-Za-z]{3,9})?\s*(\d{1,2})/);
-        if (!m) continue;
+        if (!m) {
+          // still record span with null parsed dates so we know its original place
+          origSpans.push({el:d, start:null, end:null, origIndex: detIndexMap.get(d)});
+          continue;
+        }
         const sm = m[1];
         const sd = parseInt(m[2],10);
         const em = m[3] ? m[3] : sm;
@@ -340,11 +350,37 @@
         let eYear = (eMonthIdx < sMonthIdx) ? sYear + 1 : sYear;
         const start = new Date(sYear, sMonthIdx, sd);
         const end = new Date(eYear, eMonthIdx, ed, 23, 59, 59, 999);
-        origSpans.push({el:d, start, end});
+        origSpans.push({el:d, start, end, origIndex: detIndexMap.get(d)});
+      }
+
+      // capture any .note or .holiday elements so we can relocate them after we recompute spans
+      for (const d of details) {
+        const notes = Array.from(d.querySelectorAll('.note, .holiday'));
+        for (const n of notes) {
+          // attempt to parse a date within the note text (first match)
+          const noteText = n.textContent.trim();
+          const dateMatch = noteText.match(/([A-Za-z]{3,9})\s*(\d{1,2})(?:\s*[–-]\s*([A-Za-z]{3,9})?\s*(\d{1,2}))?/);
+          let parsedDate = null;
+          if (dateMatch) {
+            const nm = dateMatch;
+            const nmMon = nm[1];
+            const nmDay = parseInt(nm[2],10);
+            const nmMonIdx = monthMap[nmMon] ?? monthMap[nmMon.slice(0,3)];
+            let nmYear = (nmMonIdx >= 7) ? acadStartYear : acadStartYear + 1;
+            parsedDate = new Date(nmYear, nmMonIdx, nmDay);
+          }
+          originalNotes.push({
+            node: n,
+            html: n.innerHTML,
+            className: n.className,
+            parent: d,
+            parsedDate
+          });
+        }
       }
 
       // Determine original schedule final end date (if parse succeeded)
-      const lastEnd = origSpans.length ? origSpans.reduce((a,b)=>a.end>b.end?a:b).end : null;
+      const lastEnd = origSpans.filter(s=>s.end).length ? origSpans.filter(s=>s.end).reduce((a,b)=>a.end>b.end?a:b).end : null;
 
       // Compute the Monday of the current week (treat current week as the week to start)
       const now = new Date();
@@ -380,11 +416,39 @@
             sum.textContent = `Week ${i+1}: ${sFmt} – ${eFmt} — ${title}`;
           }
 
-          spans.push({el: det, start: s, end: e});
+          spans.push({el: det, start: s, end: e, index: i});
         }
+
+        // Move/relocate any original notes into the correct (new) week based on parsedDate or original position
+        for (const note of originalNotes) {
+          // remove original node to avoid duplicates (we'll reinsert)
+          if (note.node && note.node.parentNode) note.node.parentNode.removeChild(note.node);
+
+          // determine target span index
+          let targetIndex = null;
+          if (note.parsedDate) {
+            targetIndex = spans.findIndex(sp => note.parsedDate >= sp.start && note.parsedDate <= sp.end);
+          }
+          // fallback: keep same ordinal (original detail index) if parse failed or date fell outside
+          if (targetIndex === -1 || targetIndex === null) {
+            const origIdx = detIndexMap.get(note.parent);
+            if (typeof origIdx === 'number' && origIdx < spans.length) targetIndex = origIdx;
+            else targetIndex = 0;
+          }
+
+          const targetSpan = spans[targetIndex];
+          if (!targetSpan) continue;
+          const topics = targetSpan.el.querySelector('.topics') || targetSpan.el;
+          const newNote = document.createElement('div');
+          newNote.className = note.className || 'note';
+          newNote.innerHTML = note.html;
+          topics.appendChild(newNote);
+        }
+
       } else {
         // fallback: use original parsed spans
-        spans = origSpans;
+        spans = origSpans.map((s,i)=>({el:s.el,start:s.start,end:s.end,index:i}));
+        // If no redistribution, notes remain where they are (no action needed)
       }
 
       function pickCurrentSpan() {
