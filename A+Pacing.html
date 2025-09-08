@@ -184,8 +184,8 @@
 
     function initAutoRefresh() {
       refreshData();
-      // Auto-refresh every 10 seconds
-      setInterval(refreshData, 10 * 1000);
+      // Auto-refresh every 5 minutes
+      setInterval(refreshData, 5 * 60 * 1000);
     }
 
     async function loadCsvAndRender() {

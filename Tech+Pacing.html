@@ -348,8 +348,8 @@
     async function init(){
       try{
         await refreshData();
-        // Auto-refresh every 10 seconds
-        setInterval(refreshData, 10 * 1000);
+        // Auto-refresh every 5 minutes
+        setInterval(refreshData, 5 * 60 * 1000);
       }catch(err){
         document.getElementById('status').textContent = 'Failed to load CSV.';
         console.error(err);
