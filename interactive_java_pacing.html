@@ -5,68 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Intro to Java Pacing Guide</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: #f9f9f9;
-    }
-    header {
-      background-color: #2c3e50;
-      color: white;
-      padding: 1rem;
-      text-align: center;
-    }
-    .container {
-      width: 90%;
-      margin: 20px auto;
-    }
-    details {
-      background: white;
-      margin: 10px 0;
-      padding: 15px;
-      border-radius: 8px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-    summary {
-      font-size: 1.2em;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    .topics {
-      margin-top: 10px;
-      padding-left: 20px;
-    }
-    .note {
-      color: #c0392b;
-      font-style: italic;
-      margin-top: 5px;
-    }
-    .holiday {
-      background-color: #fce4e4;
-      padding: 5px;
-      border-radius: 5px;
-      margin-top: 5px;
-    }
-    .current {
-      border: 2px solid #1abc9c;
-      box-shadow: 0 4px 10px rgba(26,188,156,0.3);
-      background: #f6fffb;
-    }
-    .toolbar { display:flex; gap:8px; justify-content:space-between; align-items:center; margin: 0 0 12px 0; }
-    .toolbar .btn { cursor:pointer; border:1px solid #ddd; padding:8px 12px; border-radius:8px; background:#fff; }
-    .toolbar .btn:hover { border-color:#1abc9c; }
-    .graded-badge {
-      display: inline-block;
-      background: #e74c3c;
-      color: #fff;
-      font-size: 0.85em;
-      font-weight: bold;
-      border-radius: 6px;
-      padding: 2px 8px;
-      margin-left: 8px;
-      vertical-align: middle;
-    }
+    body { font-family: Arial, sans-serif; margin:0; padding:0; background:#f9f9f9;}
+    header { background:#2c3e50; color:#fff; padding:1rem; text-align:center;}
+    .container { width:90%; margin:20px auto;}
+    details { background:#fff; margin:10px 0; padding:15px; border-radius:8px; box-shadow:0 2px 5px rgba(0,0,0,0.1);}
+    summary { font-size:1.2em; font-weight:bold; cursor:pointer;}
+    .topics { margin-top:10px; padding-left:20px;}
+    .note { color:#c0392b; font-style:italic; margin-top:5px;}
+    .holiday { background:#fce4e4; padding:5px; border-radius:5px; margin-top:5px;}
+    .current { border:2px solid #1abc9c; box-shadow:0 4px 10px rgba(26,188,156,0.3); background:#f6fffb;}
+    .toolbar { display:flex; gap:8px; justify-content:space-between; align-items:center; margin:0 0 12px 0;}
+    .toolbar .btn { cursor:pointer; border:1px solid #ddd; padding:8px 12px; border-radius:8px; background:#fff;}
+    .toolbar .btn:hover { border-color:#1abc9c;}
+    .graded-badge { display:inline-block; background:#e74c3c; color:#fff; font-size:0.85em; font-weight:bold; border-radius:6px; padding:2px 8px; margin-left:8px; vertical-align:middle;}
     .graded-panel{border:1px solid #e0e0e0;background:#fffbe6;padding:10px 12px;border-radius:8px;margin-top:10px}
     .graded-panel h4{margin:0 0 6px 0;font-size:1rem;color:#8e44ad}
     .graded-list{margin:0;padding-left:18px}
@@ -88,6 +39,7 @@
       <div><strong>Tip:</strong> Click a week to expand. The current week is highlighted.</div>
       <button class="btn" id="jumpCurrent">Jump to Current Week</button>
     </div>
+
     <details>
       <summary>Week 1: Aug 25 – Aug 29 — Getting Started in Java</summary>
       <div class="topics">
@@ -161,6 +113,7 @@
           <li>Understand parameter passing and return values</li>
           <li>Implement do-while loops</li>
         </ul>
+        <div class="note">Note: Oct 10 is a Count Day.</div>
       </div>
     </details>
 
@@ -170,7 +123,7 @@
         <ul>
           <li>Create a game using while loops and if statements</li>
         </ul>
-        <div class="note">Note: Oct 10 is a Count Day.</div>
+        <div class="note">Note: Oct 13 is a Professional Development Day, no school.</div>
       </div>
     </details>
 
@@ -181,7 +134,7 @@
           <li>Add logic for the computer's moves</li>
           <li>Implement game restart functionality</li>
         </ul>
-        <div class="note">Note: Oct 13 is a Professional Development Day, no school.</div>
+        <div class="note">Note: Oct 24 is Staff Professional Development, no students.</div>
       </div>
     </details>
 
@@ -193,7 +146,6 @@
           <li>Use arrays to manage a deck of cards</li>
         </ul>
       </div>
-      <div class="note">Note: Oct 24 is Staff Professional Development, no students.</div>
     </details>
 
     <details>
@@ -204,8 +156,8 @@
           <li>Manage remaining cards</li>
           <li>Enhance your use of arrays</li>
         </ul>
+        <div class="note">Note: Nov 4 is a half day (Election Day).</div>
       </div>
-      <div class="note">Note: Nov 4 is a half day (Election Day).</div>
     </details>
 
     <details>
@@ -316,169 +268,85 @@
       </div>
     </details>
   </div>
+
+  <!-- Simple current-week highlighter -->
   <script>
     (function(){
-      const monthMap = {January:0, February:1, March:2, April:3, May:4, June:5, July:6, August:7, September:8, October:9, November:10, December:11,
-                        Jan:0, Feb:1, Mar:2, Apr:3, May:4, Jun:5, Jul:6, Aug:7, Sep:8, Sept:8, Oct:9, Nov:10, Dec:11};
-      const acadStartYear = 2025;
+      const summaries = Array.from(document.querySelectorAll('.container details summary'));
+      if(!summaries.length) return;
 
-      // collect details and attempt to parse original dates to find original final end
-      const details = Array.from(document.querySelectorAll('.container details'));
-      const origSpans = [];
-      // Also keep original order map for notes that don't include explicit dates
-      const detIndexMap = new Map();
-      details.forEach((d,i)=>detIndexMap.set(d, i));
+      const today = new Date();
+      today.setHours(0,0,0,0);
 
-      // collect notes that need to be preserved/moved (note/holiday)
-      const originalNotes = [];
-      for (const d of details) {
-        const sum = d.querySelector('summary');
-        if (!sum) continue;
-        const text = sum.textContent;
-        const m = text.match(/([A-Za-z]{3,9})\s*(\d{1,2})\s*[–-]\s*([A-Za-z]{3,9})?\s*(\d{1,2})/);
-        if (!m) {
-          // still record span with null parsed dates so we know its original place
-          origSpans.push({el:d, start:null, end:null, origIndex: detIndexMap.get(d)});
-          continue;
-        }
-        const sm = m[1];
-        const sd = parseInt(m[2],10);
+      // Infer academic start year (if today before July, assume year started previous August)
+      const academicStartYear = (today.getMonth() < 6) ? today.getFullYear()-1 : today.getFullYear();
+
+      const monthIdx = {Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
+
+      function parseRange(text){
+        // Week X: MonAbbr DD – (MonAbbr2 )? DD —
+        const m = text.match(/:\s+([A-Za-z]{3})\s+(\d{1,2})\s+[\u2013-]\s+([A-Za-z]{3})?\s*(\d{1,2})/);
+        if(!m) return null;
+        const sm = m[1]; const sd = parseInt(m[2],10);
         const em = m[3] ? m[3] : sm;
         const ed = parseInt(m[4],10);
-        const sMonthIdx = monthMap[sm] ?? monthMap[sm.slice(0,3)];
-        const eMonthIdx = monthMap[em] ?? monthMap[em.slice(0,3)];
-        let sYear = (sMonthIdx >= 7) ? acadStartYear : acadStartYear + 1;
-        let eYear = (eMonthIdx < sMonthIdx) ? sYear + 1 : sYear;
-        const start = new Date(sYear, sMonthIdx, sd);
-        const end = new Date(eYear, eMonthIdx, ed, 23, 59, 59, 999);
-        origSpans.push({el:d, start, end, origIndex: detIndexMap.get(d)});
+        const sMonth = monthIdx[sm]; const eMonth = monthIdx[em];
+        if (sMonth==null || eMonth==null) return null;
+
+        // Year logic: months Jul–Dec belong to academicStartYear, Jan–Jun next year
+        const sYear = (sMonth >= 7) ? academicStartYear : academicStartYear + 1;
+        const eYear = (eMonth >= 7) ? academicStartYear : academicStartYear + 1;
+
+        const start = new Date(sYear, sMonth, sd);
+        const end = new Date(eYear, eMonth, ed);
+        start.setHours(0,0,0,0); end.setHours(23,59,59,999);
+        return {start,end};
       }
 
-      // capture any .note or .holiday elements so we can relocate them after we recompute spans
-      for (const d of details) {
-        const notes = Array.from(d.querySelectorAll('.note, .holiday'));
-        for (const n of notes) {
-          // attempt to parse a date within the note text (first match)
-          const noteText = n.textContent.trim();
-          const dateMatch = noteText.match(/([A-Za-z]{3,9})\s*(\d{1,2})(?:\s*[–-]\s*([A-Za-z]{3,9})?\s*(\d{1,2}))?/);
-          let parsedDate = null;
-          if (dateMatch) {
-            const nm = dateMatch;
-            const nmMon = nm[1];
-            const nmDay = parseInt(nm[2],10);
-            const nmMonIdx = monthMap[nmMon] ?? monthMap[nmMon.slice(0,3)];
-            let nmYear = (nmMonIdx >= 7) ? acadStartYear : acadStartYear + 1;
-            parsedDate = new Date(nmYear, nmMonIdx, nmDay);
-          }
-          originalNotes.push({
-            node: n,
-            html: n.innerHTML,
-            className: n.className,
-            parent: d,
-            parsedDate
-          });
+      let currentDetail = null;
+      summaries.forEach(sum=>{
+        const range = parseRange(sum.textContent);
+        if(!range) return;
+        if(today >= range.start && today <= range.end){
+          currentDetail = sum.parentElement;
         }
-      }
-
-      // Determine original schedule final end date (if parse succeeded)
-      const lastEnd = origSpans.filter(s=>s.end).length ? origSpans.filter(s=>s.end).reduce((a,b)=>a.end>b.end?a:b).end : null;
-
-      // Compute the Monday of the current week (treat current week as the week to start)
-      const now = new Date();
-      const today = new Date(now);
-      today.setHours(0,0,0,0);
-      const dow = today.getDay(); // 0 Sun .. 1 Mon .. 6 Sat
-      const daysSinceMonday = (dow + 6) % 7; // 0 -> Monday
-      const newStartWeek = new Date(today);
-      newStartWeek.setDate(today.getDate() - daysSinceMonday);
-      newStartWeek.setHours(0,0,0,0);
-
-      // If we have a valid original final end and the new start is before it, redistribute the date ranges
-      let spans = [];
-      if (lastEnd && newStartWeek < lastEnd) {
-        const n = details.length;
-        const totalMs = lastEnd.getTime() - newStartWeek.getTime();
-        const perWeekMs = totalMs / n;
-        const monthsShort = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-
-        for (let i = 0; i < n; i++) {
-          const s = new Date(newStartWeek.getTime() + perWeekMs * i);
-          const e = new Date(newStartWeek.getTime() + perWeekMs * (i + 1) - 1);
-
-          const sFmt = `${monthsShort[s.getMonth()]} ${s.getDate()}`;
-          const eFmt = `${monthsShort[e.getMonth()]} ${e.getDate()}`;
-
-          const det = details[i];
-          const sum = det.querySelector('summary');
-          if (sum) {
-            // Preserve the title text after the em-dash if present
-            const parts = sum.textContent.split('—');
-            const title = (parts[1] || '').trim();
-            sum.textContent = `Week ${i+1}: ${sFmt} – ${eFmt} — ${title}`;
-          }
-
-          spans.push({el: det, start: s, end: e, index: i});
-        }
-
-        // Move/relocate any original notes into the correct (new) week based on parsedDate or original position
-        for (const note of originalNotes) {
-          // remove original node to avoid duplicates (we'll reinsert)
-          if (note.node && note.node.parentNode) note.node.parentNode.removeChild(note.node);
-
-          // determine target span index
-          let targetIndex = null;
-          if (note.parsedDate) {
-            targetIndex = spans.findIndex(sp => note.parsedDate >= sp.start && note.parsedDate <= sp.end);
-          }
-          // fallback: keep same ordinal (original detail index) if parse failed or date fell outside
-          if (targetIndex === -1 || targetIndex === null) {
-            const origIdx = detIndexMap.get(note.parent);
-            if (typeof origIdx === 'number' && origIdx < spans.length) targetIndex = origIdx;
-            else targetIndex = 0;
-          }
-
-          const targetSpan = spans[targetIndex];
-          if (!targetSpan) continue;
-          const topics = targetSpan.el.querySelector('.topics') || targetSpan.el;
-          const newNote = document.createElement('div');
-          newNote.className = note.className || 'note';
-          newNote.innerHTML = note.html;
-          topics.appendChild(newNote);
-        }
-
-      } else {
-        // fallback: use original parsed spans
-        spans = origSpans.map((s,i)=>({el:s.el,start:s.start,end:s.end,index:i}));
-        // If no redistribution, notes remain where they are (no action needed)
-      }
-
-      function pickCurrentSpan() {
-        let current = spans.find(s => now >= s.start && now <= s.end);
-        if (current) return current;
-        const upcoming = spans.filter(s => s.start > now).sort((a,b)=>a.start-b.start);
-        if (upcoming.length) return upcoming[0];
-        const past = spans.filter(s => s.end < now).sort((a,b)=>b.end-a.end);
-        return past[0] || null;
-      }
-
-      const current = pickCurrentSpan();
-      if (current) {
-        current.el.setAttribute('open','');
-        current.el.classList.add('current');
-        setTimeout(()=>{ current.el.scrollIntoView({behavior:'smooth', block:'start'}); }, 50);
-      }
-
-      const btn = document.getElementById('jumpCurrent');
-      if (btn) btn.addEventListener('click', () => {
-        const c = pickCurrentSpan();
-        if (!c) return;
-        c.el.setAttribute('open','');
-        details.forEach(d => { if (d!==c.el) d.removeAttribute('open'); });
-        c.el.classList.add('current');
-        c.el.scrollIntoView({behavior:'smooth', block:'start'});
       });
+
+      if(!currentDetail){
+        // pick next future else last past
+        let future = [];
+        let past = [];
+        summaries.forEach(sum=>{
+          const r = parseRange(sum.textContent);
+          if(!r) return;
+          if(r.start > today) future.push({el:sum.parentElement, start:r.start});
+          else past.push({el:sum.parentElement, end:r.end});
+        });
+        future.sort((a,b)=>a.start-b.start);
+        past.sort((a,b)=>b.end-a.end);
+        if(future.length) currentDetail = future[0].el;
+        else if(past.length) currentDetail = past[0].el;
+      }
+
+      if(currentDetail){
+        currentDetail.classList.add('current');
+        currentDetail.setAttribute('open','');
+      }
+
+      const jumpBtn = document.getElementById('jumpCurrent');
+      if(jumpBtn){
+        jumpBtn.addEventListener('click',()=>{
+          if(currentDetail){
+            currentDetail.classList.add('current');
+            currentDetail.setAttribute('open','');
+            currentDetail.scrollIntoView({behavior:'smooth', block:'start'});
+          }
+        });
+      }
     })();
   </script>
+
+  <!-- Graded badges inline -->
   <script>
 document.addEventListener('DOMContentLoaded', function() {
   const gradedItems = [
@@ -501,8 +369,9 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
   </script>
+
+  <!-- Weekly graded panel -->
   <script>
-/* Inject a "Graded this week" panel into each week based on a week->items map */
 document.addEventListener('DOMContentLoaded', function(){
   const gradedByWeek = {
     1: [
@@ -579,7 +448,7 @@ document.addEventListener('DOMContentLoaded', function(){
     if(!k) return '';
     const cls = k.toLowerCase().includes('rubric') ? 'rubric' : 'key';
     return `<span class="pill ${cls}">${k}</span>`;
-    }
+  }
 
   document.querySelectorAll('.container details').forEach(det=>{
     const sum = det.querySelector('summary'); if(!sum) return;
@@ -588,18 +457,17 @@ document.addEventListener('DOMContentLoaded', function(){
     const items = gradedByWeek[week]; if(!items || !items.length) return;
 
     const panel = document.createElement('div');
-    panel.className = 'graded-panel';
+    panel.className='graded-panel';
     panel.innerHTML = `
       <h4>Graded this week</h4>
       <ul class="graded-list">
         ${items.map(it=>`<li>${it.name} ${pill(it.type)} ${keyPill(it.key)}</li>`).join('')}
       </ul>
     `;
-
     const topics = det.querySelector('.topics') || det;
     topics.appendChild(panel);
   });
 });
-</script>
+  </script>
 </body>
 </html>
