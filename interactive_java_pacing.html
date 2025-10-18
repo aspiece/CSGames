@@ -604,10 +604,8 @@
       const STARTER_URL = 'https://codehs.com/sandbox/lavenderyak4416/java-main-2';
 
       function addLink(li) {
-        // Avoid duplicates
         if (li.querySelector('a[data-starter-code]')) return;
         if (li.querySelector(`a[href="${STARTER_URL}"]`)) return;
-
         li.appendChild(document.createTextNode(' — '));
         const a = document.createElement('a');
         a.href = STARTER_URL;
@@ -618,39 +616,32 @@
         li.appendChild(a);
       }
 
-      function removeExistingLinks(root = document) {
-        root.querySelectorAll(`a[data-starter-code], a[href="${STARTER_URL}"]`).forEach(a => {
-          const prev = a.previousSibling;
-          if (prev && prev.nodeType === Node.TEXT_NODE) {
-            // Trim trailing separators like " — "
-            prev.textContent = prev.textContent.replace(/\s*[–—-]\s*$/, '');
-            if (!prev.textContent.trim()) prev.remove();
-          }
-          a.remove();
-        });
+      function removeLink(li) {
+        const a = li.querySelector(`a[data-starter-code], a[href="${STARTER_URL}"]`);
+        if (!a) return;
+        const prev = a.previousSibling;
+        if (prev && prev.nodeType === Node.TEXT_NODE) {
+          prev.textContent = prev.textContent.replace(/\s*[–—-]\s*$/, '');
+          if (!prev.textContent.trim()) prev.remove();
+        }
+        a.remove();
       }
 
       function apply(root = document) {
-        // Only include links for graded items whose text starts with "Module"
-        // Targets the graded panel list if present: .graded-panel .graded-list li
-        const lis = root.querySelectorAll('.graded-panel .graded-list li');
-        lis.forEach(li => {
+        const items = root.querySelectorAll('.graded-panel .graded-list li');
+        items.forEach(li => {
           const text = (li.textContent || '').trim();
-          if (/^module\b/i.test(text)) addLink(li);
+          const isModule = /^module\b/i.test(text);
+          if (isModule) addLink(li);
+          else removeLink(li);
         });
       }
 
-      // Run now and on future DOM changes (if graded panel is created dynamically)
-      function run() {
-        removeExistingLinks();
-        apply();
-      }
-
       document.addEventListener('DOMContentLoaded', () => {
-        run();
+        apply();
         const mo = new MutationObserver((muts) => {
           for (const m of muts) {
-            if (m.addedNodes && m.addedNodes.length) { run(); break; }
+            if (m.addedNodes && m.addedNodes.length) { apply(); break; }
           }
         });
         mo.observe(document.body, { childList: true, subtree: true });
