@@ -139,18 +139,39 @@
   </div>
 
   <script>
-    // Auto-attach Starter Code link to all project items
+    // Append starter code link to project items by text match (no other changes)
     document.addEventListener('DOMContentLoaded', function () {
-      const STARTER_HUB_URL = 'https://codehs.com/sandbox/lavenderyak4416/java-main-2';
-      document.querySelectorAll('[data-project]').forEach(li => {
-        if (li.querySelector('a.starter-code')) return;
-        const a = document.createElement('a');
-        a.href = STARTER_HUB_URL;
-        a.target = '_blank';
-        a.rel = 'noopener noreferrer';
-        a.className = 'pill starter-code';
-        a.textContent = 'Starter Code';
-        li.appendChild(a);
+      const STARTER_URL = 'https://codehs.com/sandbox/lavenderyak4416/java-main-2';
+      const PROJECT_KEYWORDS = [
+        'Mad Lib', 'Madlib',
+        'FizzBuzz', 'Fizz Buzz',
+        'Stick Game',
+        'Card Shuffler', 'Shuffle and Deal',
+        'Battleship',
+        'Tic Tac Toe',
+        'Picture Puzzle'
+      ];
+
+      const items = document.querySelectorAll('li');
+      items.forEach(li => {
+        const text = (li.textContent || '').trim().toLowerCase();
+        if (!text) return;
+
+        const isProject = PROJECT_KEYWORDS.some(k => text.includes(k.toLowerCase()));
+        const alreadyHasLink =
+          li.querySelector('a[data-starter-code]') ||
+          li.querySelector(`a[href^="${STARTER_URL}"]`);
+
+        if (isProject && !alreadyHasLink) {
+          li.appendChild(document.createTextNode(' — '));
+          const a = document.createElement('a');
+          a.href = STARTER_URL;
+          a.target = '_blank';
+          a.rel = 'noopener noreferrer';
+          a.textContent = 'Starter Code';
+          a.setAttribute('data-starter-code', '');
+          li.appendChild(a);
+        }
       });
     });
   </script>
