@@ -2,13 +2,14 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Intro to Java Pacing Guide</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       margin: 0;
+      padding: 0;
       background: #f9f9f9;
     }
 
@@ -29,34 +30,131 @@
       margin: 10px 0;
       padding: 15px;
       border-radius: 8px;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     }
 
     summary {
-      font-size: 1.05rem;
+      font-size: 1.2em;
       font-weight: bold;
       cursor: pointer;
     }
 
-    ul {
-      margin: 8px 0 0 0;
+    .topics {
+      margin-top: 10px;
       padding-left: 20px;
+    }
+
+    .note {
+      color: #c0392b;
+      font-style: italic;
+      margin-top: 5px;
+    }
+
+    .holiday {
+      background: #fce4e4;
+      padding: 5px;
+      border-radius: 5px;
+      margin-top: 5px;
+    }
+
+    .current {
+      border: 2px solid #1abc9c;
+      box-shadow: 0 4px 10px rgba(26, 188, 156, 0.3);
+      background: #f6fffb;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 8px;
+      justify-content: space-between;
+      align-items: center;
+      margin: 0 0 12px 0;
+    }
+
+    .toolbar .btn {
+      cursor: pointer;
+      border: 1px solid #ddd;
+      padding: 8px 12px;
+      border-radius: 8px;
+      background: #fff;
+    }
+
+    .toolbar .btn:hover {
+      border-color: #1abc9c;
+    }
+
+    .graded-badge {
+      display: inline-block;
+      background: #e74c3c;
+      color: #fff;
+      font-size: 0.85em;
+      font-weight: bold;
+      border-radius: 6px;
+      padding: 2px 8px;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+
+    .graded-panel {
+      border: 1px solid #e0e0e0;
+      background: #fffbe6;
+      padding: 10px 12px;
+      border-radius: 8px;
+      margin-top: 10px
+    }
+
+    .graded-panel h4 {
+      margin: 0 0 6px 0;
+      font-size: 1rem;
+      color: #8e44ad
+    }
+
+    .graded-list {
+      margin: 0;
+      padding-left: 18px
+    }
+
+    .graded-list li {
+      margin: 4px 0
     }
 
     .pill {
       display: inline-block;
-      padding: 2px 8px;
+      padding: 2px 6px;
       border-radius: 999px;
       font-size: .8em;
-      border: 1px solid #2c3e50;
-      color: #2c3e50;
-      margin-left: 8px;
-      text-decoration: none;
+      margin-left: 6px;
+      border: 1px solid
     }
 
-    .pill.starter-code {
-      border-color: #6a5acd;
-      color: #6a5acd;
+    .pill.assessment {
+      color: #fff;
+      background: #e74c3c;
+      border-color: #e74c3c
+    }
+
+    .pill.assignment {
+      color: #fff;
+      background: #27ae60;
+      border-color: #27ae60
+    }
+
+    .pill.survey {
+      color: #fff;
+      background: #8e44ad;
+      border-color: #8e44ad
+    }
+
+    .pill.key {
+      color: #fff;
+      background: #3498db;
+      border-color: #3498db
+    }
+
+    .pill.rubric {
+      color: #fff;
+      background: #2c3e50;
+      border-color: #2c3e50
     }
   </style>
 </head>
@@ -64,114 +162,439 @@
 <body>
   <header>
     <h1>Intro to Java Pacing Guide</h1>
-    <p>Starter code link automatically added to all project items.</p>
   </header>
-
   <div class="container">
-    <!-- Mark any project line with data-project to auto-attach the Starter Code link -->
+    <div class="toolbar">
+      <div><strong>Tip:</strong> Click a week to expand. The current week is highlighted.</div>
+      <button class="btn" id="jumpCurrent">Jump to Current Week</button>
+    </div>
 
-    <details open>
-      <summary>Week 1: Sep 08 – Sep 12 — Getting Started in Java</summary>
-      <ul>
-        <li>Set up Java workspace & Eclipse IDE</li>
-        <li>Create first Java class & print statements</li>
-      </ul>
+    <details>
+      <summary>Week 1: Aug 25 – Aug 29 — Getting Started in Java</summary>
+      <div class="topics">
+        <ul>
+          <li>Set up your Java environment</li>
+          <li>Create your workspace</li>
+          <li>Learn the Eclipse IDE</li>
+          <li>Create your first Java class</li>
+          <li>Print statements to the console</li>
+          <li>Complete the Getting to Know You form</li>
+        </ul>
+      </div>
     </details>
 
     <details>
-      <summary>Week 2: Sep 15 – Sep 19 — Primitive Types & User Input</summary>
-      <ul>
-        <li>Primitive data types: int, long, float, double, char, boolean</li>
-        <li>Intro to console input (Scanner)</li>
-      </ul>
+      <summary>Week 2: Sep 01 – Sep 05 — Primitive Data Types</summary>
+      <div class="topics">
+        <ul>
+          <li>Understand primitive data types</li>
+          <li>Work with int, long, float, double, char, and boolean variables</li>
+        </ul>
+      </div>
     </details>
 
     <details>
-      <summary>Week 3: Sep 22 – Sep 26 — Mad Lib Project (Start)</summary>
-      <ul>
-        <li data-project>Mad Lib project kickoff: plan placeholders & story structure</li>
-        <li>Integrate validated user input into template</li>
-      </ul>
+      <summary>Week 3: Sep 08 – Sep 12 — User Input</summary>
+      <div class="topics">
+        <ul>
+          <li>Prompt users and capture their input</li>
+          <li>Utilize user input within programs</li>
+          <li><strong>Project:</strong> Interactive Program — Start developing a simple interactive program</li>
+        </ul>
+      </div>
     </details>
 
     <details>
-      <summary>Week 4: Sep 29 – Oct 03 — Mad Lib Submission & FizzBuzz</summary>
-      <ul>
-        <li data-project>Finalize & submit Mad Lib project</li>
-        <li data-project>FizzBuzz challenge (loops & conditionals)</li>
-      </ul>
+      <summary>Week 4: Sep 15 – Sep 19 — Mad Lib Project</summary>
+      <div class="topics">
+        <ul>
+          <li>Create a Mad Lib game</li>
+          <li>Implement user input and variable manipulation</li>
+        </ul>
+      </div>
     </details>
 
     <details>
-      <summary>Week 6: Oct 13 – Oct 17 — Stick Game Project</summary>
-      <ul>
-        <li data-project>Stick Game: setup, rules, user vs user</li>
-      </ul>
+      <summary>Week 5: Sep 22 – Sep 26 — Global Variables & Rock, Paper, Scissors Game</summary>
+      <div class="topics">
+        <ul>
+          <li>Understand the scope and lifetime of variables</li>
+          <li>Use while loops for game flow</li>
+          <li>Write if statements for game logic</li>
+        </ul>
+      </div>
     </details>
 
     <details>
-      <summary>Week 8: Oct 27 – Oct 31 — Card Shuffler</summary>
-      <ul>
-        <li data-project>Card Shuffler: arrays, shuffle, deal</li>
-      </ul>
+      <summary>Week 6: Sep 29 – Oct 03 — Fizz Buzz Challenge & Introduction to Methods</summary>
+      <div class="topics">
+        <ul>
+          <li>Complete the Fizz Buzz coding exercise</li>
+          <li>Define and call methods in Java</li>
+        </ul>
+      </div>
     </details>
 
     <details>
-      <summary>Week 9–10: Nov 03 – Nov 14 — Battleship</summary>
-      <ul>
-        <li data-project>Battleship: grid, input, ship placement, firing mechanics</li>
-      </ul>
+      <summary>Week 7: Oct 06 – Oct 10 — Methods Continued & Do-While Loops</summary>
+      <div class="topics">
+        <ul>
+          <li>Understand parameter passing and return values</li>
+          <li>Implement do-while loops</li>
+        </ul>
+        <div class="note">Note: Oct 10 is a Count Day.</div>
+      </div>
     </details>
 
     <details>
-      <summary>Week 11–12: Nov 17 – Nov 28 — Tic Tac Toe</summary>
-      <ul>
-        <li data-project>Tic Tac Toe: core game, win detection, UI polish</li>
-      </ul>
+      <summary>Week 8: Oct 13 – Oct 17 — Stick Game Project</summary>
+      <div class="topics">
+        <ul>
+          <li>Create a game using while loops and if statements</li>
+        </ul>
+        <div class="note">Note: Oct 13 is a Professional Development Day, no school.</div>
+      </div>
     </details>
 
     <details>
-      <summary>Week 13–15: Dec 01 – Dec 19 — Picture Puzzle</summary>
-      <ul>
-        <li data-project>Picture Puzzle: layout, swapping logic, finish & submit</li>
-      </ul>
+      <summary>Week 9: Oct 20 – Oct 24 — Computer's Turn Logic</summary>
+      <div class="topics">
+        <ul>
+          <li>Add logic for the computer's moves</li>
+          <li>Implement game restart functionality</li>
+        </ul>
+        <div class="note">Note: Oct 24 is Staff Professional Development, no students.</div>
+      </div>
+    </details>
+
+    <details>
+      <summary>Week 10: Oct 27 – Oct 31 — Card Shuffler Project</summary>
+      <div class="topics">
+        <ul>
+          <li>Start the Card Shuffler program</li>
+          <li>Use arrays to manage a deck of cards</li>
+        </ul>
+      </div>
+    </details>
+
+    <details>
+      <summary>Week 11: Nov 03 – Nov 07 — Shuffle and Deal</summary>
+      <div class="topics">
+        <ul>
+          <li>Deal cards to players</li>
+          <li>Manage remaining cards</li>
+          <li>Enhance your use of arrays</li>
+        </ul>
+        <div class="note">Note: Nov 4 is a half day (Election Day).</div>
+      </div>
+    </details>
+
+    <details>
+      <summary>Week 12: Nov 10 – Nov 14 — Battleship Game</summary>
+      <div class="topics">
+        <ul>
+          <li>Start creating a modified Battleship game</li>
+          <li>Use two-dimensional arrays for the grid</li>
+          <li>Learn about switch-case statements</li>
+        </ul>
+        <div class="note">Note: Nov 11 is Veterans Day, no school.</div>
+      </div>
+    </details>
+
+    <details>
+      <summary>Week 13: Nov 17 – Nov 21 — Ships and Firing Mechanics</summary>
+      <div class="topics">
+        <ul>
+          <li>Place ships randomly on the grid</li>
+          <li>Ensure ships stay in bounds</li>
+          <li>Implement firing mechanics with coordinate input</li>
+        </ul>
+        <div class="note">Note: Nov 20 is Parent-Teacher Conferences.</div>
+      </div>
+    </details>
+
+    <details>
+      <summary>Week 14: Nov 24 – Nov 28 — Tic Tac Toe Game</summary>
+      <div class="topics">
+        <ul>
+          <li>Build a user interface for the game</li>
+          <li>Set up the game grid and basic gameplay</li>
+        </ul>
+        <div class="note">Note: Nov 26–28 is Fall Break, no classes.</div>
+      </div>
+    </details>
+
+    <details>
+      <summary>Week 15: Dec 01 – Dec 05 — Adding X & O Functionality</summary>
+      <div class="topics">
+        <ul>
+          <li>Create and customize the X and O buttons</li>
+          <li>Enhance the user interface</li>
+        </ul>
+        <div class="note">Note: Dec 5 is a half day.</div>
+      </div>
+    </details>
+
+    <details>
+      <summary>Week 16: Dec 08 – Dec 12 — Action Listeners and Game Logic</summary>
+      <div class="topics">
+        <ul>
+          <li>Make squares interactive with action events</li>
+          <li>Add a third player to the game (optional challenge)</li>
+        </ul>
+        <div class="note">Note: Dec 11 is a half day.</div>
+      </div>
+    </details>
+
+    <details>
+      <summary>Week 17: Dec 15 – Dec 19 — Picture Puzzle Project</summary>
+      <div class="topics">
+        <ul>
+          <li>Start the Picture Puzzle game</li>
+          <li>Add panels and set properties for the puzzle</li>
+        </ul>
+        <div class="note">Note: Dec 16 is Staff In-Service, no students.</div>
+      </div>
+    </details>
+
+    <details>
+      <summary>Week 18: Dec 22 – Dec 26 — Switching Puzzle Pieces / Winter Break Begins</summary>
+      <div class="topics">
+        <ul>
+          <li>Implement action events for clickable pieces</li>
+          <li>Use setIcon and getIcon methods to switch images</li>
+        </ul>
+        <div class="holiday">Winter Break (short week)</div>
+      </div>
+    </details>
+
+    <details>
+      <summary>Week 19: Dec 29 – Jan 02 — Winter Break</summary>
+      <div class="holiday">No Classes</div>
+    </details>
+
+    <details>
+      <summary>Week 20: Jan 05 – Jan 09 — Winning Conditions and Image Slicing</summary>
+      <div class="topics">
+        <ul>
+          <li>Set the correct order of images in an array</li>
+          <li>Check for the winning condition</li>
+          <li>Use slicer code to prepare custom images</li>
+        </ul>
+        <div class="note">Note: Jan 7 is a half day.</div>
+      </div>
+    </details>
+
+    <details>
+      <summary>Week 21: Jan 12 – Jan 16 — Course Review and Finalization</summary>
+      <div class="topics">
+        <ul>
+          <li>Review key concepts</li>
+          <li>Final project presentations</li>
+          <li>Course wrap-up and feedback</li>
+        </ul>
+        <div class="note">Note: Jan 16 is the end of Semester 1 and a half day.</div>
+      </div>
     </details>
   </div>
 
+  <!-- Simple current-week highlighter -->
   <script>
-    // Append starter code link to project items by text match (no other changes)
-    document.addEventListener('DOMContentLoaded', function () {
-      const STARTER_URL = 'https://codehs.com/sandbox/lavenderyak4416/java-main-2';
-      const PROJECT_KEYWORDS = [
-        'Mad Lib', 'Madlib',
-        'FizzBuzz', 'Fizz Buzz',
-        'Stick Game',
-        'Card Shuffler', 'Shuffle and Deal',
-        'Battleship',
-        'Tic Tac Toe',
-        'Picture Puzzle'
-      ];
+    (function () {
+      const summaries = Array.from(document.querySelectorAll('.container details summary'));
+      if (!summaries.length) return;
 
-      const items = document.querySelectorAll('li');
-      items.forEach(li => {
-        const text = (li.textContent || '').trim().toLowerCase();
-        if (!text) return;
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
 
-        const isProject = PROJECT_KEYWORDS.some(k => text.includes(k.toLowerCase()));
-        const alreadyHasLink =
-          li.querySelector('a[data-starter-code]') ||
-          li.querySelector(`a[href^="${STARTER_URL}"]`);
+      // Infer academic start year (if today before July, assume year started previous August)
+      const academicStartYear = (today.getMonth() < 6) ? today.getFullYear() - 1 : today.getFullYear();
 
-        if (isProject && !alreadyHasLink) {
-          li.appendChild(document.createTextNode(' — '));
-          const a = document.createElement('a');
-          a.href = STARTER_URL;
-          a.target = '_blank';
-          a.rel = 'noopener noreferrer';
-          a.textContent = 'Starter Code';
-          a.setAttribute('data-starter-code', '');
-          li.appendChild(a);
+      const monthIdx = { Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5, Jul: 6, Aug: 7, Sep: 8, Oct: 9, Nov: 10, Dec: 11 };
+
+      function parseRange(text) {
+        // Week X: MonAbbr DD – (MonAbbr2 )? DD —
+        const m = text.match(/:\s+([A-Za-z]{3})\s+(\d{1,2})\s+[\u2013-]\s+([A-Za-z]{3})?\s*(\d{1,2})/);
+        if (!m) return null;
+        const sm = m[1]; const sd = parseInt(m[2], 10);
+        const em = m[3] ? m[3] : sm;
+        const ed = parseInt(m[4], 10);
+        const sMonth = monthIdx[sm]; const eMonth = monthIdx[em];
+        if (sMonth == null || eMonth == null) return null;
+
+        // Year logic: months Jul–Dec belong to academicStartYear, Jan–Jun next year
+        const sYear = (sMonth >= 7) ? academicStartYear : academicStartYear + 1;
+        const eYear = (eMonth >= 7) ? academicStartYear : academicStartYear + 1;
+
+        const start = new Date(sYear, sMonth, sd);
+        const end = new Date(eYear, eMonth, ed);
+        start.setHours(0, 0, 0, 0); end.setHours(23, 59, 59, 999);
+        return { start, end };
+      }
+
+      let currentDetail = null;
+      summaries.forEach(sum => {
+        const range = parseRange(sum.textContent);
+        if (!range) return;
+        if (today >= range.start && today <= range.end) {
+          currentDetail = sum.parentElement;
         }
+      });
+
+      if (!currentDetail) {
+        // pick next future else last past
+        let future = [];
+        let past = [];
+        summaries.forEach(sum => {
+          const r = parseRange(sum.textContent);
+          if (!r) return;
+          if (r.start > today) future.push({ el: sum.parentElement, start: r.start });
+          else past.push({ el: sum.parentElement, end: r.end });
+        });
+        future.sort((a, b) => a.start - b.start);
+        past.sort((a, b) => b.end - a.end);
+        if (future.length) currentDetail = future[0].el;
+        else if (past.length) currentDetail = past[0].el;
+      }
+
+      if (currentDetail) {
+        currentDetail.classList.add('current');
+        currentDetail.setAttribute('open', '');
+      }
+
+      const jumpBtn = document.getElementById('jumpCurrent');
+      if (jumpBtn) {
+        jumpBtn.addEventListener('click', () => {
+          if (currentDetail) {
+            currentDetail.classList.add('current');
+            currentDetail.setAttribute('open', '');
+            currentDetail.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        });
+      }
+    })();
+  </script>
+
+  <!-- Graded badges inline -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const gradedItems = [
+        "Eclipse Quiz", "Print Statements Quiz", "Primitive Data Types Quiz", "Short, Int and Long Quiz",
+        "Float, Double, Char & Boolean Quiz", "Getting Started in Java Quiz", "User Input Quiz",
+        "Module 2 Mad Lib Assignment", "Global Variables Quiz", "RockPaperScissors Quiz",
+        "Module 2 FizzBuzz Assignment", "Methods Quiz", "Do While Quiz", "Module 3 Guess My Number Assignment",
+        "Stick Game Quiz", "Computers Turn Quiz", "Module 3 Stick Game Assignment", "Card Shuffler Quiz",
+        "Shuffle and Deal Quiz", "Battleship Quiz", "Module 4 BattleShip Assignment", "TicTacToe Quiz",
+        "X & O Quiz", "Action Quiz", "Module 5 TicTacToe Assignment", "Picture Puzzle Quiz",
+        "Switching Pieces Quiz", "Module 6 PicturePuzzler Assignment", "Semester Exam",
+        "End of Course Survey", "Participation"
+      ].map(s => s.toLowerCase());
+
+      document.querySelectorAll('.topics li').forEach(li => {
+        const txt = li.textContent.trim().toLowerCase();
+        if (gradedItems.some(name => txt.includes(name))) {
+          li.innerHTML += ' <span class="graded-badge">Graded</span>';
+        }
+      });
+    });
+  </script>
+
+  <!-- Weekly graded panel -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const gradedByWeek = {
+        1: [
+          { name: "Getting Started in Java Quiz", type: "Assessment", key: "Key-LMS" },
+          { name: "Eclipse Quiz", type: "Assessment", key: "Key-LMS" },
+          { name: "Print Statements Quiz", type: "Assessment", key: "Key-LMS" }
+        ],
+        2: [
+          { name: "Primitive Data Types Quiz", type: "Assessment", key: "Key-LMS" },
+          { name: "Short, Int and Long Quiz", type: "Assessment", key: "Key-LMS" },
+          { name: "Float, Double, Char & Boolean Quiz", type: "Assessment", key: "Key-LMS" }
+        ],
+        3: [
+          { name: "User Input Quiz", type: "Assessment", key: "Key-LMS" }
+        ],
+        4: [
+          { name: "Module 2 Mad Lib Assignment", type: "Assignment", key: "Rubric" }
+        ],
+        5: [
+          { name: "Global Variables Quiz", type: "Assessment", key: "Key-LMS" },
+          { name: "RockPaperScissors Quiz", type: "Assessment", key: "Key-LMS" }
+        ],
+        6: [
+          { name: "Module 2 FizzBuzz Assignment", type: "Assignment", key: "Rubric" }
+        ],
+        7: [
+          { name: "Methods Quiz", type: "Assessment", key: "Key-LMS" },
+          { name: "Do While Quiz", type: "Assessment", key: "Key-LMS" }
+        ],
+        8: [
+          { name: "Module 3 Stick Game Assignment", type: "Assignment", key: "Rubric" }
+        ],
+        9: [
+          { name: "Computers Turn Quiz", type: "Assessment", key: "Key-LMS" },
+          { name: "Stick Game Quiz", type: "Assessment", key: "Key-LMS" },
+          { name: "Module 3 Guess My Number Assignment", type: "Assignment", key: "Rubric" }
+        ],
+        10: [
+          { name: "Card Shuffler Quiz", type: "Assessment", key: "Key-LMS" }
+        ],
+        11: [
+          { name: "Shuffle and Deal Quiz", type: "Assessment", key: "Key-LMS" }
+        ],
+        12: [
+          { name: "Battleship Quiz", type: "Assessment", key: "Key-LMS" },
+          { name: "Module 4 BattleShip Assignment", type: "Assignment", key: "Rubric" }
+        ],
+        14: [
+          { name: "TicTacToe Quiz", type: "Assessment", key: "Key-LMS" }
+        ],
+        15: [
+          { name: "X & O Quiz", type: "Assessment", key: "Key-LMS" },
+          { name: "Module 5 TicTacToe Assignment", type: "Assignment", key: "Rubric" }
+        ],
+        16: [
+          { name: "Action Quiz", type: "Assessment", key: "Key-LMS" }
+        ],
+        17: [
+          { name: "Picture Puzzle Quiz", type: "Assessment", key: "Key-LMS" }
+        ],
+        18: [
+          { name: "Switching Pieces Quiz", type: "Assessment", key: "Key-LMS" },
+          { name: "Module 6 PicturePuzzler Assignment", type: "Assignment", key: "Rubric" }
+        ],
+        21: [
+          { name: "Semester Exam", type: "Assessment", key: "Key-LMS" },
+          { name: "End of Course Survey", type: "Survey", key: "Rubric" },
+          { name: "Participation", type: "Assignment", key: "Rubric" }
+        ]
+      };
+
+      function pill(type) { return `<span class="pill ${type.toLowerCase()}">${type}</span>`; }
+      function keyPill(k) {
+        if (!k) return '';
+        const cls = k.toLowerCase().includes('rubric') ? 'rubric' : 'key';
+        return `<span class="pill ${cls}">${k}</span>`;
+      }
+
+      document.querySelectorAll('.container details').forEach(det => {
+        const sum = det.querySelector('summary'); if (!sum) return;
+        const m = sum.textContent.match(/^Week\s+(\d+)/i); if (!m) return;
+        const week = parseInt(m[1], 10);
+        const items = gradedByWeek[week]; if (!items || !items.length) return;
+
+        const panel = document.createElement('div');
+        panel.className = 'graded-panel';
+        panel.innerHTML = `
+      <h4>Graded this week</h4>
+      <ul class="graded-list">
+        ${items.map(it => `<li>${it.name} ${pill(it.type)} ${keyPill(it.key)}</li>`).join('')}
+      </ul>
+    `;
+        const topics = det.querySelector('.topics') || det;
+        topics.appendChild(panel);
       });
     });
   </script>
