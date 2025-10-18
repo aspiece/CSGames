@@ -598,6 +598,37 @@
       });
     });
   </script>
+
+  <script>
+    (function () {
+      const STARTER_URL = 'https://codehs.com/sandbox/lavenderyak4416/java-main-2';
+      const KEYWORDS = [
+        'mad lib', 'madlib', 'fizzbuzz', 'fizz buzz',
+        'stick game', 'card shuffler', 'shuffle and deal',
+        'battleship', 'tic tac toe', 'tictactoe', 'picture puzzle'
+      ];
+
+      function isProjectItem(el) {
+        const t = (el.textContent || '').toLowerCase();
+        return t && (KEYWORDS.some(k => t.includes(k)) || /\b(project|assignment)\b/.test(t));
+      }
+      function addStarterLink(el) {
+        if (el.querySelector('a[data-starter-code]')) return;
+        const a = document.createElement('a');
+        a.href = STARTER_URL; a.target = '_blank'; a.rel = 'noopener noreferrer';
+        a.textContent = 'Starter Code'; a.setAttribute('data-starter-code', '');
+        el.appendChild(document.createTextNode(' — '));
+        el.appendChild(a);
+      }
+      function attach(root = document) {
+        root.querySelectorAll?.('li').forEach(li => { if (isProjectItem(li)) addStarterLink(li); });
+      }
+      document.addEventListener('DOMContentLoaded', () => {
+        attach();
+        new MutationObserver(() => attach()).observe(document.body, { childList: true, subtree: true });
+      });
+    })();
+  </script>
 </body>
 
 </html>
