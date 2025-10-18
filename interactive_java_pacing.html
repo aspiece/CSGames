@@ -602,30 +602,58 @@
   <script>
     (function () {
       const STARTER_URL = 'https://codehs.com/sandbox/lavenderyak4416/java-main-2';
-      const KEYWORDS = [
-        'mad lib', 'madlib', 'fizzbuzz', 'fizz buzz',
-        'stick game', 'card shuffler', 'shuffle and deal',
-        'battleship', 'tic tac toe', 'tictactoe', 'picture puzzle'
-      ];
 
-      function isProjectItem(el) {
-        const t = (el.textContent || '').toLowerCase();
-        return t && (KEYWORDS.some(k => t.includes(k)) || /\b(project|assignment)\b/.test(t));
-      }
-      function addStarterLink(el) {
-        if (el.querySelector('a[data-starter-code]')) return;
+      function addLink(li) {
+        // Avoid duplicates
+        if (li.querySelector('a[data-starter-code]')) return;
+        if (li.querySelector(`a[href="${STARTER_URL}"]`)) return;
+
+        li.appendChild(document.createTextNode(' — '));
         const a = document.createElement('a');
-        a.href = STARTER_URL; a.target = '_blank'; a.rel = 'noopener noreferrer';
-        a.textContent = 'Starter Code'; a.setAttribute('data-starter-code', '');
-        el.appendChild(document.createTextNode(' — '));
-        el.appendChild(a);
+        a.href = STARTER_URL;
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        a.textContent = 'Starter Code';
+        a.setAttribute('data-starter-code', '');
+        li.appendChild(a);
       }
-      function attach(root = document) {
-        root.querySelectorAll?.('li').forEach(li => { if (isProjectItem(li)) addStarterLink(li); });
+
+      function removeExistingLinks(root = document) {
+        root.querySelectorAll(`a[data-starter-code], a[href="${STARTER_URL}"]`).forEach(a => {
+          const prev = a.previousSibling;
+          if (prev && prev.nodeType === Node.TEXT_NODE) {
+            // Trim trailing separators like " — "
+            prev.textContent = prev.textContent.replace(/\s*[–—-]\s*$/, '');
+            if (!prev.textContent.trim()) prev.remove();
+          }
+          a.remove();
+        });
       }
+
+      function apply(root = document) {
+        // Only include links for graded items whose text starts with "Module"
+        // Targets the graded panel list if present: .graded-panel .graded-list li
+        const lis = root.querySelectorAll('.graded-panel .graded-list li');
+        lis.forEach(li => {
+          const text = (li.textContent || '').trim();
+          if (/^module\b/i.test(text)) addLink(li);
+        });
+      }
+
+      // Run now and on future DOM changes (if graded panel is created dynamically)
+      function run() {
+        removeExistingLinks();
+        apply();
+      }
+
       document.addEventListener('DOMContentLoaded', () => {
-        attach();
-        new MutationObserver(() => attach()).observe(document.body, { childList: true, subtree: true });
+        run();
+        const mo = new MutationObserver((muts) => {
+          for (const m of muts) {
+            if (m.addedNodes && m.addedNodes.length) { run(); break; }
+          }
+        });
+        mo.observe(document.body, { childList: true, subtree: true });
       });
     })();
   </script>
