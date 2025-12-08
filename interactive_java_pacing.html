@@ -601,14 +601,25 @@
 
   <script>
     (function () {
-      const STARTER_URL = 'https://codehs.com/sandbox/lavenderyak4416/java-main-2';
+      const DEFAULT_STARTER_URL = 'https://codehs.com/sandbox/lavenderyak4416/java-main-2';
+      const SPECIAL_STARTER = [
+        { match: /\btic\s*-?\s*tac\s*-?\s*toe\b|tictactoe/i, url: 'https://codehs.com/sandbox/lavenderyak4416/java-swing' }
+      ];
+      const ALL_URLS = [DEFAULT_STARTER_URL, ...SPECIAL_STARTER.map(s => s.url)];
 
-      function addLink(li) {
+      function findUrlForText(text) {
+        for (const s of SPECIAL_STARTER) {
+          if (s.match.test(text)) return s.url;
+        }
+        return DEFAULT_STARTER_URL;
+      }
+
+      function addLink(li, url) {
         if (li.querySelector('a[data-starter-code]')) return;
-        if (li.querySelector(`a[href="${STARTER_URL}"]`)) return;
+        if (li.querySelector(`a[href="${url}"]`)) return;
         li.appendChild(document.createTextNode(' — '));
         const a = document.createElement('a');
-        a.href = STARTER_URL;
+        a.href = url;
         a.target = '_blank';
         a.rel = 'noopener noreferrer';
         a.textContent = 'Starter Code';
@@ -617,7 +628,8 @@
       }
 
       function removeLink(li) {
-        const a = li.querySelector(`a[data-starter-code], a[href="${STARTER_URL}"]`);
+        const selector = ['a[data-starter-code]', ...ALL_URLS.map(u => `a[href="${u}"]`)].join(', ');
+        const a = li.querySelector(selector);
         if (!a) return;
         const prev = a.previousSibling;
         if (prev && prev.nodeType === Node.TEXT_NODE) {
@@ -630,10 +642,16 @@
       function apply(root = document) {
         const items = root.querySelectorAll('.graded-panel .graded-list li');
         items.forEach(li => {
-          const text = (li.textContent || '').trim();
+          // remove any appended "— Starter Code" for matching logic then test
+          const raw = li.textContent || '';
+          const text = raw.replace(/\u2013|\u2014|—|–/g, '-').replace(/\s*-\s*Starter Code\s*$/i, '').trim();
           const isModule = /^module\b/i.test(text);
-          if (isModule) addLink(li);
-          else removeLink(li);
+          if (!isModule) {
+            removeLink(li);
+            return;
+          }
+          const url = findUrlForText(text);
+          addLink(li, url);
         });
       }
 
