@@ -314,7 +314,7 @@
     // Render as soon as signups arrive
     signupsP.then(renderGrid).catch(err => {
       console.error(err);
-      setError('Could not load signups. If you opened this file directly, try hosting it or check the Apps Script deployment and permissions.');
+      setError('⚠️ Cannot load signups. If you\'re using a school Google account in Chrome, try: (1) Open Chrome Settings → Switch to a personal profile or sign out of your school account, (2) Use a different browser, or (3) Use Incognito mode with a personal account.');
       renderGrid([]);
     });
 
@@ -370,7 +370,7 @@
         }
       } catch (e) {
         console.error(e);
-        setError('Signup failed. Please verify the Apps Script web app is deployed to "Anyone" and supports this action.');
+        setError('⚠️ Signup failed. If you\'re using a school Google account, it may be blocking this page. Try: opening in Incognito mode, switching to a personal Chrome profile, or using a different browser.');
         alert("Could not submit your signup. Please try again.");
       } finally {
         btn?.classList.remove('loading');
