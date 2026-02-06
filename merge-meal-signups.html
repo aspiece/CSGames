@@ -172,36 +172,6 @@
       margin-top: 6px
     }
 
-    .connectivity {
-      margin-top: 8px;
-      padding: 10px 12px;
-      border: 1px dashed var(--border);
-      border-radius: 10px;
-      background: var(--surface)
-    }
-
-    .connectivity ul {
-      list-style: none;
-      padding: 0;
-      margin: 6px 0 0
-    }
-
-    .connectivity li {
-      display: flex;
-      justify-content: space-between;
-      gap: 8px
-    }
-
-    .status-ok {
-      color: #15803d;
-      font-weight: 700
-    }
-
-    .status-fail {
-      color: #b91c1c;
-      font-weight: 700
-    }
-
     footer {
       margin: 28px 0;
       color: var(--muted);
@@ -267,7 +237,6 @@
       <div class="h-title">MERGE Youth Group — Sunday Meal Sign-Ups</div>
       <div id="err" class="err"></div>
       <div id="debug" class="meta"></div>
-      <div id="connectivity" class="meta connectivity" aria-live="polite"></div>
     </header>
 
     <section id="grid" class="grid">
@@ -291,7 +260,6 @@
   </main>
 
   <script>
-    const CONNECTION_TIMEOUT_MS = 6000;
     function cardHTML(d, takenName) {
       const iso = d.iso;
       const nice = d.nice;
@@ -343,66 +311,12 @@
       if (dbg) dbg.textContent = 'Loaded ' + (signups ? signups.length : 0) + ' signup(s) • Starting from ' + nextSunday.toLocaleDateString() + ' • ' + new Date().toLocaleTimeString();
     }
 
-    function testJsonp(base) {
-      return new Promise((resolve) => {
-        const timer = setTimeout(() => {
-          resolve({ ok: false, reason: 'timeout' });
-        }, CONNECTION_TIMEOUT_MS);
-        jsonp(base + '?action=list')
-          .then(() => {
-            clearTimeout(timer);
-            resolve({ ok: true });
-          })
-          .catch((err) => {
-            clearTimeout(timer);
-            resolve({ ok: false, reason: err && err.message ? err.message : 'error' });
-          });
-      });
-    }
-
-    async function testConnectivity() {
-      const wrap = document.getElementById('connectivity');
-      if (!wrap) return;
-      wrap.textContent = 'Connectivity test: running...';
-
-      const results = [];
-      for (const base of SCRIPT_URLS) {
-        const host = new URL(base).hostname;
-        const result = await testJsonp(base);
-        results.push({ host, ok: result.ok, reason: result.reason });
-      }
-
-      const list = document.createElement('ul');
-      results.forEach((r) => {
-        const li = document.createElement('li');
-        const left = document.createElement('span');
-        const right = document.createElement('span');
-        left.textContent = r.host;
-        if (r.ok) {
-          right.textContent = 'OK';
-          right.className = 'status-ok';
-        } else {
-          right.textContent = 'BLOCKED';
-          right.className = 'status-fail';
-          right.title = r.reason || '';
-        }
-        li.appendChild(left);
-        li.appendChild(right);
-        list.appendChild(li);
-      });
-
-      wrap.textContent = 'Connectivity test results:';
-      wrap.appendChild(list);
-    }
-
     // Render as soon as signups arrive
     signupsP.then(renderGrid).catch(err => {
       console.error(err);
       setError('Could not load signups. If you opened this file directly, try hosting it or check the Apps Script deployment and permissions.');
       renderGrid([]);
     });
-
-    testConnectivity();
 
     async function submitSignup(form) {
       try {
