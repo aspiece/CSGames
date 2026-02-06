@@ -273,6 +273,11 @@
   `;
     }
 
+    function setError(msg) {
+      const err = document.getElementById('err');
+      if (err) err.textContent = msg || '';
+    }
+
     function renderGrid(signups) {
       const byDate = new Map((signups || []).map(r => [String(r.date_iso).slice(0, 10), r.name]));
       // Find upcoming Sunday (including today if today is Sunday)
@@ -299,8 +304,26 @@
     // Render as soon as signups arrive
     signupsP.then(renderGrid).catch(err => {
       console.error(err);
+      setError('Could not load signups. If you opened this file directly, try hosting it or check the Apps Script deployment and permissions.');
       renderGrid([]);
     });
+
+    async function submitSignup(form) {
+      try {
+        const res = await fetch(SCRIPT_URL, { method: 'POST', body: form, mode: 'cors' });
+        if (res.ok || res.type === 'opaque') return true;
+      } catch (_) {
+        // Fall through to JSONP fallback.
+      }
+
+      const qs = new URLSearchParams(form);
+      const url = SCRIPT_URL + '?' + qs.toString();
+      const result = await jsonp(url);
+      if (result && result.ok === false) {
+        throw new Error(result.message || 'Signup failed');
+      }
+      return true;
+    }
 
     async function signup(iso, nice) {
       const input = document.querySelector(`[data-input-for="${iso}"]`);
@@ -308,14 +331,15 @@
       const name = (input?.value || '').trim();
       if (!name) { alert("Please enter your name."); input?.focus(); return; }
       btn?.classList.add('loading');
+      setError('');
       try {
         const form = new URLSearchParams();
         form.set('action', 'signup');
         form.set('date_iso', iso);
         form.set('date_nice', nice);
         form.set('name', name);
-        const res = await fetch(SCRIPT_URL, { method: 'POST', body: form });
-        if (res.ok) {
+        const ok = await submitSignup(form);
+        if (ok) {
           // Hot-update card
           const card = document.querySelector(`[data-iso="${iso}"]`);
           if (card) {
@@ -336,6 +360,7 @@
         }
       } catch (e) {
         console.error(e);
+        setError('Signup failed. Please verify the Apps Script web app is deployed to "Anyone" and supports this action.');
         alert("Could not submit your signup. Please try again.");
       } finally {
         btn?.classList.remove('loading');
