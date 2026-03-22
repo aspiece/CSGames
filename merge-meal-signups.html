@@ -225,7 +225,20 @@
     }
 
     const signupsP = jsonpAny("?action=list");
-    const DATES = [{ iso: "2025-09-07", nice: "Sunday, September 7, 2025" }, { iso: "2025-09-14", nice: "Sunday, September 14, 2025" }, { iso: "2025-09-21", nice: "Sunday, September 21, 2025" }, { iso: "2025-09-28", nice: "Sunday, September 28, 2025" }, { iso: "2025-10-05", nice: "Sunday, October 5, 2025" }, { iso: "2025-10-12", nice: "Sunday, October 12, 2025" }, { iso: "2025-10-19", nice: "Sunday, October 19, 2025" }, { iso: "2025-10-26", nice: "Sunday, October 26, 2025" }, { iso: "2025-11-02", nice: "Sunday, November 2, 2025" }, { iso: "2025-11-09", nice: "Sunday, November 9, 2025" }, { iso: "2025-11-16", nice: "Sunday, November 16, 2025" }, { iso: "2025-11-23", nice: "Sunday, November 23, 2025" }, { iso: "2025-11-30", nice: "Sunday, November 30, 2025" }, { iso: "2025-12-07", nice: "Sunday, December 7, 2025" }, { iso: "2025-12-14", nice: "Sunday, December 14, 2025" }, { iso: "2025-12-21", nice: "Sunday, December 21, 2025" }, { iso: "2025-12-28", nice: "Sunday, December 28, 2025" }, { iso: "2026-01-04", nice: "Sunday, January 4, 2026" }, { iso: "2026-01-11", nice: "Sunday, January 11, 2026" }, { iso: "2026-01-18", nice: "Sunday, January 18, 2026" }, { iso: "2026-01-25", nice: "Sunday, January 25, 2026" }, { iso: "2026-02-01", nice: "Sunday, February 1, 2026" }, { iso: "2026-02-08", nice: "Sunday, February 8, 2026" }, { iso: "2026-02-15", nice: "Sunday, February 15, 2026" }, { iso: "2026-02-22", nice: "Sunday, February 22, 2026" }, { iso: "2026-03-01", nice: "Sunday, March 1, 2026" }, { iso: "2026-03-08", nice: "Sunday, March 8, 2026" }, { iso: "2026-03-15", nice: "Sunday, March 15, 2026" }, { iso: "2026-03-22", nice: "Sunday, March 22, 2026" }, { iso: "2026-03-29", nice: "Sunday, March 29, 2026" }, { iso: "2026-04-05", nice: "Sunday, April 5, 2026" }, { iso: "2026-04-12", nice: "Sunday, April 12, 2026" }, { iso: "2026-04-19", nice: "Sunday, April 19, 2026" }, { iso: "2026-04-26", nice: "Sunday, April 26, 2026" }, { iso: "2026-05-03", nice: "Sunday, May 3, 2026" }, { iso: "2026-05-10", nice: "Sunday, May 10, 2026" }, { iso: "2026-05-17", nice: "Sunday, May 17, 2026" }, { iso: "2026-05-24", nice: "Sunday, May 24, 2026" }, { iso: "2026-05-31", nice: "Sunday, May 31, 2026" }];
+    // Dynamically generate all Sundays from 2025-09-07 to 2026-12-27
+    const DATES = (() => {
+      const start = new Date("2025-09-07T00:00:00");
+      const end = new Date("2026-12-27T00:00:00");
+      const arr = [];
+      let d = new Date(start);
+      while (d <= end) {
+        const iso = d.toISOString().slice(0, 10);
+        const nice = d.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+        arr.push({ iso, nice });
+        d.setDate(d.getDate() + 7);
+      }
+      return arr;
+    })();
   </script>
 
 </head>
